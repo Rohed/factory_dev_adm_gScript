@@ -1617,11 +1617,15 @@ html+=' </div></div></td>';
 html+='<td>'+data[i].mixing_status+'</td><td>'+formatDateDisplay(data[i].orderdate)+'</td><td>'+data[i].batch+'</td>';
 if(data[i].machineP){
 var machinePDisp='';
-machines.map(function(item){
-if(item.sku==data[i].machineP){
-machinePDisp=item.name;
+
+for(var m=0;m<machines.length;m++){
+if(data[i].machineP==machines[m].sku){
+machinePDisp=machines[m].name;
+break;
 }
-});
+}
+    
+      
 
 html += '<td>' + machinePDisp + '</td>';
 }else{

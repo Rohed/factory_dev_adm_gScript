@@ -885,16 +885,16 @@ edit_flavour_mix_order=true;
 
     function buildOrders(data) {
     
-        var machinesHTML='<option></option>';
+    var machinesHTML='<option></option>';
     google.script.run.withSuccessHandler(buildMachinesOptions).getMachines();
     function buildMachinesOptions(rett){
-    var machines=rett[0];
-    
-    
-    for(var i=0;i<machines.length;i++){
-    machinesHTML+='<option sku="'+machines[i].sku+'" value="'+machines[i].sku+'">'+machines[i].name+'</option>';
-    }
-  
+      var machines=rett[0];
+      
+      
+      for(var i=0;i<machines.length;i++){
+      machinesHTML+='<option sku="'+machines[i].sku+'" value="'+machines[i].sku+'">'+machines[i].name+'</option>';
+      }
+      
     
     var takefrom=0;
         console.log(data);
@@ -1857,8 +1857,8 @@ google.script.run.withSuccessHandler(updateMachine).changeFactory(mixbatch,facto
     }
 
     function buildProductionTable(data) {
-          google.script.run.withSuccessHandler(buildMachinesOptions).getMachines();
-    function buildMachinesOptions(rett){
+     google.script.run.withSuccessHandler(buildMachinesOptions2).getMachines();
+    function buildMachinesOptions2(rett){
     var machines=rett[0];
     
         var html = '';
@@ -1926,17 +1926,19 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
             html += '<td>' + data[i].mixing_status + '</td><td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + data[i].batch + '</td><td>' + data[i].orderID + '</td><td>' + data[i].productcode + '</td><td>' + data[i].productdescription + '</td><td>' + data[i].mixbatch + '</td><td>' + data[i].priority + '</td><td>' + data[i].customer + '</td><td>' + data[i].brand + '</td><td>' + data[i].recipe.name + '</td>';
             html += '<td>' + data[i].flavour.name + '</td><td>' + data[i].bottles + '</td><td>' + data[i].btype + '</td><td>' + data[i].lid + '</td><td>' + data[i].packagingType.name + '</td><td>'+formatDateDisplay2(data[i].starttime)+'</td><td>' + formatDateDisplay2(data[i].CompletionDate) + '</td>';
              html += '<td>' + data[i].Completed + '</td><td>' + data[i].Location + '</td>';
-            
+             var machinePDisp='';
              if(data[i].machineP){
-              machines.map(function(item){
-                if(data[i].machineP==item.sku){
-                data[i].machineP=item.name;
-                break;
-                }
-              });
-    
-            }
-            html += ' <td>' + data[i].machineP + '</td></tr>';
+             
+             
+             for(var m=0;m<machines.length;m++){
+             if(data[i].machineP==machines[m].sku){
+             machinePDisp=machines[m].name;
+             break;
+             }
+             }
+             
+             }
+            html += ' <td>' + machinePDisp + '</td></tr>';
             bottlesTotal+=parseInt(data[i].bottles,10);
             
             }
