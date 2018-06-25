@@ -71,7 +71,6 @@
                   <button type="button" id='getOrderIDs' class="btn btn-info btn-lg" data-toggle="modal" data-target="#xeroModal">Print Xero</button>
                   <button type="button" id='getOrderIDs2' class="btn btn-info btn-lg" data-toggle="modal" data-target="#statusModal">Check Order Status</button>
                   <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#priorityModal" id='priorityButton'>Set Order Priorities</button>
-                  <button class="btn btn-info btn-lg" type="button"  id='saveSchedule'>Save Schedule</button> 
                   <button class="btn btn-info btn-lg" type="button" id='scheduleManage'>Manage Schedules</button>
                   <button type='button' id='savepoint' class="btn btn-info btn-lg"><i class="fa fa-floppy-o fa-3x" aria-hidden="true"></i></button>
                   <button type='button' style='display:none;' id='restorepoint' class="btn btn-info btn-lg"><i class="fa fa-undo fa-3x" aria-hidden="true"></i></button>
@@ -222,13 +221,14 @@
       </div>
       <div id="tab3" class="tab">
          <nav class="navbar navbar-default" role="navigation">
-            <ul class="nav navbar-nav navbar">
+            <ul class="nav navbar-nav navbar" style="margin-right: 100px;">
                <li class="nav-item">
                   <h2>Production - V1.0</h2>
                </li>
                <li>
                   <button type="button" id='deleteDisplayedOrders' onclick="deleteAll()">Delete Displayed</button>
                </li>
+               <li><button class="btn btn-info btn-lg" type="button"  id='saveSchedule' style="margin: 20px 0;">Save Schedule</button> </li>
                <li class="nav-item">
                   <div>
                      <div id='selectionProduction'>

@@ -42,8 +42,8 @@ function saveSchedule(dataPaginated, obj) {
       'dataPaginated':JSON.stringify(dataPaginated),
       'obj':JSON.stringify(obj),
     };
-//    base.updateData('schedulingpayload/payload',payload);
-//    return;
+    base.updateData('schedulingpayload/payload',payload);
+    return;
 
     var params={
       method:"POST",
@@ -168,90 +168,128 @@ function insertNewSchedule(dataPaginated, obj){
   return msg;
 }
 function testSAVESCHEDYLEANDMOVE() {
-    base.removeData('Schedules');
-    base.removeData('Schedules Reference');
-    var para = ['00010274'];
+//    base.removeData('Schedules');
+//    base.removeData('Schedules Reference');
+    var para = ['00010646','00010684','00010530','00010545','00010546','00010549','00010604','00010612','00010622','00010644','00010645','00010681','00010666','00010677'];
+    var para = ['00010545','00010546','00010549','00010604','00010612'];
+    var para = ['00010677'];
+//    var para = ['00010519'];
     var ids = [];
     for (var i = 0; i < para.length; i++) {
         var searcharr = [];
         var params = {
             orderBy: ['final_status'],
-            equalTo: "Not Run",
+            equalTo: "started",
 
         }
-        searcharr.push(['Orders', params]);
+        searcharr.push(['Production', params]);
         var params = {
             orderBy: ['word'],
             equalTo: para[i],
 
         }
-        searcharr.push(['Orders', params]);
+        searcharr.push(['Production', params]);
 
 
 
         var data = searchFor(searcharr)[1];
         var obj = {
-            name: 'TestNAME',
+            name: para[i],
             type: 'automatic',
             entryDate: (new Date()).getTime(),
         }
         obj.date = new Date();
         obj.date = obj.date.setUTCHours(0,0,0,0);
-        Utilities.sleep(5000);
+      
         //  obj.time=180;
         ids.push(obj.entryDate.toString());
 
-       saveSchedule([data], obj);
-return;
+
+      obj.id=obj.entryDate;
+      var payload={ 
+        'dataPaginated':JSON.stringify([data]),
+        'obj':JSON.stringify(obj),
+      };
+
+      var params={
+        method:"POST",
+        "Content-Type":'application/json',
+        muteHttpExceptions :true,
+        'payload':payload,
+      }
+      var url='http://212.69.229.10:4000/'+NODE_PATH+'/saveschedulepath';
+       var response=UrlFetchApp.fetch(url, params).getContentText();
+     Utilities.sleep(5000);
+       //saveSchedule(, obj);
+
     }
 
-    var oldItem = base.getData('Schedules Reference/' + ids[0]);
-    var newItem = base.getData('Schedules Reference/' + ids[0]);
-    newItem.date = 1524088800000;
-    newItem.time = 0;
-    updateSchedulesFor(newItem, oldItem)
+//    var oldItem = base.getData('Schedules Reference/' + ids[0]);
+//    var newItem = base.getData('Schedules Reference/' + ids[0]);
+//    newItem.date = 1524088800000;
+//    newItem.time = 0;
+//    updateSchedulesFor(newItem, oldItem)
 
 }
+function testslice(){
+var data=[2,3,5]
+data.splice(1,1);
+Logger.log(data);
+
+
+}
+
 function JUSTSAVESCHEDULE(){
 
-
+var name = '00010519';
+//    var para = ['00010646','00010684','00010530','00010545','00010546','00010549','00010604','00010612','00010622','00010644',
+//'00010645','00010681','00010666','00010677'];
+// spec 00010512
  var searcharr = [];
         var params = {
             orderBy: ['final_status'],
-            equalTo: "Busy",
+            equalTo: "started",
 
         }
-        searcharr.push(['Orders', params]);
+        searcharr.push(['Production', params]);
         var params = {
             orderBy: ['word'],
-            equalTo: '00000803',
+            equalTo: name,
 
         }
-        searcharr.push(['Orders', params]);
+        searcharr.push(['Production', params]);
 
 
 
         var data = searchFor(searcharr)[1];
         var obj = {
-            name: '00000803',
+            name: name,
             type: 'automatic',
             entryDate: (new Date()).getTime(),
         }
         obj.date = new Date();
         obj.date = obj.date.setUTCHours(0,0,0,0);
     
-        var params={
-        method:"POST",
-        muteHttpExceptions :true,
-          payload:{ 
-           
-              obj:obj,
-              dataPaginated:[data],
-          }
-        }
-        var url='https://us-central1-testing-gbvco-factory-app.cloudfunctions.net/createSchedules';
-        var resp=UrlFetchApp.fetch(url, params);
-        Logger.log(resp);
+//        var params={
+//        method:"POST",
+//        muteHttpExceptions :true,
+//          payload:{ 
+//           
+//              obj:obj,
+//              dataPaginated:[data],
+//          }
+//        }
+//        
+    obj.id=obj.entryDate;
+    var payload={ 
+      'dataPaginated':JSON.stringify([data]),
+      'obj':JSON.stringify(obj),
+    };
+  base.updateData('schedulingpayload/payload',payload);
+    return;
+//        var url='https://us-central1-testing-gbvco-factory-app.cloudfunctions.net/createSchedules';
+//        var resp=UrlFetchApp.fetch(url, params);
+//        Logger.log(resp);
 
 }
 //function saveSchedule2(dataPaginated, obj) {
@@ -954,7 +992,7 @@ function getScheduleData(id, page) {
 }
 function TESTGETDATANEAREST(){
 
-getScheduleDataNearest('Orders');
+getScheduleDataNearest('Production');
 }
 function getScheduleDataNearest(page) {
     var now = new Date();
@@ -1543,7 +1581,7 @@ function getToPrint(arr) {
     return [a, b];
 }
 function getTodaySchedule(){
-  var orders=base.getData('Orders');
+  var orders=base.getData('Production');
   var arr=[];
   var existingTimes = [];
   for (var i = 0; i <288; i++) {
@@ -1592,7 +1630,7 @@ function getTodaySchedule(){
    return [arr,botandbatchLarge];
 }
 function getFromToSchedule(from,to){
-  var orders=base.getData('Orders');
+  var orders=base.getData('Production');
   var arr=[];
   var existingTimes = [];
   for (var i = 0; i <288; i++) {
@@ -1647,7 +1685,7 @@ function getSelectedSchedules(selected){
     existingTimes.push(i * 5);
   }
   //sortSchedulesArr
-  var orders=base.getData('Orders');
+  var orders=base.getData('Production');
   var schedules=base.getData('Schedules');
   for(var s=0;s<selected.length;s++){
     var item=base.getData('Schedules Reference/'+selected[s]);
