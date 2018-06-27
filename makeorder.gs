@@ -337,9 +337,9 @@ function runItem(batch,frombulk) {
       if(LOGDATA.data[LOGDATA.data.length-1][0]=='WENT NEGATIVE'){
        
         if(frombulk){
-        logItem(LOGDATA);
+       
                   var msg =  'MISSING: '+LOGDATA.data[LOGDATA.data.length-1][1];
-
+           logItem(LOGDATA);
           return ['BREAK',msg];
 
           

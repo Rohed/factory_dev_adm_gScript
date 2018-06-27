@@ -1595,29 +1595,29 @@ function checkStockValues(BATCHES) {
     for (var i = 0; i < flavoursArr.length; i++) {
         var running = base.getData('Flavours/' + flavoursArr[i][0]);
         FlavMSG += running.name+' '+ flavoursArr[i][0] + ":  -   Will Use: " + flavoursArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + flavoursArr[i][2] + " - Required: " + flavoursArr[i][3] +'<br>';
-        logDATA.push([flavoursArr[i][0], flavoursArr[i][1], running.Running, flavoursArr[i][2], flavoursArr[i][3]]);
+        logDATA.push([running.name+' '+flavoursArr[i][0], flavoursArr[i][1], running.Running, flavoursArr[i][2], flavoursArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
      logDATA.push(['Colors', '', '', '', '']);
     for (var i = 0; i < colorsArr.length; i++) {
         var running = base.getData('Color/' + colorsArr[i][0]);
         ColorMSG += running.name+' '+ colorsArr[i][0] + ":  -   Will Use: " + colorsArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + colorsArr[i][2] + " - Required: " + colorsArr[i][3] +'<br>';
-        logDATA.push([colorsArr[i][0], colorsArr[i][1], running.Running, colorsArr[i][2], colorsArr[i][3]]);
+        logDATA.push([running.name+' '+colorsArr[i][0], colorsArr[i][1], running.Running, colorsArr[i][2], colorsArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Bottles', '', '', '', '']);
     for (var i = 0; i < BottlesArr.length; i++) {
-        var running = base.getData('BottleTypes/' + BottlesArr[i][0] + '/Running');
-        BottleMSG += BottlesArr[i][0] + ":  -   Will Use: " + BottlesArr[i][1] + " - Available: " + running + ' -  Missing: ' + BottlesArr[i][2] + " - Required: " + BottlesArr[i][3] + '<br>';
-        logDATA.push([BottlesArr[i][0], BottlesArr[i][1], running, BottlesArr[i][2], BottlesArr[i][3]]);
+        var running = base.getData('BottleTypes/' + BottlesArr[i][0] );
+        BottleMSG += running.name+' '+BottlesArr[i][0] + ":  -   Will Use: " + BottlesArr[i][1] + " - Available: " + running + ' -  Missing: ' + BottlesArr[i][2] + " - Required: " + BottlesArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+BottlesArr[i][0], BottlesArr[i][1], running.Running, BottlesArr[i][2], BottlesArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 
     logDATA.push(['Lids', '', '', '', '']);
     for (var i = 0; i < LidsArr.length; i++) {
-        var running = base.getData('Lids/' + LidsArr[i][0] + '/Running');
-        LidMSG += LidsArr[i][0] + ":  -   Will Use: " + LidsArr[i][1] + " - Available: " + running + ' -  Missing: ' + LidsArr[i][2] + " - Required: " + LidsArr[i][3] + '<br>';
-        logDATA.push([LidsArr[i][0], LidsArr[i][1], running, LidsArr[i][2], LidsArr[i][3]]);
+        var running = base.getData('Lids/' + LidsArr[i][0]);
+        LidMSG += running.name+' '+LidsArr[i][0] + ":  -   Will Use: " + LidsArr[i][1] + " - Available: " + running + ' -  Missing: ' + LidsArr[i][2] + " - Required: " + LidsArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+LidsArr[i][0], LidsArr[i][1], running.Running, LidsArr[i][2], LidsArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 
@@ -1652,24 +1652,24 @@ function checkStockValues(BATCHES) {
 
     logDATA.push(['Pack Types', '', '', '', '']);
     for (var i = 0; i < TubesArr.length; i++) {
-        var running = base.getData('Packages/' + TubesArr[i][0] + '/Running');
-        tubeMSG += TubesArr[i][0] + ":  -   Will Use: " + TubesArr[i][1] + " - Available: " + running + ' -  Missing: ' + TubesArr[i][2] + " - Required: " + TubesArr[i][3] + '<br>';
-        logDATA.push([TubesArr[i][0], TubesArr[i][1], running, TubesArr[i][2], TubesArr[i][3]]);
+        var running = base.getData('Packages/' + TubesArr[i][0] );
+        tubeMSG += running.name+' '+TubesArr[i][0] + ":  -   Will Use: " + TubesArr[i][1] + " - Available: " + running + ' -  Missing: ' + TubesArr[i][2] + " - Required: " + TubesArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+TubesArr[i][0], TubesArr[i][1], running.Running, TubesArr[i][2], TubesArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Boxes', '', '', '', '']);
     for (var i = 0; i < BoxArr.length; i++) {
-        var running = base.getData('Boxes/' + BoxArr[i][0] + '/Running');
+        var running = base.getData('Boxes/' + BoxArr[i][0] );
         BoxMSG += BoxArr[i][0] + ":  -   Will Use: " + BoxArr[i][1] + " - Available: " + running + ' -  Missing: ' + BoxArr[i][2] + " - Required: " + BoxArr[i][3] + '<br>';
-        logDATA.push([BoxArr[i][0], BoxArr[i][1], running, BoxArr[i][2], BoxArr[i][3]]);
+        logDATA.push([running.name+' '+BoxArr[i][0], BoxArr[i][1], running.Running, BoxArr[i][2], BoxArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 
     logDATA.push(['Labels', '', '', '', '']);
     for (var i = 0; i < LabelsArr.length; i++) {
-        var running = base.getData('Labels/' + LabelsArr[i][0] + '/Running');
-        LabelMSG += LabelsArr[i][0] + ":  -   Will Use: " + LabelsArr[i][1] + " - Available: " + running + ' -  Missing: ' + LabelsArr[i][2] + " - Required: " + LabelsArr[i][3] + '<br>';
-        logDATA.push([LabelsArr[i][0], LabelsArr[i][1], running, LabelsArr[i][2], LabelsArr[i][3]]);
+        var running = base.getData('Labels/' + LabelsArr[i][0]);
+        LabelMSG += running.name+' '+LabelsArr[i][0] + ":  -   Will Use: " + LabelsArr[i][1] + " - Available: " + running + ' -  Missing: ' + LabelsArr[i][2] + " - Required: " + LabelsArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+LabelsArr[i][0], LabelsArr[i][1], running.Running, LabelsArr[i][2], LabelsArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Ink', '', '', '', '']);
