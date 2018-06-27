@@ -250,9 +250,17 @@ function printOrdersBatches(SELECTED){
        }else{
          data[i].final_status =="Not Run"
        }
+       
+//        data.mixing_status = 0;
+//        data.production_status = 0;
+//        data.printing_status = 0;
+//        data.labeling_status = 0;
+//        data.packaging_status = 0;
+//        
+        
       values.push([formatDateDisplay(data[i].orderdate),data[i].batch,data[i].orderID,data[i].productcode,data[i].productdescription,data[i].customer,data[i].brand,data[i].recipe.name,data[i].flavour.name,
       data[i].bottles,data[i].btype,data[i].lid,data[i].packagingType.name,
-      data[i].mixing,data[i].premixed,data[i].unbranded,data[i].branded,data[i].backtubed, data[i].final_status]);
+      data[i].mixing,data[i].premixed,data[i].unbranded,data[i].branded,data[i].backtubed, data[i].final_status,data[i].mixing_status,data[i].production_status,data[i].printing_status,data[i].labeling_status,data[i].packaging_status]);
   }
   
   
