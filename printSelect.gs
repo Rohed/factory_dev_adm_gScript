@@ -235,8 +235,15 @@ function printOrdersBatches(SELECTED){
   
    if(!data[i].recipe){continue;}
       if(SELECTED.indexOf(data[i].batch)!=-1){
+      if(data[i].packagingType){
+        if(data[i].packagingType.name){
+        
+        }else{
+        data[i].packagingType.name = '';
+        }
+      }
       values.push([formatDateDisplay(data[i].orderdate),data[i].batch,data[i].orderID,data[i].productcode,data[i].productdescription,data[i].customer,data[i].brand,data[i].recipe.name,data[i].flavour.name,
-      data[i].bottles,data[i].btype,data[i].lid,data[i].packagingType,
+      data[i].bottles,data[i].btype,data[i].lid,data[i].packagingType.name,
       data[i].mixing,data[i].premixed,data[i].unbranded,data[i].branded,data[i].backtubed]);
   }
   
