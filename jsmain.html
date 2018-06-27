@@ -2433,7 +2433,7 @@ $('#rowsTotal'+thisPage).html(rowsTotal);
             
             }
             if(page=='Flavours'||page=='PremixesTypes'){
-            html += '<td>' + data[i].name + '</td><td>' + data[i].Running.toFixed(2) + '</td><td>' + data[i].Reserved.toFixed(2) + '</td><td>' + data[i].Completed.toFixed(2) + '</td>';
+            html += '<td>' + data[i].name + '</td><td>' + parseFloat(data[i].Running).toFixed(2) + '</td><td>' + parseFloat(data[i].Reserved).toFixed(2) + '</td><td>' + parseFloat(data[i].Completed).toFixed(2) + '</td>';
             }else{
             html += '<td>' + data[i].name + '</td><td>' + data[i].Running + '</td><td>' + data[i].Reserved + '</td><td>' + data[i].Completed + '</td>';
 
@@ -2442,7 +2442,7 @@ $('#rowsTotal'+thisPage).html(rowsTotal);
             html+='<td>' + data[i].Stock + '</td></tr>';
             }else{html+='<td>0</td></tr>';}
             
-        }catch(e){console.log(data[i]);}
+        }catch(e){console.log(data[i],e);}
         }
         html += '</tbody></table>';
         $("#updating").css("display", "none");
@@ -2472,9 +2472,11 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
       html += '<tr><td><h4>' + data.name + '</h4></td><td><tr>';
       if(page=='BrandedTypes'||page=='UnbrandedTypes'||page=='PremixesTypes'||page=='Packages'||page=='Labels'||page=='Boxes'||page=='Flavours'||page=='BottleTypes'||page=='Lids'||page=='Color'){
       html += '<tr><td><div class="input-group"><input type="text" id="qtyID" value ="' + data.sku + '" class="form-control" placeholder="' + data.sku + '" disabled aria-describedby="sizing-addon1"></div></td></tr>';
+      html += '<tr><td><div class="input-group"><input type="text" id="qtyname" value ="' + data.name + '" class="form-control" placeholder="' + data.name + '"  aria-describedby="sizing-addon1"></div></td></tr>';
       }else{
       
       html += '<tr><td><div class="input-group"><input type="text" id="qtyID" value ="' + data.name + '" class="form-control" placeholder="' + data.name + '" disabled aria-describedby="sizing-addon1"></div></td></tr>';
+      html += '<tr><td><div class="input-group"  style="display:none;" ><input type="text" id="qtyname" value ="' + data.name + '" class="form-control" placeholder="' + data.name + '" aria-describedby="sizing-addon1"></div></td></tr>';
       
       }
       html +='</table><table class="form_table">'
@@ -2489,6 +2491,7 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
         $('#Completed').val(data.Completed);
         $('#Running').val(data.Running);
         $('#Reserved').val(data.Reserved);
+        $('#qtyname').val(data.name);
 
 
     }
@@ -2505,11 +2508,12 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
         var Reserved = parseInt($('#Reserved').val(), 10);
         var Completed = parseInt($('#Completed').val(), 10);
         }
+        var name =  $('#qtyname').val();
         var obj = {
             Completed: Completed,
             Reserved: Reserved,
             Running: Running,
-
+            name:name,
 
         };
         console.log(obj);

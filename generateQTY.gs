@@ -254,7 +254,11 @@ var params={
 orderBy : ['name'],
 
 };
-var data=JSONtoARR(base.getData(page,params));
+var data=JSONtoARR(base.getData(page))
+for(var i=0;i<data.length;i++){
+ if(!data[i].name){ data[i].name="none"}
+}
+data=data.sort(sortSTRINGHL('name'));
 //data=data.sort(superSort1('name'));
 
 return [data,page];
