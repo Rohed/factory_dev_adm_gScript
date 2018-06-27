@@ -200,7 +200,8 @@ function saveOrder(data,edit) {
 }
 
 function bulkrun(arr,page) {
-   // arr = ['901155', '901576','901480'];
+//  arr = ['912126'];
+//  page = 'Orders';
     Logger.log(arr);
     var l = arr.length;
     if(page=='Orders'){

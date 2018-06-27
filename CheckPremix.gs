@@ -391,7 +391,7 @@ function returnData(data,neg) {
         base.removeData(sheets2[i] + '/' + data.batch);
 
     }
-    var name = base.getData(data.used[i][0] + data.used[i][1]+'/name');
+    var name = base.getData(data.used[data.used.length-1][0] + data.used[data.used.length-1][1]+'/name');
     LOGARR.push(['WENT NEGATIVE', Math.abs(neg)+ ' - '+ data.used[data.used.length-1][0] + data.used[data.used.length-1][1]+' - '+name ])
 
     return LOGARR;
@@ -403,7 +403,7 @@ function returnData2(data,neg) {
         fromReservedToRunning(data[i][0] + data[i][1], data[i][2]);
         LOGARR.push(['To Running: ' + data[i][0] + data[i][1], data[i][2]]);
     }
-       var name = base.getData(data.used[i][0] + data.used[i][1]+'/name');
+       var name = base.getData(data.used[data.used.length-1][0] + data.used[data.used.length-1][1]+'/name');
 
     LOGARR.push(['WENT NEGATIVE', Math.abs(neg)+' - '+ data.used[data.used.length-1][0] + data.used[data.used.length-1][1]+' - '+name])
 
