@@ -242,9 +242,17 @@ function printOrdersBatches(SELECTED){
         data[i].packagingType.name = '';
         }
       }
+       if(data[i].final_status == "started"){
+        data[i].final_status = "Started";
+       }else if(data[i].final_status == "Completed"){
+       data[i].final_status =="Completed"
+       
+       }else{
+         data[i].final_status =="Not Run"
+       }
       values.push([formatDateDisplay(data[i].orderdate),data[i].batch,data[i].orderID,data[i].productcode,data[i].productdescription,data[i].customer,data[i].brand,data[i].recipe.name,data[i].flavour.name,
       data[i].bottles,data[i].btype,data[i].lid,data[i].packagingType.name,
-      data[i].mixing,data[i].premixed,data[i].unbranded,data[i].branded,data[i].backtubed]);
+      data[i].mixing,data[i].premixed,data[i].unbranded,data[i].branded,data[i].backtubed, data[i].final_status]);
   }
   
   
