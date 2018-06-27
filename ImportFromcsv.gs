@@ -232,8 +232,13 @@ function saveFileCsv(data, name) {
                             productdescription: dataPC.descr,
 
                         };
-                        
-                            if(values[i][5].toLowerCase()=='y'){
+                        if(values[i][5]){
+                        values[i][5] = values[i][5].toLowerCase();
+                        }
+                          if(values[i][6]){
+                        values[i][6] = values[i][6].toLowerCase();
+                        }
+                            if(values[i][5]=='y'){
                             item.ppb=true;
                               item.botlabel = dataPC.ppbotlabel;
                               item.botlabelsku = dataPC.ppbotlabelsku;
@@ -242,7 +247,7 @@ function saveFileCsv(data, name) {
                               item.botlabel = dataPC.botlabel;
                               item.botlabelsku = dataPC.botlabelsku;
                             }
-                            if(values[i][6].toLowerCase()=='y'){
+                            if(values[i][6]=='y'){
                                 item.ppp=true;
                               item.packlabel = dataPC.pppacklabel;
                               item.packlabelsku = dataPC.pppacklabelsku;
