@@ -14,9 +14,9 @@ Reserved:orig2+value
 base.updateData(item,data1);
 base.updateData(item,data2);
 if(data1.Running>=0){
-return false;
+return 1;
 }else{
-return true;
+return data1.Running;
 }
 }
 

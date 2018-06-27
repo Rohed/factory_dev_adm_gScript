@@ -218,14 +218,14 @@ function bulkrun(arr,page) {
         
             var resp = runItem(arr[i],true);
           
-          if(resp=='BREAK'){
+          if(resp[0]=='BREAK'){
             var dat1 = {
               final_status: 0,
               runtime: 0,
               started: 0,
               wentNegative:true,
             };
-              msg += arr[i] + " - WENT TO NEGATIVE \n";
+              msg += arr[i] + " - "+resp[1]+" \n";
             base.updateData('Orders/' + arr[i], dat1);
             
             }
@@ -235,14 +235,14 @@ function bulkrun(arr,page) {
         
           var resp = runflavourmixItem(arr[i],true);
           
-          if(resp=='BREAK'){
+          if(resp[0]=='BREAK'){
             var dat1 = {
               final_status: 0,
               runtime: 0,
               started: 0,
               wentNegative:true,
             };
-            msg += arr[i] + " - WENT TO NEGATIVE \n";
+             msg += arr[i] + " - "+resp[1]+" \n";
             base.updateData('FlavourMixOrders/' + arr[i], dat1);
             
           }
@@ -258,7 +258,7 @@ function bulkrun(arr,page) {
 
 
 function testrun() {
-    runItem('904897POPO',false);
+    runItem('912091',false);
 
 }
 
@@ -335,9 +335,13 @@ function runItem(batch,frombulk) {
       LOGDATA.data = assignMixture2(data);
      
       if(LOGDATA.data[LOGDATA.data.length-1][0]=='WENT NEGATIVE'){
-       logItem(LOGDATA);
+       
         if(frombulk){
-          return 'BREAK'
+        logItem(LOGDATA);
+                  var msg =  'MISSING: '+LOGDATA.data[LOGDATA.data.length-1][1];
+
+          return ['BREAK',msg];
+
           
         }else{
           
@@ -349,8 +353,9 @@ function runItem(batch,frombulk) {
           };
           
           base.updateData('Orders/' +batch, dat1);
-          
-          return 'WENT TO NEGATIVE';
+          var msg =  'MISSING: '+LOGDATA.data[LOGDATA.data.length-1][1];
+          logItem(LOGDATA);
+          return msg;
         }
         
       }else{
@@ -1025,17 +1030,17 @@ function runflavourmixItem(batch,frombulk){
       LOGDATA.data.push(['Flavour:', flavours[i].val* data.stocking / 10]);
       var neg = fromRunningtoReserved('Flavours/' + flavours[i].sku, flavours[i].val * data.stocking / 10);
       
-      if (neg) {
-        LOGDATA.data = LOGDATA.data.concat(returnData2(used))
+      if (neg<0) {
+        LOGDATA.data = LOGDATA.data.concat(returnData2(used,neg))
         logItem(LOGDATA);
         if(frombulk){ 
-          return 'BREAK';
+          return ['BREAK','MISSING: '+LOGDATA.data[LOGDATA.data.length-1][1]];
         }else{
           data.wentNegative=true;
           data.started=0;
           data.final_status=0;
           base.updateData('FlavourMixOrders/' + batch,data);
-         return 'WENT TO NEGATIVE';
+         return 'MISSING: '+LOGDATA.data[LOGDATA.data.length-1][1] ;
         }
       }
       

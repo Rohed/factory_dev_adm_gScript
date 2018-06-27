@@ -10,8 +10,8 @@ function CheckPremixed(data) {
     data.used.push(['Color/', data.Color.sku, data.QTY*10*data.Color.val]);
     LOGARR.push(['Color:',data.QTY*10*data.Color.val]);
     var neg = fromRunningtoReserved('Color/' + data.Color.sku, data.QTY*10*data.Color.val);
-    if (neg) {
-      LOGARR = LOGARR.concat(returnData(data))
+    if (neg<0) {
+      LOGARR = LOGARR.concat(returnData(data,neg))
       return LOGARR;
     }
     toPremixColoring(data);
@@ -137,8 +137,8 @@ function CheckPremixed(data) {
       LOGARR.push(['Flavour:', data.flavvalue * data.QTY / 1000]);
       var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, data.flavvalue * data.QTY / 1000);
       
-      if (neg) {
-        LOGARR = LOGARR.concat(returnData(data))
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
         return LOGARR;
       }
       
@@ -148,8 +148,8 @@ function CheckPremixed(data) {
       data.used.push(['Misc/VG', '', data.VGval * data.QTY]);
       LOGARR.push(['VG:', data.VGval * data.QTY]);
       var neg = fromRunningtoReserved("Misc/VG", data.VGval * data.QTY);
-      if (neg) {
-        LOGARR = LOGARR.concat(returnData(data))
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
         return LOGARR;
       }
       
@@ -157,8 +157,8 @@ function CheckPremixed(data) {
       data.used.push(['Misc/PG', '', data.PGval * data.QTY]);
       LOGARR.push(['PG:', data.PGval * data.QTY]);
       var neg = fromRunningtoReserved("Misc/PG", data.PGval * data.QTY);
-      if (neg) {
-        LOGARR = LOGARR.concat(returnData(data))
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
         return LOGARR;
       }
       
@@ -168,8 +168,8 @@ function CheckPremixed(data) {
       data.used.push(['Misc/AG', '', data.AGval * data.QTY]);
       LOGARR.push(['AG:', data.AGval * data.QTY]);
       var neg = fromRunningtoReserved("Misc/AG", data.AGval * data.QTY);
-      if (neg) {
-        LOGARR = LOGARR.concat(returnData(data))
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
         return LOGARR;
       }
       
@@ -180,8 +180,8 @@ function CheckPremixed(data) {
       data.used.push(['Misc/MCT', '', data.MCTval * data.QTY]);
       LOGARR.push(['MCT:', data.MCTval * data.QTY]);
       var neg = fromRunningtoReserved("Misc/MCT", data.MCTval * data.QTY);
-      if (neg) {
-        LOGARR = LOGARR.concat(returnData(data))
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
         return LOGARR;
       }
       
@@ -189,8 +189,8 @@ function CheckPremixed(data) {
         data.used.push(['Misc/Nicotine', '', data.Nico * data.QTY]);
         LOGARR.push(['Nicotine:', data.Nico * data.QTY]);
         var neg = fromRunningtoReserved("Misc/Nicotine", data.Nico * data.QTY);
-        if (neg) {
-          LOGARR = LOGARR.concat(returnData(data))
+        if (neg<0) {
+          LOGARR = LOGARR.concat(returnData(data,neg))
           return LOGARR;
         }
         
@@ -200,8 +200,8 @@ function CheckPremixed(data) {
         data.used.push(['Misc/Nicotine Salts', '', data.Nicosalts * data.QTY]);
         LOGARR.push(['Nicotine Salts:', data.Nicosalts * data.QTY]);
         var neg = fromRunningtoReserved("Misc/Nicotine Salts", data.Nicosalts * data.QTY);
-        if (neg) {
-          LOGARR = LOGARR.concat(returnData(data))
+        if (neg<0) {
+          LOGARR = LOGARR.concat(returnData(data,neg))
           return LOGARR;
         }
         
@@ -210,8 +210,8 @@ function CheckPremixed(data) {
         data.used.push(['Misc/CBD', '', data.CBDvalue * data.QTY]);
         LOGARR.push(['CBD:', data.CBDvalue * data.QTY]);
         var neg = fromRunningtoReserved("Misc/CBD", data.CBDvalue * data.QTY);
-        if (neg) {
-          LOGARR = LOGARR.concat(returnData(data))
+        if (neg<0) {
+          LOGARR = LOGARR.concat(returnData(data,neg))
           return LOGARR;
         }
         
@@ -373,7 +373,7 @@ function checkColoredPremix(data){
 
 
 }
-function returnData(data) {
+function returnData(data,neg) {
     var LOGARR = [];
     for (var i = 0; i < data.used.length; i++) {
         fromReservedToRunning(data.used[i][0] + data.used[i][1], data.used[i][2]);
@@ -391,19 +391,19 @@ function returnData(data) {
         base.removeData(sheets2[i] + '/' + data.batch);
 
     }
-    LOGARR.push(['WENT NEGATIVE', ])
+    LOGARR.push(['WENT NEGATIVE', Math.abs(neg)+ ' - '+ data.used[data.used.length-1][0] + data.used[data.used.length-1][1]])
 
     return LOGARR;
 }
 
-function returnData2(data) {
+function returnData2(data,neg) {
     var LOGARR = [];
     for (var i = 0; i < data.length; i++) {
         fromReservedToRunning(data[i][0] + data[i][1], data[i][2]);
         LOGARR.push(['To Running: ' + data[i][0] + data[i][1], data[i][2]]);
     }
    
-    LOGARR.push(['WENT NEGATIVE', ])
+    LOGARR.push(['WENT NEGATIVE', Math.abs(neg)+' - '+ data.used[data.used.length-1][0] + data.used[data.used.length-1][1]])
 
     return LOGARR;
 }
