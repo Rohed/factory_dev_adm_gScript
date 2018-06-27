@@ -233,7 +233,7 @@ function saveFileCsv(data, name) {
 
                         };
                         
-                            if(values[i][5]=='Y'){
+                            if(values[i][5].toLowerCase()=='y'){
                             item.ppb=true;
                               item.botlabel = dataPC.ppbotlabel;
                               item.botlabelsku = dataPC.ppbotlabelsku;
@@ -242,7 +242,7 @@ function saveFileCsv(data, name) {
                               item.botlabel = dataPC.botlabel;
                               item.botlabelsku = dataPC.botlabelsku;
                             }
-                            if(values[i][6]=='Y'){
+                            if(values[i][6].toLowerCase()=='y'){
                                 item.ppp=true;
                               item.packlabel = dataPC.pppacklabel;
                               item.packlabelsku = dataPC.pppacklabelsku;
