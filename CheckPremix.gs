@@ -379,10 +379,15 @@ function returnData(data,neg) {
         fromReservedToRunning(data.used[i][0] + data.used[i][1], data.used[i][2]);
         LOGARR.push(['To Running: ' + data.used[i][0] + data.used[i][1], data.used[i][2]]);
     }
-    var dat = {
+      var dat = {
         wentNegative: true,
-
-    }
+        unbranded : 0,
+        branded : 0,
+        premixed : 0,
+        coloredpremix : 0,
+        mixing : 0,
+        backtubed : 0,
+      }
 
     base.updateData('Orders/' + data.batch, dat);
     var sheets2 = ['Production', 'Printing', 'Labelling', 'Packaging', 'Shipping'];
