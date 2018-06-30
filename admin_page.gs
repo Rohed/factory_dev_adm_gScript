@@ -1141,17 +1141,11 @@ function searchforWord(page, word) {
     }
     var retarr = [];
     for (var i = 0; i < sheetData.length; i++) {
-        if (sheetData[i].name) {
-            var match = sheetData[i].name.toLowerCase().indexOf(word.toLowerCase());
-            if (sheetData[i].sku) {
-                var match2 = sheetData[i].sku.toLowerCase().indexOf(word.toLowerCase());
-            } else {
-                var match2 = -1;
-            }
-            if (match != -1 || match2 != -1) {
+            var match = JSON.stringify(sheetData[i]).toLowerCase().indexOf(word.toLowerCase().trim());
+            if (match >=0) {
                 retarr.push(sheetData[i]);
             }
-        }
+   
     }
 
     return [retarr, page];
