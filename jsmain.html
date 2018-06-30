@@ -5549,6 +5549,7 @@ $("#updating").css("display", "none");
 
 
 $("#generatePUB").on('click',function(){
+  $("#updating").css("display", "block");
  google.script.run.withSuccessHandler(buildhtmlmodal).generatePremixBrandUnbrand();
 
 })
