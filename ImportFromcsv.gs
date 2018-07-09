@@ -35,16 +35,10 @@ function getLargestBatch(orders){
   }
 }
 
-function saveOrder2(data) {
+function saveOrder2(data,row) {
 
 
-    var orders = getOrdersData();
-    if (orders) {
 
-        var row = orders.length + 1;
-    } else {
-        var row = 1;
-    }
     data.partialProduction = 0;
     data.partialPackaging = 0;
     data.saved = true;
@@ -146,16 +140,19 @@ function saveFileCsv(data, name) {
     try {
       var msg = '';
   
- 
+// 
       var contentType = data.substring(5, data.indexOf(','));
       var fileBlob = Utilities.newBlob(Utilities.base64Decode(data.substr(data.indexOf('base64,') + 7)), contentType, name);
       
       var values = [];
       
       var rows = fileBlob.getDataAsString().replace(/\t/g,'');
+         
       values=Utilities.parseCsv(rows);
       
-      
+     // SpreadsheetApp.openById('1bli8feeguWoLZl7_VAt3r4i1OC6oElk_pr_ZCBY3sC4').getSheets()[0].getRange(1, 1, values.length, values[0].length).setValues(values);
+     //  var values =SpreadsheetApp.openById('1bli8feeguWoLZl7_VAt3r4i1OC6oElk_pr_ZCBY3sC4').getSheets()[0].getDataRange().getValues();
+     
       if (values.length < 2) {
         
         msg +="Failed to read file.";
@@ -163,22 +160,55 @@ function saveFileCsv(data, name) {
         
       } 
   
-  fileBlob='';
-  data='';
-
+    fileBlob='';
+    data='';
+    rows='';
 //var values = SpreadsheetApp.openById('1xvW_vuMnkI5OvPdeZ0GVZKLIAv95_OxoXfCBm1ER3lY').getSheets()[0].getDataRange().getValues();
         
 
         var options = '{';
-        var allPC=base.getData("References/ProductCodes");
-   
+      //  var allPC=base.getData("References/ProductCodes");
+    var allPC='';
           var rawOrders=base.getData('Orders');
 
       var orders=JSONtoARR(rawOrders);
           var largestBatch=getLargestBatch(orders); 
    
-      var orderID=getNewOrderID2(orders);
+      //var orderID=getNewOrderID2(orders);
+     var ordersByOrderID=orders.sort(sortOrderIDsHL)
+      if(ordersByOrderID.length>=1){
+        var LastorderID=ordersByOrderID[0].orderID;
+        if(LastorderID){
+          var num=(parseInt(LastorderID.substr(4,LastorderID.length),10)+1);
+        }else{
+          for(var i=ordersByOrderID.length-2;i>0;i--){
+            var LastorderID=ordersByOrderID[i].orderID;
+            if(LastorderID){
+              var cutString=LastorderID.substr(4,LastorderID.length);
+              var num=(parseInt(cutString,10)+1);
+              if(num>=10100){
+                break;
+              }
+            }
+          }
+        }
+      }else{
+        var num= 'INV-00010100';
+      }
+      if(num<10100){
+        num='00010100';
+      }else{
+        var zeros=8-num.toString().length;
+        for(var i=0;i<zeros;i++){
+          num='0'+num;
+        }
+      }
+      var orderID= 'INV-'+num;
+ordersByOrderID = {};
+
       var newPRIORITIES=[];
+      
+
         for (var i = 1; i < values.length; i++) {
             try {
            if(!values[i][0]){
@@ -201,7 +231,7 @@ function saveFileCsv(data, name) {
                                 Logger.log(values[i][0]);
 
                 var PC = values[i][0];
-                var dataPC = allPC[PC];
+                var dataPC = base.getData("References/ProductCodes"+PC);
                                 Logger.log(dataPC);
 
                 if (dataPC) {
@@ -258,8 +288,8 @@ function saveFileCsv(data, name) {
                             }
                         } else {
                           LOGDATA.data.push(['Missing PC',PC]);
-                        msg += 'Unable to SAVE ' +PC+ ' On line: ' + i + '<br>';
-                        msg += 'DATA: ' + item.ratio + '<br>'; 
+                        msg += 'Unable to SAVE ' +PC+ ' On line: ' + i + '. Reason: Missing <br>';
+                       // msg += 'DATA: ' + item.ratio + '<br>'; 
                         continue;
                     }
                    /* if (item.customer == 'Great British Vape Canada') {
@@ -270,15 +300,19 @@ function saveFileCsv(data, name) {
                     */
                     if (item.recipe.name) {
                       if (orders) {
+                
+                        if(i==1){
                         var ordersL = orders.length;
                         var row = orders.length + 1;
-                        if(i==1){
                           var lastbatch=orders[orders.length-1].batch;
                           var inint=parseInt(lastbatch,10);
                           item.batch = (parseInt(orders[orders.length-1].batch,10)+1).toString();
                           var batch = checkBatchExists(rawOrders, item.batch,ordersL, largestBatch);
                           item.batch=batch;
+                          orders=true;
                         }else{
+                          row++;
+                        ordersL++;
                           batch=parseInt(batch,10);
                           batch++;
                           item.batch=(batch).toString()
@@ -293,7 +327,7 @@ function saveFileCsv(data, name) {
                       if(i==values.length-1){
                         base.updateData('',{'highestBatch':parseInt(batch,10)});
                       }  
-                        var resp = saveOrder2(item);
+                        var resp = saveOrder2(item,row);
                         LOGDATA.data.push(['Added Batch',item.batch +'With Order ID: '+orderID ]);
                         options += '"' + item.batch + '":' + resp + ',';
                     } else {
@@ -344,11 +378,11 @@ function saveFileCsv(data, name) {
       dat1='';
        newPRIORITIES = uniq3(newPRIORITIES);
        setPriorityARR(newPRIORITIES);
-      return msg;
+      return msg+' '+i;
     } catch (e) {
      LOGDATA.data.push(['Failed: ',e.toString()]); 
       logItem(LOGDATA);
-      return msg;
+      return msg+' '+i;
     }
 }
 

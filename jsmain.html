@@ -3059,11 +3059,7 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
     var fileCounter = 0;
     reader.onloadend = function() {
         console.log('Load ended',reader.result, files[fileCounter].name);
-          google.script.run
-        .withFailureHandler(function(err) {
-        console.log("error",err);
-           // showToast(err);
-        }).withSuccessHandler(filesuccess)
+          google.script.run.withSuccessHandler(filesuccess)
         .saveFileCsv(reader.result, files[fileCounter].name);
          $("#updating").css("display", "block");
         return false;
