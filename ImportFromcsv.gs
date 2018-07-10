@@ -140,7 +140,7 @@ function saveFileCsv(data, name) {
     try {
       var msg = '';
   
-// 
+ 
       var contentType = data.substring(5, data.indexOf(','));
       var fileBlob = Utilities.newBlob(Utilities.base64Decode(data.substr(data.indexOf('base64,') + 7)), contentType, name);
       
@@ -150,8 +150,8 @@ function saveFileCsv(data, name) {
          
       values=Utilities.parseCsv(rows);
       
-     // SpreadsheetApp.openById('1bli8feeguWoLZl7_VAt3r4i1OC6oElk_pr_ZCBY3sC4').getSheets()[0].getRange(1, 1, values.length, values[0].length).setValues(values);
-     //  var values =SpreadsheetApp.openById('1bli8feeguWoLZl7_VAt3r4i1OC6oElk_pr_ZCBY3sC4').getSheets()[0].getDataRange().getValues();
+    // SpreadsheetApp.openById('10lo4vLIJONltnwO_n1Va5ixkIE7_Z4Y-7DEZRE5_8xc').getSheets()[0].getRange(1, 1, values.length, values[0].length).setValues(values);
+    // var values =SpreadsheetApp.openById('10lo4vLIJONltnwO_n1Va5ixkIE7_Z4Y-7DEZRE5_8xc').getSheets()[0].getDataRange().getValues();
      
       if (values.length < 2) {
         
@@ -160,9 +160,9 @@ function saveFileCsv(data, name) {
         
       } 
   
-    fileBlob='';
-    data='';
-    rows='';
+      fileBlob='';
+      data='';
+      rows='';
 //var values = SpreadsheetApp.openById('1xvW_vuMnkI5OvPdeZ0GVZKLIAv95_OxoXfCBm1ER3lY').getSheets()[0].getDataRange().getValues();
         
 
@@ -231,7 +231,7 @@ ordersByOrderID = {};
                                 Logger.log(values[i][0]);
 
                 var PC = values[i][0];
-                var dataPC = base.getData("References/ProductCodes"+PC);
+                var dataPC = base.getData("References/ProductCodes/"+PC);
                                 Logger.log(dataPC);
 
                 if (dataPC) {
