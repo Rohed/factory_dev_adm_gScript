@@ -4658,7 +4658,7 @@ $('#editPackageButton').on('click',function(){
    $('.newPackagingBody').hide();
    $('.editPackagingBody').show();
   $("#delete_edit_packaging").show();
-    google.script.run.withSuccessHandler(set_packages_helper_dropdown).get_packages_helper_dropdown();
+  //  google.script.run.withSuccessHandler(set_packages_helper_dropdown).get_packages_helper_dropdown();
 
  google.script.run.withSuccessHandler(set_active_dropdown_arrays).get_active_dropdown_arrays('editPackageButton');
 
