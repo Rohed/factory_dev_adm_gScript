@@ -780,13 +780,19 @@ edit_flavour_mix_order=true;
       }
     }
     
-    function formatDateDisplay2(datems){
+        function formatDateDisplay2(datems){
     try{
     if(datems&&datems!=""){
     var now=new Date(parseInt(datems,10));
+    var now1 = now.toISOString().replace('T',' ').replace('Z','').split('.');
+  
+    var now2=now1[0].split(' ');
     
+    var now3=now2[0].split('-');
+    var now4=now3[2]+'-'+now3[1]+'-'+now3[0]+' '+now2[1];
+    
+    return now4;
 
-    return now.toISOString().replace('T',' ').replace('Z','').split('.')[0];
     }else{
     return '';
     }
@@ -1278,8 +1284,11 @@ edit_flavour_mix_order=true;
          google.script.run.withSuccessHandler(stockCheck).printOrdersBatches(SELECTED);
 
     }
-      function printPackaging(){
-     google.script.run.withSuccessHandler(stockCheck).printPackagingBatches(SELECTED);
+//      function printPackaging(){
+//     google.script.run.withSuccessHandler(stockCheck).printPackagingBatches(SELECTED);
+//    }
+          function printPackaging(){
+     google.script.run.withSuccessHandler(buildhtmlmodal).checkPackagePrinting(SELECTED);
     }
     function printSuccess(msg){
     alert(msg);
@@ -5404,7 +5413,9 @@ switch (type){
     case 'ScheduleManage':
     built= buildScheduleManagement(data);
     break;
-    
+    case 'PackagePrint':
+    built= buildPackagePrint(data);
+    break;
   default:
 
   break;
@@ -5423,6 +5434,7 @@ alert(rett);
 }
 $("#updating").css("display", "none");
 }
+
 
 var DELandREVData=[];
 function buildDeleteAndReverse(list){
@@ -6288,6 +6300,25 @@ $('#htmlMSGmodal').hide();
 $('.modal-backdrop').hide();
 }
 
+
+function buildPackagePrint(msg){
+var html='<div>\
+<h3>Packaging:</h3>\
+<p>'+msg+'</p>\
+<br/>';
+
+html+='<button type="button" class="btn btn-primary" onclick="printSelectedAdmin()" >Continue</button>';
+
+
+html+='</div>';
+return html;
+}
+
+function printSelectedAdmin(){
+closemainmodal();
+  google.script.run.withSuccessHandler(buildhtmlmodal).printPackagingBatches(SELECTED,true);
+
+}
 //END SHCEDULING CODE
 
 </script>

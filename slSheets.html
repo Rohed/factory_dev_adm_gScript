@@ -728,13 +728,19 @@ width: 100%;
       }
     }
     
-    function formatDateDisplay2(datems){
+        function formatDateDisplay2(datems){
     try{
     if(datems&&datems!=""){
-    var now=new Date(datems);
+    var now=new Date(parseInt(datems,10));
+    var now1 = now.toISOString().replace('T',' ').replace('Z','').split('.');
+  
+    var now2=now1[0].split(' ');
     
+    var now3=now2[0].split('-');
+    var now4=now3[2]+'-'+now3[1]+'-'+now3[0]+' '+now2[1];
+    
+    return now4;
 
-    return now.toISOString().replace('T',' ').replace('Z','').split('.')[0];
     }else{
     return '';
     }
@@ -2963,7 +2969,7 @@ for(var i=0;i<SelAllOrders.length;i++){
  if(sheet=='Production'){
      google.script.run.withSuccessHandler(stockCheck).printProductionBatches(SELECTED);
     }else{
-     google.script.run.withSuccessHandler(stockCheck).printPackagingBatches(SELECTED);
+     google.script.run.withSuccessHandler(buildhtmlmodal).printPackagingBatches(SELECTED,false);
     }
     }
   
@@ -2971,7 +2977,7 @@ for(var i=0;i<SelAllOrders.length;i++){
      google.script.run.withSuccessHandler(stockCheck).printProductionBatches(SELECTED);
     }
       function printPackaging(){
-     google.script.run.withSuccessHandler(stockCheck).printPackagingBatches(SELECTED);
+     google.script.run.withSuccessHandler(stockCheck).printPackagingBatches(SELECTED,false);
     }
     function printSuccess(msg){
     alert(msg);
@@ -3576,6 +3582,9 @@ switch (type){
     case 'statuscheck':
     built= buildCheckStock(data);
     break;
+    case 'PackagePrint':
+    built= buildPackagePrint(data);
+    break;
   default:
 
   break;
@@ -3675,6 +3684,17 @@ $("#updating").css("display", "block");
 console.log('selPage setScheduleDropdown',selPage);
 google.script.run.withSuccessHandler(filterResult).getScheduleDataNearest(selPage);
 
+}
+
+function buildPackagePrint(msg){
+var html='<div>\
+<h3>Packaging:</h3>\
+<p>'+msg+'</p>\
+<br/>';
+
+
+html+='</div>';
+return html;
 }
 </script>
 
