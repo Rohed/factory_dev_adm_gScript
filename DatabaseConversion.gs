@@ -1372,3 +1372,33 @@ for(var i=0;i<sheets.length;i++){
 
 
 }
+
+
+function checkpacknotes(){
+var packaging = base.getData('Packaging');
+var shipping = base.getData('Shipping');
+var plist = JSONtoARR(packaging);
+var slist = JSONtoARR(shipping);
+
+var arr=[];
+for(var i=0;i<plist.length;i++){
+  if(shipping[plist[i].batch]){
+   if(shipping[plist[i].batch].PRINTCODE != plist[i].PRINTCODE){
+     if(shipping[plist[i].batch].PRINTCODE){
+     var dat = {
+     PRINTCODE:shipping[plist[i].batch].PRINTCODE
+     }
+     base.updateData('Packaging/'+plist[i].batch,dat);
+     }else if(plist[i].PRINTCODE){
+     var dat = {
+     PRINTCODE:plist[i].PRINTCODE
+     }
+     base.updateData('Shipping/'+plist[i].batch,dat);
+     }
+     //arr.push(plist[i].batch +' - '+plist[i].PRINTCODE+' -- '+plist[i].batch +' - '+shipping[plist[i].batch].PRINTCODE+'\n');
+    }
+  }
+}
+
+Logger.log(arr);
+}

@@ -1417,7 +1417,7 @@ function getPackCodes() {
         }
     }
     ret = uniq(ret);
-
+Logger.log(ret.length);
     return ret;
 }
 

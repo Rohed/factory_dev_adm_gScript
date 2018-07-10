@@ -87,7 +87,7 @@ for(;i<21;i++){
 
 function testPRING(){
 
-printShippingNote(['13834668'],1);
+printShippingNote(['71474925','4670815','27656320'],1);
 }
 
 
@@ -108,45 +108,52 @@ if(x==1){
   var SS=SpreadsheetApp.openById(create.getId());
   var sheet=SS.getSheets()[0];
   var orders=base.getData('Orders');
-  var shippingData=base.getData('Shipping');
-  var list=JSONtoARR(base.getData('Packaging'));
+
+  var packagingData = base.getData('Packaging')
+  var list=JSONtoARR(base.getData('Shipping'));
   var values=[];
   var customer;
   var batches=[];
   for(var i=0;i<data.length;i++){
     for(var j=0;j<list.length;j++){
+
       if(data[i]==list[j].PRINTCODE){
-      if(shippingData[list[j].batch]){
-        if(shippingData[list[j].batch].SHIPPINGCODE){
-        continue;
-        }
-      }
+   
+//        if(list[j].SHIPPINGCODE){
+//        continue;
+//        }
+    
           if(orders[list[j].batch]){
+   
         customer=list[j].customer;
         if(orders[list[j].batch].final_status=='Completed'){
           if(orders[list[j].batch+"PO"] ||orders[list[j].batch+"PK"] ){
             if(orders[list[j].batch+"PO"]){
               if(orders[list[j].batch+"PO"].final_status!='Completed'){
                 values.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,parseInt(orders[list[j].batch].bottles,10)-parseInt(orders[list[j].batch+"PO"].bottles,10),orders[list[j].batch+"PO"].bottles]);
+              }else{
+                values.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,orders[list[j].batch].bottles,'']);
               }
             }
             if(orders[list[j].batch+"PK"]){
               if(orders[list[j].batch+"PK"].final_status!='Completed'){
                 values.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,parseInt(orders[list[j].batch].bottles,10)-parseInt(orders[list[j].batch+"PK"].bottles,10),orders[list[j].batch+"PK"].bottles]);
+              }else{
+                values.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,orders[list[j].batch].bottles,'']);
               }
             }
           }else{
-          values.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,list[j].bottles,'']);
+          values.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,packagingData[list[j].batch].bottles,'']);
         }
           orderIDs.push(list[j].orderID);
           orderDates.push(formatDateDisplay(list[j].orderdate));
           batches.push(list[j].batch);
         }else{
-          incomplete.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,'',list[j].bottles]);
+          incomplete.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,'',packagingData[list[j].batch].bottles]);
           
         }
         }else{
-         incomplete.push([data[i],list[j].batch+' '+list[j].productcode+' '+list[j].productdescription,list[j].bottles,'',list[j].bottles]);
+         incomplete.push([data[i],list[j].batch+' '+list[j].productcode+' '+list[j].productdescription,packagingData[list[j].batch].bottles,'',packagingData[list[j].batch].bottles]);
         }
       }
       
@@ -174,15 +181,15 @@ if(x==1){
   for(var i=0;i<list.length;i++){
     
     for(var j=0;j<orderIDsFiltered.length;j++){
-      if(list[i].orderID==orderIDsFiltered[j]){
-        if(data.indexOf(list[j].PRINTCODE)>=0){
+      if(list[i].orderID==orderIDsFiltered[j] && packagingData[list[i].batch]){
+        if(data.indexOf(packagingData[list[i].batch].PRINTCODE)>=0){
           continue;
         }
-        if(list[i].final_status=='Completed'){
+        if(packagingData[list[i].batch].final_status=='Completed'){
           continue;
         }
         
-         incomplete.push(['',list[i].batch+' '+list[i].productcode+' '+list[i].productdescription,list[i].bottles,'',list[i].bottles]);
+         incomplete.push(['',list[i].batch+' '+list[i].productcode+' '+list[i].productdescription,packagingData[list[i].batch].bottles,'',packagingData[list[i].batch].bottles]);
       }
       
     }
