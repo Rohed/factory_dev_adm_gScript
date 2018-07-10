@@ -1819,7 +1819,7 @@ var EDITORDER=false;
       
             
             html += '<td><button page="MixingTeam" batch="'+data[i].MIXNAME+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="MixingTeam" batch="'+data[i].MIXNAME+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
-            html += '<td>' + data[i].Completed + '</td><td>' + priorities.join() + '</td><td>' + data[i].prodDate + '</td><td>' + batches.join() + '</td><td>' + customers.join() + '</td><td>' + orderIDs.join() + '</td><td>' + data[i].MIXNAME + '</td><td>' + data[i].RECIPE + '</td>';
+            html += '<td>' + data[i].Completed + '</td><td>' + priorities.join() + '</td><td>' + formatDateDisplay2(data[i].prodDate) + '</td><td>' + batches.join() + '</td><td>' + customers.join() + '</td><td>' + orderIDs.join() + '</td><td>' + data[i].MIXNAME + '</td><td>' + data[i].RECIPE + '</td>';
             html += '<td>' + data[i].FLAVOUR + '</td><td>' + orderDates.join() + '</td><td>' + data[i].QTYTOTAL + '</td><td>' + data[i].VGval + '</td><td>' + data[i].AGval + '</td><td>' + data[i].PGval + '</td><td>' + data[i].Nico + '</td><td>' + data[i].Nicosalts + '</td><td>' + data[i].CBDvalue + '</td><td>' + data[i].MCTval + '</td>';
             html += '<td>' + data[i].flavvalue + '</td><td>' + data[i].Notes + '</td>';
             html += '<td>' + data[i].Location + '</td>';

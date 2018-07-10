@@ -1375,7 +1375,7 @@ html+=' </div></div></td>';
         data[i].MCTval=data[i].MCTval ? data[i].MCTval: ' ';
       
 
-html+='<td>'+data[i].Completed+'</td><td>'+priorities.join()+'</td><td>'+data[i].prodDate+'</td><td>'+batches.join()+'</td><td>' + customers.join() + '</td><td>' + orderIDs.join() + '</td><td>'+data[i].MIXNAME+'</td><td>'+data[i].RECIPE+'</td>';
+html+='<td>'+data[i].Completed+'</td><td>'+priorities.join()+'</td><td>'+formatDateDisplay2(data[i].prodDate)+'</td><td>'+batches.join()+'</td><td>' + customers.join() + '</td><td>' + orderIDs.join() + '</td><td>'+data[i].MIXNAME+'</td><td>'+data[i].RECIPE+'</td>';
 html+='<td>'+data[i].FLAVOUR+'</td><td>'+ orderDates.join()+'</td><td>'+data[i].QTYTOTAL+'</td><td>'+data[i].VGval+'</td><td>'+data[i].AGval+'</td><td>'+data[i].PGval+'</td><td>'+data[i].Nico+'</td><td>'+data[i].Nicosalts+'</td><td>'+data[i].CBDvalue+'</td><td>'+data[i].MCTval+'</td>';
 html+='<td>'+data[i].flavvalue+'</td><td>'+data[i].Notes+'</td><td>'+data[i].factory+'</td><td>'+data[i].Location+'</td><td>'+formatDateDisplay2(data[i].starttime)+'</td><td>'+formatDateDisplay2(data[i].CompletionDate)+'</td><td>'+data[i].vgSupplier+'</td><td>'+data[i].pgSupplier+'</td><td>'+data[i].nicSupplier+'</td><td>'+data[i].flavSupplier+'</td></tr>';
 

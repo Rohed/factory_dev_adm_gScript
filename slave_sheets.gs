@@ -23,8 +23,8 @@ function saveItemSL(obj, sheet) {
     };
     base.updateData(sheet + '/' + obj.batch, obj);
     if (obj.Completed == 'Completed') {
-        obj.CompletionDate = new Date();
-        obj.prodDate = new Date();
+        obj.CompletionDate = new Date().getTime();
+        obj.prodDate = new Date().getTime();
         obj.movedtoNext = 1;
         base.updateData(sheet + '/' + obj.batch, obj);
         LOGDATA.data.push(['Marked Completed:', obj.batch]);
@@ -37,8 +37,8 @@ function saveItemSL(obj, sheet) {
     } else if (obj.Completed == 'Completed and Labelled') {
         LOGDATA.data.push(['Marked Completed and Labelled:', obj.batch]);
         logItem(LOGDATA);
-        obj.CompletionDate = new Date();
-        obj.prodDate = new Date();
+        obj.CompletionDate = new Date().getTime();
+        obj.prodDate = new Date().getTime();
         obj.movedtoNext = 1;
         base.updateData(sheet + '/' + obj.batch, obj);
 
