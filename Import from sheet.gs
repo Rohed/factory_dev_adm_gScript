@@ -1268,20 +1268,23 @@ function importPackagesFromSheet(id) {
     }
 
     options += '}';
+    var msg='';
     try {
         var upload = JSON.parse(options);
         base.updateData('Packages', upload);
+        msg=LOGDATA.msg;
         logItem(LOGDATA);
 
     } catch (e) {
         LOGDATA.status = false;
         LOGDATA.data.push(['FAILED:', e.toString()]);
         LOGDATA.msg = 'Failed ' + e.toString + '- ' + LOGDATA.msg + ' \n ';
+           msg=LOGDATA.msg;
         logItem(LOGDATA);
     }
 
 
-    return LOGDATA.msg;
+    return msg;
 }
 
 function importFlavoursFromSheet(id) {
