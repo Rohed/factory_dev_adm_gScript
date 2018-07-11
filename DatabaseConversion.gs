@@ -1402,3 +1402,23 @@ for(var i=0;i<plist.length;i++){
 
 Logger.log(arr);
 }
+
+function updateInvKeys(){
+var inv=base.getData('Inventory');
+var invlist=JSONtoARR(inv);
+var keys=Object.keys(inv);
+var options ='{';
+for(var i=0;i<keys.length;i++){
+var thenum = keys[i].replace( /^\D+/g, '').replace(/ /g,'');
+inv[keys[i]].key=thenum;
+ options += '"' + thenum+ '":' + JSON.stringify(inv[keys[i]]) + ',';
+
+}
+
+
+  
+options+='}';  
+      var upload =JSON.parse(options);
+base.removeData('Inventory');
+base.updateData('Inventory',upload);
+}

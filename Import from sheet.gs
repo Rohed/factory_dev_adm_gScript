@@ -1903,6 +1903,7 @@ function importInventoryData(id){
     
     for(var i=1;i<data.length;i++){
      var obj = {
+           
             sku:data[i][0],
             desc: data[i][1],
             orderdate: data[i][2],
@@ -1933,7 +1934,7 @@ function importInventoryData(id){
         break;
         }
         }
-    LOGDATA.msg+=saveItem(obj)+'\n';
+    LOGDATA.msg+=saveItem2(obj)+'\n';
     }
      logItem(LOGDATA);
     return LOGDATA.msg;

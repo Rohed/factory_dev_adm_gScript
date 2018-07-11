@@ -463,6 +463,7 @@ width: 100%;
        
                    <tr><td>
                    <div class="input-group"><input autocomplete="on" sku="" page="" class="form-control" id="description" placeholder="Product Description" aria-describedby="sizing-addon2"/>
+                   <input autocomplete="on" sku="" page="" class="form-control" id="description2"  style='display:none;' placeholder="Product Description" aria-describedby="sizing-addon2"/>
                   <input autocomplete="on" class="form-control" id="descriptionpage"  style="display:none;"  placeholder="Product Description"  aria-describedby="sizing-addon2"/>
                   <input autocomplete="on"  class="form-control" id="descriptionsku" style="display:none;" placeholder="Product Description" aria-describedby="sizing-addon2"/>
                    </div>
@@ -1110,8 +1111,6 @@ setPartial(href.substr(8,href.length),page);
 setOver(href.substr(5,href.length),page);
 }else if (href.substr(0, 7) == '#select') {
 addToSelected(href.substr(7, href.length));
-} else if (href.substr(0, 7) == '#insert') {
-insertToQTY(href.substr(7, href.length), page);
 } else if (href.substr(0, 10) == '#deleteInv') {
 removeFromInventory(href.substr(10, href.length), page);
 }  else if (href.substr(0, 9) == '#editItem') {
@@ -2569,10 +2568,10 @@ function populateLocationsTab() {
            if(data[i].quantity){
       var quant=data[i].quantity;
       }else{var quant='null';} 
-                html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" data-toggle="modal" data-target="#myModal2" href="#editItem' + data[i].desc + ' ' + data[i].orderdate + ' ' + quant + '">Edit</a>';
+                html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" data-toggle="modal" data-target="#myModal2" href="#editItem' + data[i].key +  '">Edit</a>';
           
     
-            html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" href="#deleteInv' + data[i].desc + ' ' + data[i].orderdate + ' ' + quant + '">Delete Item</a>';
+            html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" href="#deleteInv' + data[i].key + '">Delete Item</a>';
             html += ' </div></div></td>';
             html += '<td>'+data[i].row+'</td>';
             html += '<td>' + data[i].desc + '</td><td>' + data[i].orderdate + '</td><td>' + data[i].delivdate + '</td><td>' + data[i].paiddate + '</td><td>' + data[i].eta + '</td><td>' + quant + '</td><td>' + data[i].note + '</td></tr>';
@@ -2632,12 +2631,7 @@ function populateLocationsTab() {
     }
 
 
-    function insertToQTY(item, page) {
 
-        google.script.run.withSuccessHandler(InventoryItemSuccess).addtoQTY(item, page);
-
-
-    }
 
     function InventoryItemSuccess(msg) {
         alert(msg);
@@ -2654,6 +2648,7 @@ function populateLocationsTab() {
         var dataold = retval[1];
     
        $('#description').val(dataold.desc);
+       $('#description2').val(dataold.key);
         $('#orderDate1').val(dataold.orderdate);
         $('#paiddate').val(dataold.paiddate);
         $('#deliveryDate').val(dataold.delivdate);
@@ -2675,6 +2670,7 @@ function populateLocationsTab() {
         var paiddate = $('#paiddate').val();
         var eta = $('#eta').val();
         var desc = $('#description').val();
+         var key = $('#description2').val();
         var sku = $("#descriptionsku").val();
         var page = $("#descriptionpage").val();
         var quantity = parseInt($('#quantity').val(), 10);
@@ -2695,7 +2691,16 @@ function populateLocationsTab() {
         console.log(obj);
         google.script.run.withSuccessHandler(newItemSuccess2).saveItem(obj);
    
-
+  $('#orderDate1').val('');
+       $('#deliveryDate').val('');
+       $('#paiddate').val('');
+       $('#eta').val('');
+       $('#description').val('');
+       $("#descriptionsku").val('');
+       $("#descriptionpage").val('');
+       $("#description2").val('');
+       $('#quantity').val('');
+       $('#note').val('');
 
     });
 
@@ -2728,7 +2733,7 @@ function show4() {
              if(INPDATA[i].name){
             if (INPDATA[i].name.match(testableRegExp)) {
            
-                addValue4(INPDATA[i].name, INPDATA[i].name, INPDATA[i].sku, INPDATA[i].page);
+                addValue4(INPDATA[i].name, INPDATA[i].name, INPDATA[i].sku, INPDATA[i].page,INPDATA[i].key);
 
             }
             }
@@ -2752,7 +2757,7 @@ function show4() {
     }
 }
 
-function addValue4(text, val,sku,page) {
+function addValue4(text, val,sku,page,key) {
 //console.log('here');
     var createOptions = document.createElement('option');
     optionsVal3.appendChild(createOptions);
@@ -2760,6 +2765,7 @@ function addValue4(text, val,sku,page) {
     createOptions.value = val;
     createOptions.setAttribute('sku',sku);
      createOptions.setAttribute('page',page);
+      createOptions.setAttribute('key',key);
 }
 
 //Settin the value in the box by firing the click event
@@ -2768,6 +2774,7 @@ $('#description').val($(selectedVal).val());
 console.log(selectedVal.options[selectedVal.selectedIndex].getAttribute('page'),selectedVal.options[selectedVal.selectedIndex].getAttribute('sku'))
 $('#descriptionsku').val(selectedVal.options[selectedVal.selectedIndex].getAttribute('sku'));
 $('#descriptionpage').val(selectedVal.options[selectedVal.selectedIndex].getAttribute('page'));
+$('#description2').val(selectedVal.options[selectedVal.selectedIndex].getAttribute('key'));
 
     document.getElementById('dropdown4').style.display = 'none';
 }

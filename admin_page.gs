@@ -410,7 +410,7 @@ function getInventoryDescription() {
 }
 
 
-function saveItem(data) {
+function saveItem2(data) {
     var LOGDATA = {
         status: true,
         msg: '',
@@ -534,27 +534,6 @@ function saveItem(data) {
 
 }
 
-function getInventoryData() {
-
-    var data = base.getData('Inventory');
-    if (data) {
-        var result = Object.keys(data).map(function(key) {
-            return [Number(key), data[key]];
-        });
-
-        var retArr = [];
-        for (var i = 0; i < result.length; i++) {
-            retArr.push(result[i][1]);
-
-        }
-        retArr.sort(function(a, b) {
-            return (a.row) - (b.row)
-        });
-        return retArr;
-    } else {
-        return [];
-    }
-}
 
 var date_sort_asc = function(date1, date2) {
     // This is a comparison function that will result in dates being sorted in

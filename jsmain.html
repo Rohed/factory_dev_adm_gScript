@@ -1089,7 +1089,7 @@ edit_flavour_mix_order=true;
         var desc = $('#description').val();
         var sku = $("#descriptionsku").val();
         var page = $("#descriptionpage").val();
-        var oldname = $("#description :selected").attr('oldname');
+        var key = $("#description2").val();
         var quantity = parseInt($('#quantity').val(), 10);
         var note = $('#note').val();
         
@@ -1099,7 +1099,7 @@ edit_flavour_mix_order=true;
             delivdate: delivdate,
             eta: eta,
             desc: desc,
-            oldname: oldname,
+            key: key,
             quantity: quantity,
             note: note,
             page: page,
@@ -1108,7 +1108,16 @@ edit_flavour_mix_order=true;
         console.log(obj);
         google.script.run.withSuccessHandler(newItemSuccess).saveItem(obj);
    
-
+       $('#orderDate1').val('');
+       $('#deliveryDate').val('');
+       $('#paiddate').val('');
+       $('#eta').val('');
+       $('#description').val('');
+       $("#descriptionsku").val('');
+       $("#descriptionpage").val('');
+       $("#description2").val('');
+       $('#quantity').val('');
+       $('#note').val('');
 
     });
 
@@ -1136,10 +1145,10 @@ edit_flavour_mix_order=true;
            if(data[i].quantity){
       var quant=data[i].quantity;
       }else{var quant='null';} 
-                html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" data-toggle="modal" data-target="#myModal2" href="#editItem' + data[i].desc + ' ' + data[i].orderdate + ' ' + quant + '">Edit</a>';
+                html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" data-toggle="modal" data-target="#myModal2" href="#editItem' + data[i].key +  '">Edit</a>';
           
     
-            html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" href="#deleteInv' + data[i].desc + ' ' + data[i].orderdate + ' ' + quant + '">Delete Item</a>';
+            html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" href="#deleteInv' + data[i].key +  '">Delete Item</a>';
             html += ' </div></div></td>';
             html += '<td>'+data[i].row+'</td>';
             html += '<td>' + data[i].desc + '</td><td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + formatDateDisplay(data[i].delivdate) + '</td><td>' + formatDateDisplay(data[i].paiddate) + '</td><td>' + data[i].eta + '</td><td>' + quant + '</td><td>' + data[i].note + '</td></tr>';
@@ -1171,9 +1180,7 @@ edit_flavour_mix_order=true;
         console.log(href);
         if (href.substr(0, 4) == '#run') {
             runItem(href.substr(4, href.length));
-        } else if (href.substr(0, 7) == '#insert') {
-            insertToQTY(href.substr(7, href.length), extra);
-        } else if (href.substr(0, 10) == '#deleteInv') {
+        }else if (href.substr(0, 10) == '#deleteInv') {
             removeFromInventory(href.substr(10, href.length), extra);
         } else if (href.substr(0, 12) == '#deleteOrder') {
             deleteItem(href.substr(12, href.length), 'Orders');
@@ -3943,6 +3950,7 @@ var INPDATA;
         var dataold = retval[1];
     
        $('#description').val(dataold.desc);
+       $('#description2').val(dataold.key);
         $('#orderDate1').val(formatDateInput(dataold.orderdate));
         $('#paiddate').val(formatDateInput(dataold.paiddate));
         $('#deliveryDate').val(formatDateInput(dataold.delivdate));
@@ -3983,7 +3991,7 @@ function show4() {
              if(INPDATA[i].name){
             if (INPDATA[i].name.match(testableRegExp)) {
            
-                addValue4(INPDATA[i].name, INPDATA[i].name, INPDATA[i].sku, INPDATA[i].page);
+                addValue4(INPDATA[i].name, INPDATA[i].name, INPDATA[i].sku, INPDATA[i].page, INPDATA[i].key);
 
             }
             }
@@ -4007,22 +4015,25 @@ function show4() {
     }
 }
 
-function addValue4(text, val,sku,page) {
+function addValue4(text, val,sku,page,key) {
 //console.log('here');
     var createOptions = document.createElement('option');
     optionsVal3.appendChild(createOptions);
     createOptions.text = text;
     createOptions.value = val;
     createOptions.setAttribute('sku',sku);
+    createOptions.setAttribute('key',key);
      createOptions.setAttribute('page',page);
 }
 
 //Settin the value in the box by firing the click event
 function setVal4(selectedVal) {
 $('#description').val($(selectedVal).val());
+
 console.log(selectedVal.options[selectedVal.selectedIndex].getAttribute('page'),selectedVal.options[selectedVal.selectedIndex].getAttribute('sku'))
 $('#descriptionsku').val(selectedVal.options[selectedVal.selectedIndex].getAttribute('sku'));
 $('#descriptionpage').val(selectedVal.options[selectedVal.selectedIndex].getAttribute('page'));
+$('#description2').val(selectedVal.options[selectedVal.selectedIndex].getAttribute('key'));
 
     document.getElementById('dropdown4').style.display = 'none';
 }
