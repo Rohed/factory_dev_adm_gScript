@@ -329,7 +329,23 @@ function runItem(batch,frombulk) {
   } else {
    var labelexists = 1
   }
-
+  if (data.packagingType) {
+    var packagingTypeexists = null;
+    if(data.packagingType.sku){
+      packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
+      if(!packagingTypeexists){
+        missingmsg+='Missing Package: '+data.botlabelsku+'\n';
+      }else if(!packagingTypeexists.botperPack){
+        missingmsg+='Missing Package Bottles Per Pack: '+data.packagingType.sku+'\n';
+        packagingTypeexists=false;
+      }
+      
+    }else{
+      missingmsg+='Missing Package SKU: '+data.packagingType.sku+'\n';
+    }
+  } else {
+    var packagingTypeexists = 1
+    }
     if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists ) {
 
       

@@ -1422,3 +1422,26 @@ options+='}';
 base.removeData('Inventory');
 base.updateData('Inventory',upload);
 }
+
+function updateFillLevels(){
+  var PC = base.getData('References/ProductCodes');
+  var sheets=['Orders','Production','Printing','Labelling','Packaging','Shipping'];
+  for(var s =0;s<sheets.length;s++){
+    var data= base.getData(sheets[s]);
+    var list = JSONtoARR(data);
+    for(var i=0;i<list.length;i++){
+      if(list[i].batch){
+        if(list[i].productcode){
+          var item = PC[list[i].productcode];
+          if(item){
+            if(item.fill){
+              data[list[i].batch].fill=item.fill;
+            }
+          }
+          
+        }
+      }
+    }
+    base.updateData(sheets[s],data);
+  }
+}

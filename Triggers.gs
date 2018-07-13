@@ -24,13 +24,11 @@ subject+=' 8PM report ';
 }
 var name = subject+' '+formattedDate;
 var file = createCompletedExport(today.getHours(),name)
-Logger.log(file.getUrl());
-return;
-MailApp.sendEmail(COMPLETED_ITEMS_MAIL, name, '', {
-attachments:file
-})
-
-
-
+file.addEditor(COMPLETED_ITEMS_MAIL);
+MailApp.sendEmail({
+    to: COMPLETED_ITEMS_MAIL,
+    subject: name,
+    htmlBody: "<a href='"+file.getUrl()+"'>"+name+"</a> ",
+  });
 
 }

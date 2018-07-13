@@ -1090,6 +1090,10 @@ function createCompletedExport(H,name){
   }else{
     range = [14,20];
   }
+  
+  var d2=new Date().setHours(0,0,0,0)-(60*60*1000*24);
+  
+  
   var sheets=['Orders','MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
   var keys=[['orderdate','runtime','machineP','machineL','batch','orderID','productcode','productdescription','priority','customer','brand','recipe.name','flavour.name','bottles',
                 'stocking','btype','lid','packagingType.name','QTY','flavvalue','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','mixing','premixed',
@@ -1126,7 +1130,7 @@ function createCompletedExport(H,name){
                ['Order Date','Batch','Order ID','Product Code','ProductDescription','Priority','Packaging Code','Customer','Brand','Recipe','Flavour','Bottles','Bottle Type','Lid Type',
                'Packaging Tube','Status','Shipping Status','Shipping Code','Date Shipped','Tracking No.','Date Delivered','Location','TOTAL']];
  
-var d2=new Date().setHours(0,0,0,0)-(60*60*1000*24);
+
 for(var s =0;s<sheets.length;s++){
      var params = {
         orderBy: ['final_status'],
@@ -1169,18 +1173,16 @@ for(var s =0;s<sheets.length;s++){
      var list=searchFor([[sheets[s], params]])[1];
        var data =[];
        for(var i =0;i<list.length;i++){
-         if(sheets[s] == 'Orders'){
-           var t2=true;
-           var t3=true;
-           
-         }else{
+         
            var t2=new Date(list[i].CompletionDate).getHours()>=range[0];
            var t3=new Date(list[i].CompletionDate).getHours()<range[1];
            
-         }
-         var d1=new Date(list[i].CompletionDate).getTime();
+      
          
-         var t1=(d1>d2);
+         var d1=new Date(list[i].CompletionDate).getTime();
+           var t1=(d1>d2);
+
+       
          if(t1 && t2 && t3){
          data.push(list[i]);
          }
@@ -1301,7 +1303,7 @@ for(var s =0;s<sheets.length;s++){
                   row.push(cell);
                }else if(keys[s][k]=='machineP'){
                if(cell){
-                row.push(machines[cell]);
+                row.push(machines[cell].name);
                 }else{
                  row.push(cell);
                 }
@@ -1436,7 +1438,7 @@ for(var s =0;s<sheets.length;s++){
                   row.push(cell);
                }else if(keys[s][k]=='machineP'){
                if(cell){
-                row.push(machines[cell]);
+                row.push(machines[cell].name);
                 }else{
                  row.push(cell);
                 }
@@ -1517,7 +1519,7 @@ for(var s =0;s<sheets.length;s++){
        SS.getSheets()[s].getRange(2, 1, values.length, values[0].length).setValues(values)
     }
  
- return create;
+ return SS;
   
 }    
 
