@@ -376,7 +376,7 @@ function runItem(batch,frombulk) {
 function assignMixture2(data) {
     try {
         var LOGARR = new Array();
-        var runtime = new Date();
+        var runtime = new Date().getTime();
         var dat1 = {
             final_status: 'started',
             runtime: runtime,

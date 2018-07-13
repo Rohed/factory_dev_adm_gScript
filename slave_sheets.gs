@@ -45,11 +45,13 @@ function saveItemSL(obj, sheet) {
         var rez = MoveItem(obj.batch, sheet);
 
         var inPrint = base.getData('Printing/' + obj.batch);
-        if (inPrint.final_status == 'Completed') {} else {
-
+        if(inPrint){
+          if (inPrint.final_status == 'Completed') {} else {
+            
             base.updateData('Printing/' + obj.batch, obj);
-
+            
             var rez = MoveItem(obj.batch, 'Printing');
+          }
         }
 
 
@@ -126,7 +128,7 @@ function runBusy(batch, page) {
             var batches = getBatchesInMIXBATCH(MIXBATCH);
             for (var i = 0; i < batches.length; i++) {
                 var dat1 = {
-                    starttime: (new Date()),
+                    starttime: (new Date()).getTime(),
                     movedtoNext: "Busy"
 
                 };

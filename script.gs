@@ -827,13 +827,13 @@ function moveMain(item) {
                     var dat1 = {
                       mixing_status: 'Completed',
                       final_status: 'Completed',
-                      CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy")
+                      CompletionDate: new Date().getTime()
                     };
                     base.updateData('Orders/' + batches[i].batch, dat1);
                     
                   }
                   var dat3 = {
-                    CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                    CompletionDate: new Date().getTime(),
                     final_status: 'Completed',
                     movedtoNext: 1
                   };
@@ -855,7 +855,7 @@ function moveMain(item) {
                            var dmix = base.getData('Orders/' + item.dudpremixCode);
                            dmix.mixing_status = 'Completed';
                            dmix.final_status = 'Completed';
-                           dmix.CompletionDate = Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy");
+                           dmix.CompletionDate = new Date().getTime();
                            LOGARR.push(['Premix to Running RU:', item.forpremix]);
                            PtoRunning(premix, item.forpremix);
                            base.updateData('Orders/' + item.dudpremixCode, dmix);
@@ -876,7 +876,7 @@ function moveMain(item) {
                           var dmix = base.getData('Orders/' + item.dudpremixCode);
                           dmix.mixing_status = 'Completed';
                           dmix.final_status = 'Completed';
-                          dmix.CompletionDate = Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy");
+                          dmix.CompletionDate = new Date().getTime();
                           LOGARR.push(['Premix to Running RU:', item.forpremix]);
                           PtoRunning(premix, item.forpremix);
                           base.updateData('Orders/' + item.dudpremixCode, dmix);
@@ -918,12 +918,12 @@ function moveMain(item) {
             if (for_unbranded_stock) {
                 var dat1 = {
                     production_status: 'Completed',
-                    CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                    CompletionDate: new Date().getTime(),
                 };
                 base.updateData('Orders/' + item.batch, dat1);
                 var dat2 = {
                     final_status: 'Completed',
-                    CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                    CompletionDate: new Date().getTime(),
                 };
                 base.updateData('Orders/' + item.batch, dat2);
                 var tomix = order.mixing;
@@ -958,7 +958,7 @@ function moveMain(item) {
                     production_status: 'Completed',
                     final_status: 'Completed',
                     Completed: item.Completed,
-                    CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                    CompletionDate: new Date().getTime(),
                     movedtoNext: 1
                 };
                 base.updateData('Orders/' + item.overprodbatch, dat1);
@@ -1041,7 +1041,7 @@ function moveMain(item) {
                     LOGARR.push(['Branded to Running', item.bottles]);
                     var dat2 = {
                         final_status: 'Completed',
-                        CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                        CompletionDate: new Date().getTime(),
                     };
                     base.updateData('Orders/' + item.batch, dat2);
                 }
@@ -1053,7 +1053,7 @@ function moveMain(item) {
             var dat1 = {
                 final_status: 'Completed',
                 movedtoNext: 1,
-                CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                CompletionDate: new Date().getTime(),
             };
             base.updateData('Labelling/' + item.batch, dat1);
             var dat2 = {
@@ -1119,13 +1119,13 @@ function moveMain(item) {
             var dat1 = {
                 final_status: 'Completed',
                 movedtoNext: 1,
-                CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                CompletionDate: new Date().getTime(),
             };
             base.updateData('Packaging/' + item.batch, dat1);
             var dat2 = {
                 packaging_status: 'Completed',
                 final_status: 'Completed',
-                CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+                CompletionDate: new Date().getTime(),
             };
             base.updateData('Orders/' + item.batch, dat2);
             updateAllTabs(item.batch);
@@ -1142,7 +1142,7 @@ function moveMain(item) {
             LOGARR.push(['Mover To Running:' + item.batch + ' ' + item.flavourmix.sku, item.stocking]);
             item.final_status = 'Completed';
             item.movedtoNext = 1;
-            item.CompletionDate = Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy");
+            item.CompletionDate = new Date().getTime();
             base.updateData('FlavourMixOrders/' + item.batch, item);
             base.updateData('FlavourMixMixingTeam/' + item.batch, item);
         } else if (sheet_name == 'PremixColoring') {
@@ -1159,13 +1159,13 @@ function moveMain(item) {
             var dat1 = {
               mixing_status: 'Completed',
               final_status: 'Completed',
-              CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy")
+              CompletionDate: new Date().getTime()
             };
             base.updateData('Orders/' + item.batch, dat1);
             
        
           var dat3 = {
-            CompletionDate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
+            CompletionDate: new Date().getTime(),
             final_status: 'Completed',
             movedtoNext: 1
           };

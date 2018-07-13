@@ -2287,7 +2287,8 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
         html += '<th>Status</th><th>Shipping Status</th><th>Shipping Code</th><th>Date Shipped</th><th>Tracking No.</th><th>Date Delivered</th><th>Location</th></tr>';
         html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
         if(data){
-        var keys=['orderdate','batch','orderID','productcode','productdescription','priority','PRINTCODE','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','final_status','shipping_status','SHIPPINGCODE','dateshipped','trackingNo','datedelivered', 'Location'];
+        var keys=['orderdate','batch','orderID','productcode','productdescription','priority','PRINTCODE','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','final_status','shipping_status','SHIPPINGCODE',
+        'dateshipped','trackingNo','datedelivered', 'Location'];
         var drpdowns='';
         html += '<tr><th></th>';
         console.log(keys);

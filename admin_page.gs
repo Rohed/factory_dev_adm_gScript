@@ -727,8 +727,8 @@ function updateShippingItem(batch, data) {
     user:Session.getActiveUser().getEmail(),
     data:new Array()
   };
-  data.dateshipped=Utilities.formatDate(new Date(data.dateshipped),  "GMT", "dd-MM-yyyy' 'HH:mm:ss");
-   data.datedelivered=Utilities.formatDate(new Date(data.datedelivered),  "GMT", "dd-MM-yyyy' 'HH:mm:ss");
+  data.dateshipped=new Date(data.dateshipped).getTime();
+   data.datedelivered=new Date(data.datedelivered).getTime();
   LOGDATA.data.push(['EDITED SHIPPING ITEM',batch]);
     base.updateData('Shipping/' + batch, data);
 logItem(LOGDATA);
