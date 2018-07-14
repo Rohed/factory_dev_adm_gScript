@@ -259,7 +259,7 @@ function bulkrun(arr,page) {
 
 
 function testrun() {
-    runItem('906408',false);
+    runItem('912091',false);
 
 }
 
@@ -338,13 +338,6 @@ function runItem(batch,frombulk) {
       }else if(!packagingTypeexists.botperPack){
         missingmsg+='Missing Package Bottles Per Pack: '+data.packagingType.sku+'\n';
         packagingTypeexists=false;
-      }else{
-        var div = data.bottles/packagingTypeexists.botperPack;
-        if(parseInt(div,10)!=div){
-        missingmsg+='WARNING! Running '+data.bottles+' Bottles with a package that uses '+packagingTypeexists.botperPack+' Bottles per Package. \n Order quantities must be in raw bottles format. Ex: 1 of 3x10ml = 3 raw 10ml bottles ';
-        packagingTypeexists=false;
-        }
-      
       }
       
     }else{
@@ -353,7 +346,7 @@ function runItem(batch,frombulk) {
   } else {
     var packagingTypeexists = 1
     }
-    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists ) {
+    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists ) {
 
       
       LOGDATA.data = assignMixture2(data);

@@ -1209,8 +1209,8 @@ return false;
 
             html += ' </div></div></td>';  
             html += '<td></td>';
-             data[i].runtime=data[i].runtime ? data[i].runtime: ' ';
-            html += '<td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + formatDateDisplay2(data[i].runtime) + '</td>';
+         
+            html += '<td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + data[i].runtime + '</td>';
                   if(data[i].machineP){
             var machinePDisp='';
             machines.map(function(item){
