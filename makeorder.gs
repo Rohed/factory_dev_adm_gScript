@@ -338,6 +338,13 @@ function runItem(batch,frombulk) {
       }else if(!packagingTypeexists.botperPack){
         missingmsg+='Missing Package Bottles Per Pack: '+data.packagingType.sku+'\n';
         packagingTypeexists=false;
+      }else{
+        var div = data.bottles/packagingTypeexists.botperPack;
+        if(parseInt(div,10)!=div){
+        missingmsg+='WARNING! Running '+data.bottles+' Bottles with '+packagingTypeexists.botperPack+' Bottles per Package. \n';
+        packagingTypeexists=false;
+        }
+      
       }
       
     }else{
