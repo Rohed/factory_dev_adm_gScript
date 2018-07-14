@@ -259,7 +259,7 @@ function bulkrun(arr,page) {
 
 
 function testrun() {
-    runItem('912091',false);
+    runItem('906408',false);
 
 }
 
@@ -341,7 +341,7 @@ function runItem(batch,frombulk) {
       }else{
         var div = data.bottles/packagingTypeexists.botperPack;
         if(parseInt(div,10)!=div){
-        missingmsg+='WARNING! Running '+data.bottles+' Bottles with '+packagingTypeexists.botperPack+' Bottles per Package. \n';
+        missingmsg+='WARNING! Running '+data.bottles+' Bottles with a package that uses '+packagingTypeexists.botperPack+' Bottles per Package. \n';
         packagingTypeexists=false;
         }
       
@@ -353,7 +353,7 @@ function runItem(batch,frombulk) {
   } else {
     var packagingTypeexists = 1
     }
-    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists ) {
+    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists ) {
 
       
       LOGDATA.data = assignMixture2(data);

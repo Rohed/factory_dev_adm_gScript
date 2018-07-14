@@ -991,7 +991,7 @@ edit_flavour_mix_order=true;
             html += ' </div></div></td>';  
             html += '<td><button page="Orders" batch="'+data[i].batch+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="Orders" batch="'+data[i].batch+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
             data[i].runtime=data[i].runtime ? data[i].runtime: ' ';
-            html += '<td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + data[i].runtime + '</td>';
+            html += '<td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + formatDateDisplay2(data[i].runtime) + '</td>';
                   if(data[i].machineP){
             var selectedDropdown=machinesHTML;    
             selectedDropdown=selectedDropdown.replace('sku="'+data[i].machineP+'"','sku="'+data[i].machineP+'" selected');
