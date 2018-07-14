@@ -1097,40 +1097,40 @@ function createCompletedExport(H,name){
   var sheets=['Orders','MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
   var keys=[['orderdate','runtime','machineP','machineL','batch','orderID','productcode','productdescription','priority','customer','brand','recipe.name','flavour.name','bottles',
                 'stocking','btype','lid','packagingType.name','QTY','flavvalue','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','mixing','premixed',
-                'unbranded','branded','backtubed','mixing_status','production_status','printing_status','labeling_status','packaging_status','final_status','CompletionDate','partialProduction','partialPackaging','total'],
-            ['QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','Notes','Location','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier','total'],
+                'unbranded','branded','backtubed','mixing_status','production_status','printing_status','labeling_status','packaging_status','final_status','CompletionDate','partialProduction','partialPackaging','TOTAL BOTTLES'],
+            ['QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','Notes','Location','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier','TOTAL LITRES'],
             ['mixing_status','orderdate','batch','orderID','productcode','productdescription','mixbatch','priority','customer','brand',
-             'recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineP','total'],
+             'recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineP','TOTAL BOTTLES'],
             ['production_status','orderdate','batch','numLabelsBottles','numLabelsTubes','expDate','orderID','productcode','productdescription','priority','customer','brand','recipe.name',
-             'flavour.name','bottles','btype','lid','packagingType.name','botlabel','boxname.name','starttime','CompletionDate','Completed','Location','total'],
+             'flavour.name','bottles','btype','lid','packagingType.name','botlabel','boxname.name','starttime','CompletionDate','Completed','Location','TOTAL BOTTLES'],
             ['production_status','orderdate','batch','orderID','productcode','productdescription','priority','customer','brand','recipe.name','flavour.name','bottles',
-             'btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineL','total'],
+             'btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineL','TOTAL BOTTLES'],
             ['production_status','printing_status','orderdate','batch','orderID','productcode','productdescription','PRINTCODE','priority','customer',
-             'brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','total'],
+             'brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','TOTAL BOTTLES'],
             ['orderdate','batch','orderID','productcode','productdescription','priority','PRINTCODE','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','final_status','shipping_status','SHIPPINGCODE',
-        'dateshipped','trackingNo','datedelivered', 'Location','total']];
+        'dateshipped','trackingNo','datedelivered', 'Location','TOTAL BOTTLES']];
   
   
   var headers=[['Order Date','Started','Production Machine','Labelling Machine', 'Batch','OrderID','Product Code','Product Description', 'Priority', 'Customer', 'Brand', 'Recipe', 'Flavour', 'Bottles',
               'Stocking Amount (litre)', 'Bottle Type', 'Lid Type', 'Packaging Tube',
              'QTY', 'Flavour Value', 'VG Value', 'AG Value', 'PG Value', 'Nicotine Value', 'Nicotine Salts Value', 'CBD Value', 'MCT Value', 'Backed by Mixing',
              'Backed by Premixed', 'Backed by Unbranded', 'Backed by Branded', 'Backed By Branded Packaged', 'Mixing Status',
-             'Production Status', 'Printing Status', 'Labelling Status', 'Packaging Status', 'FINAL STATUS','Completed','Partial Production','Partial Packaging','TOTAL'],
+             'Production Status', 'Printing Status', 'Labelling Status', 'Packaging Status', 'FINAL STATUS','Completed','Partial Production','Partial Packaging','TOTAL BOTTLES','FILL LEVEL'],
                ['Completed','Priority','Date of Production','Batch','Customers','Order IDs','Mix Batch','Recipe','Flavour','Order Date','QTY(Litres)','VG (MG)','AG (MG)',
                 'PG (MG)','Nicotine (MG)','Nicotine Salts (MG)','CBD (MG)','MCT (MG)','Flavour (MG)','Notes - Mixing Dept','Location','Start Date','Completion Date','VG supplier batch',
-                'PG supplier batch','Nicotine supplier batch','Flavour supplier batch','TOTAL'],
+                'PG supplier batch','Nicotine supplier batch','Flavour supplier batch','TOTAL LITRES','COMPLETED FLAVOUR'],
                ['Mixing Completed','Order Date','Batch','OrderID','Product Code','Product Description','Mix Batch code','Priority','Customer','Brand','Recipe','Flavour','Bottles',
-                'Bottle Type','Cap Type','Packaging Tube','Start Date','Completion Date','Production Completed','Location','Machine','TOTAL'],
+                'Bottle Type','Cap Type','Packaging Tube','Start Date','Completion Date','Production Completed','Location','Machine','TOTAL BOTTLES','FILL LEVEL'],
                ['Production Status','Order Date','Batch','Bottle Labels QTY','Cylinder Labels QTY','Exp. Date','OrderID','Product Code','Product Description','Priority','Customer','Brand','Recipe','Flavour','Bottles',
-                'Bottle Type','Cap Type','Packaging Tube','Label','Outer Box','Start Date','Completion Date','Production Completed','Location','TOTAL'],
+                'Bottle Type','Cap Type','Packaging Tube','Label','Outer Box','Start Date','Completion Date','Production Completed','Location','TOTAL BOTTLES','FILL LEVEL'],
                ['Production Status','Order Date','Batch','OrderID','Product Code','ProductDescription','Priority','Customer','Brand','Recipe','Flavour','Bottles',
-                'Bottle Type','Cap Type','Packaging Tube','Start Date','Completion Date','Production Completed','Location','Machine','TOTAL'],
+                'Bottle Type','Cap Type','Packaging Tube','Start Date','Completion Date','Production Completed','Location','Machine','TOTAL BOTTLES','FILL LEVEL'],
                ['Production Status','Printing Status','Order Date','Batch','OrderID','Product Code','ProductDescription','Packaging Code','Priority','Customer',
-                'Brand','Recipe','Flavour','Bottles','Bottle Type','Cap Type','Packaging Tube','Start Date','Completion Date','Packaging Completed','Location','TOTAL'],
+                'Brand','Recipe','Flavour','Bottles','Bottle Type','Cap Type','Packaging Tube','Start Date','Completion Date','Packaging Completed','Location','TOTAL BOTTLES','FILL LEVEL'],
                ['Order Date','Batch','Order ID','Product Code','ProductDescription','Priority','Packaging Code','Customer','Brand','Recipe','Flavour','Bottles','Bottle Type','Lid Type',
-               'Packaging Tube','Status','Shipping Status','Shipping Code','Date Shipped','Tracking No.','Date Delivered','Location','TOTAL']];
+               'Packaging Tube','Status','Shipping Status','Shipping Code','Date Shipped','Tracking No.','Date Delivered','Location','TOTAL BOTTLES','FILL LEVEL']];
  
-
+var TOTALS_FINAL = [[],[],[],[],[],[],[]];
 for(var s =0;s<sheets.length;s++){
      var params = {
         orderBy: ['final_status'],
@@ -1200,6 +1200,7 @@ for(var s =0;s<sheets.length;s++){
         data = data.filter(function(item){ if(item.fill){return item}}).sort(sortNUMHL('fill'));
         break;
     }
+     
      var totals=[0,0,0,0,0,0];
      var sideTotal = 0;
      var separator='';
@@ -1212,14 +1213,19 @@ for(var s =0;s<sheets.length;s++){
                sideTotal+=data[i].QTYTOTAL ? data[i].QTYTOTAL : 0;
              }else if(separator==data[i].FLAVOUR){
                sideTotal+=data[i].QTYTOTAL ? data[i].QTYTOTAL : 0;
+           
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Litres with '+ separator;
-                separator=data[i].FLAVOUR;
+               TOTALS_FINAL[s].push([sideTotal,separator]);
+               values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator;
+               if(i != data[i].length-1){
+               separator=data[i].FLAVOUR;
                data.splice(i, 0, {});
                sideTotal=0
-              
-              
+               }
              }
+             
+              
              var batches=[];
              var orderDates=[];
              var priorities=[];
@@ -1266,8 +1272,9 @@ for(var s =0;s<sheets.length;s++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'){
                row.push(formatDateDisplay2(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL LITRES'){
                  totals[0]+=data[i].QTYTOTAL ? data[i].QTYTOTAL : 0;
+                 row.push(cell);
                  row.push(cell);
                }else{
                  if(keys[s][k].indexOf('.')>=0){
@@ -1277,6 +1284,8 @@ for(var s =0;s<sheets.length;s++){
                  }
                }
              }
+             
+          
              break;
            case 'Production':
             if(i==0){
@@ -1285,21 +1294,27 @@ for(var s =0;s<sheets.length;s++){
              }else if(separator==data[i].fill){
                sideTotal+=data[i].bottles ? data[i].bottles : 0;
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Bottles of '+separator+'ml';
-                separator=data[i].fill;
+              TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+               values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator+'ML';
+               if(i != data[i].length-1){
+              separator=data[i].fill;
                data.splice(i, 0, {});
                sideTotal=0
-              
+              }
               
              }
+             
+              
               for(var k =0;k<keys[s].length;k++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'){
                row.push(formatDateDisplay2(cell));
                }else if(keys[s][k]=='orderdate'){
                row.push(formatDateDisplay(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL BOTTLES'){
                  totals[0]+=data[i].bottles ? data[i].bottles : 0;
+                  row.push(cell);
                   row.push(cell);
                }else if(keys[s][k]=='machineP'){
                if(cell){
@@ -1323,21 +1338,27 @@ for(var s =0;s<sheets.length;s++){
              }else if(separator==data[i].fill){
                sideTotal+=data[i].bottles ? data[i].bottles : 0;
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Bottles of '+separator+'ml';
-                 separator=data[i].fill;
+             TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+                values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator+'ML';
+               if(i != data[i].length-1){
+              separator=data[i].fill;
                data.splice(i, 0, {});
                sideTotal=0
-             
+             }
              
              }
+             
+              
               for(var k =0;k<keys[s].length;k++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'){
                row.push(formatDateDisplay2(cell));
                }else if(keys[s][k]=='orderdate'){
                row.push(formatDateDisplay(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL BOTTLES'){
                  totals[0]+=data[i].bottles ? data[i].bottles : 0;
+                  row.push(cell);
                   row.push(cell);
                }else{
                 if(keys[s][k].match('.')){
@@ -1355,21 +1376,26 @@ for(var s =0;s<sheets.length;s++){
              }else if(separator==data[i].fill){
                sideTotal+=data[i].bottles ? data[i].bottles : 0;
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Bottles of '+separator+'ml';
-                separator=data[i].fill;
+             TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+               values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator+'ML';
+                if(i != data[i].length-1){
+               separator=data[i].fill;
                data.splice(i, 0, {});
                sideTotal=0
-              
+              }
                
              }
+           
              for(var k =0;k<keys[s].length;k++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'){
                row.push(formatDateDisplay2(cell));
                }else if(keys[s][k]=='orderdate'){
                row.push(formatDateDisplay(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL BOTTLES'){
                  totals[0]+=data[i].bottles ? data[i].bottles : 0;
+                  row.push(cell);
                   row.push(cell);
                }else{
                if(keys[s][k].indexOf('.')>=0){
@@ -1387,21 +1413,25 @@ for(var s =0;s<sheets.length;s++){
              }else if(separator==data[i].fill){
                sideTotal+=data[i].bottles ? data[i].bottles : 0;
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Bottles of '+separator+'ml';
-               separator=data[i].fill;
-               data.splice(i, 0, {});
-               sideTotal=0
-               
-               
+             TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+                values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator+'ML';
+               if(i != data[i].length-1){
+                 separator=data[i].fill;
+                 data.splice(i, 0, {});
+                 sideTotal=0
+               }
              }
+              
                for(var k =0;k<keys[s].length;k++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'){
                row.push(formatDateDisplay2(cell));
                }else if(keys[s][k]=='orderdate'){
                row.push(formatDateDisplay(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL BOTTLES'){
                  totals[0]+=data[i].bottles ? data[i].bottles : 0;
+                  row.push(cell);
                   row.push(cell);
                }else{
                if(keys[s][k].indexOf('.')>=0){
@@ -1419,22 +1449,27 @@ for(var s =0;s<sheets.length;s++){
              }else if(separator==data[i].fill){
                sideTotal+=data[i].bottles ? data[i].bottles : 0;
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Bottles of '+separator+'ml';
-               separator=data[i].fill;
-               data.splice(i, 0, {});
-               sideTotal=0
-               
+             TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+                values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator+'ML';
+              if(i != data[i].length-1){
+                 separator=data[i].fill;
+                 data.splice(i, 0, {});
+                 sideTotal=0
+               }
               
              }
+          
               for(var k =0;k<keys[s].length;k++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'||keys[s][k]=='runtime'){
                row.push(formatDateDisplay2(cell));
                }else if(keys[s][k]=='orderdate'){
                row.push(formatDateDisplay(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL BOTTLES'){
                  totals[0]+=data[i].bottles ? data[i].bottles : 0;
                  totals[1]+=data[i].QTY ? data[i].QTY : 0;
+                  row.push(cell);
                   row.push(cell);
                }else if(keys[s][k]=='machineP'){
                if(cell){
@@ -1458,21 +1493,27 @@ for(var s =0;s<sheets.length;s++){
              }else if(separator==data[i].fill){
                sideTotal+=data[i].bottles ? data[i].bottles : 0;
              }else{
-               values[values.length-1][values[0].length-1]=sideTotal+' Bottles of '+separator+'ml';
-                separator=data[i].fill;
-               data.splice(i, 0, {});
-               sideTotal=0
-              
+             TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+               values[values.length-1][values[0].length-2]=sideTotal;
+               values[values.length-1][values[0].length-1]=separator+'ML';
+              if(i != data[i].length-1){
+                 separator=data[i].fill;
+                 data.splice(i, 0, {});
+                 sideTotal=0
+               }
               
              }
+             
+           
                for(var k =0;k<keys[s].length;k++){
                var cell= data[i][keys[s][k]]? data[i][keys[s][k]]:'';
                if(keys[s][k]=='starttime'||keys[s][k]=='CompletionDate'){
                row.push(formatDateDisplay2(cell));
                }else if(keys[s][k]=='orderdate'){
                row.push(formatDateDisplay(cell));
-               }else if(keys[s][k]=='total'){
+               }else if(keys[s][k]=='TOTAL BOTTLES'){
                  totals[0]+=data[i].bottles ? data[i].bottles : 0;
+                  row.push(cell);
                   row.push(cell);
                }else{
                if(keys[s][k].indexOf('.')>=0){
@@ -1486,6 +1527,17 @@ for(var s =0;s<sheets.length;s++){
            default:
              break;
          }
+       if(i == data.length-1){
+         if(sheets[s]=='MixingTeam'){
+         TOTALS_FINAL[s].push([sideTotal,separator]);
+         row[row.length-2]=sideTotal;
+         row[row.length-1]=separator;
+         }else{
+         TOTALS_FINAL[s].push([sideTotal,separator+'ML']);
+         row[row.length-2]=sideTotal;
+         row[row.length-1]=separator+'ML';
+         }
+       }
      values.push(row);
        }
       switch (sheets[s]){
@@ -1516,9 +1568,27 @@ for(var s =0;s<sheets.length;s++){
           break;
       }
 
-       SS.getSheets()[s].getRange(2, 1, values.length, values[0].length).setValues(values)
+       SS.getSheets()[s+1].getRange(2, 1, values.length, values[0].length).setValues(values)
     }
- 
+    
+  var sumArr=[];
+  var max = 0;
+  for(var i=0;i<TOTALS_FINAL.length;i++){
+    if(TOTALS_FINAL[i].length>max){
+    max=TOTALS_FINAL[i].length;
+    }
+  }
+  for(var m=0;m<max;m++){
+    var row=[];
+    for(var i=0;i<TOTALS_FINAL.length;i++){
+    var it1=TOTALS_FINAL[i][m] ? (TOTALS_FINAL[i][m][0] ? TOTALS_FINAL[i][m][0] : '' ): '';
+     var it2=TOTALS_FINAL[i][m] ? (TOTALS_FINAL[i][m][1] ? TOTALS_FINAL[i][m][1] : '' ): '';
+      row.push(it1);
+      row.push(it2);
+     }
+     sumArr.push(row);
+  }
+  SS.getSheets()[0].getRange(4, 1, max, 14).setValues(sumArr);
  return SS;
   
 }    
