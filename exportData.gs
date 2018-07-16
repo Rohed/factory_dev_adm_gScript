@@ -1588,7 +1588,9 @@ for(var s =0;s<sheets.length;s++){
      }
      sumArr.push(row);
   }
+  if(max>0){
   SS.getSheets()[0].getRange(4, 1, max, 14).setValues(sumArr);
+  }
  return SS;
   
 }    
