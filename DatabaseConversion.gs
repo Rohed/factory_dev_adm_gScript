@@ -1445,3 +1445,15 @@ function updateFillLevels(){
     base.updateData(sheets[s],data);
   }
 }
+
+function listundefined(){
+var data = base.getData('Orders');
+var keys = Object.keys(data);
+for(var i=0;i<keys.length;i++){
+ if(!data[keys[i]].orderID){
+   Logger.log(keys[i]);
+ }
+}
+
+
+}
