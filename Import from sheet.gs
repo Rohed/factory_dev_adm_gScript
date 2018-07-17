@@ -96,7 +96,7 @@ function QTYInport(id) {
     // id='1sWqguyu1TsaGgxKAo6zzDYCwQg-FkGIA_57P7J8L7WA';
     var ss = SpreadsheetApp.openById(id);
     LOGDATA.batch = id;
-    var sheets = [['Flavour Concentrates','Flavours','FLAV'],['Packages','Packages','PAC'],['Boxes','Boxes','BOX'],['Labels','Labels','LAB'],['Colors','Color','COL']];
+    var sheets = [['Flavour Concentrates','Flavours','FLAV','float'],['Packages','Packages','PAC','int'],['Boxes','Boxes','BOX','int'],['Labels','Labels','LAB','int'],['Colors','Color','COL','float']];
     for(var s=0;s<sheets.length;s++){
     try {
         var flavours = ss.getSheetByName(sheets[s][0]);
@@ -126,45 +126,88 @@ function QTYInport(id) {
 
                     var foundSKU = origflavours[flavours[i][3]];
                     if (foundSKU) {
+                      if(sheets[s][3]=='float'){
                         var dat1 = {
-                            Running: flavours[i][2] + origflavours[flavours[i][3]].Running,
-                            Reserved: origflavours[flavours[i][3]].Reserved,
-                            Completed: origflavours[flavours[i][3]].Completed,
+                            Running: parseFloat(flavours[i][2]) + parseFloat(origflavours[flavours[i][3]].Running),
+                            Reserved: parseFloat(origflavours[flavours[i][3]].Reserved),
+                            Completed: parseFloat(origflavours[flavours[i][3]].Completed),
                             name: flav,
                             sku: flavours[i][3],
                         };
-
+                        }else{
+                        var dat1 = {
+                            Running: parseInt(flavours[i][2],10) + parseInt(origflavours[flavours[i][3]].Running,10),
+                            Reserved: parseInt(origflavours[flavours[i][3]].Reserved,10),
+                            Completed: parseInt(origflavours[flavours[i][3]].Completed,10),
+                            name: flav,
+                            sku: flavours[i][3],
+                        };
+                        }
                         if (replace) {
-
+                         if(sheets[s][3]=='float'){
                             var dat1 = {
-                                Running: flavours[i][2],
-                                Reserved: origflavours[flavours[i][3]].Reserved,
-                                Completed: origflavours[flavours[i][3]].Completed,
+                                Running: parseFloat(flavours[i][2]),
+                                Reserved: parseFloat(origflavours[flavours[i][3]].Reserved),
+                                Completed: parseFloat(origflavours[flavours[i][3]].Completed),
                                 name: flav,
                                 sku: flavours[i][3],
                             };
-
+                          }else{
+                           var dat1 = {
+                                Running: parseInt(flavours[i][2],10),
+                                Reserved: parseInt(origflavours[flavours[i][3]].Reserved,10),
+                                Completed: parseInt(origflavours[flavours[i][3]].Completed,10),
+                                name: flav,
+                                sku: flavours[i][3],
+                            };
+                          
+                          
+                          }
                         }
                     } else if (flav) {
+                    if(sheets[s][3]=='float'){
                         var dat1 = {
-                            Running: flavours[i][2],
+                            Running: parseFloat(flavours[i][2]),
                             sku: flavours[i][3],
                             Reserved: 0,
                             Completed: 0,
                             name: flav,
                         };
-
+                      }else{
+                      
+                       var dat1 = {
+                            Running: parseInt(flavours[i][2],10),
+                            sku: flavours[i][3],
+                            Reserved: 0,
+                            Completed: 0,
+                            name: flav,
+                        };
+                      
+                      }
                         newitems += 'Updated SKU for: ' + flav + ' to ' + flavours[i][3] + '<br>';
                     } else {
                         var sku = flavours[i][3];
+                        
+                       if(sheets[s][3]=='float'){ 
                         var dat1 = {
-                            Running: flavours[i][2],
+                            Running: parseFloat(flavours[i][2]),
                             Completed: 0,
                             Reserved: 0,
                             sku: sku,
                             name: flav
                         };
-
+                        }else{
+                        
+                        var dat1 = {
+                            Running: parseInt(flavours[i][2],10),
+                            Completed: 0,
+                            Reserved: 0,
+                            sku: sku,
+                            name: flav
+                        };
+                        
+                        
+                        }
 
                         base.updateData(sheets[s][1]+'/' + dat1.sku, dat1);
                         // generateForSingleFlavour(flav);
@@ -221,27 +264,27 @@ function QTYInport(id) {
                         var foundSKU = origbottles[botlid[i][3]];
                         if (foundSKU > 0) {
                             var dat1 = {
-                                Running: botlid[i][2] + origbottles[botlid[i][3]].Running,
+                                Running:  parseInt(botlid[i][2],10) +  parseInt(origbottles[botlid[i][3]].Running,10),
                                 'sku': botlid[i][3],
-                                Reserved: origbottles[botlid[i][3]].Reserved,
-                                Completed: origbottles[botlid[i][3]].Completed,
+                                Reserved:  parseInt(origbottles[botlid[i][3]].Reserved,10),
+                                Completed:  parseInt(origbottles[botlid[i][3]].Completed,10),
                                 'name': origbottles[botlid[i][3]].name,
                             };
 
                             if (replace) {
 
                                 var dat1 = {
-                                    Running: botlid[i][2],
+                                    Running:  parseInt(botlid[i][2],10),
                                     'sku': botlid[i][3],
-                                    Reserved: origbottles[botlid[i][3]].Reserved,
-                                    Completed: origbottles[botlid[i][3]].Completed,
+                                    Reserved:  parseInt(origbottles[botlid[i][3]].Reserved,10),
+                                    Completed:  parseInt(origbottles[botlid[i][3]].Completed,10),
                                     'name': origbottles[botlid[i][3]].name,
                                 };
 
                             }
                         } else if (name) {
                             var dat1 = {
-                                Running: botlid[i][2],
+                                Running:  parseInt(botlid[i][2],10),
                                 'sku': botlid[i][3],
                                 Reserved: 0,
                                 Completed: 0,
@@ -252,7 +295,7 @@ function QTYInport(id) {
                         } else {
                             var sku = botlid[i][3];
                             var dat1 = {
-                                Running: botlid[i][2],
+                                Running:  parseInt(botlid[i][2],10),
                                 Completed: 0,
                                 Reserved: 0,
                                 sku: sku,
@@ -280,27 +323,27 @@ function QTYInport(id) {
                         var foundSKU = origcaps[botlid[i][3]];
                         if (foundSKU > 0) {
                             var dat1 = {
-                                Running: botlid[i][2] + origcaps[botlid[i][3]].Running,
+                                Running: parseInt(botlid[i][2],10) + parseInt(origcaps[botlid[i][3]].Running,10),
                                 'sku': botlid[i][3],
-                                Reserved: origcaps[botlid[i][3]].Reserved,
-                                Completed: origcaps[botlid[i][3]].Completed,
+                                Reserved: parseInt(origcaps[botlid[i][3]].Reserved,10),
+                                Completed: parseInt(origcaps[botlid[i][3]].Completed,10),
                                 name: origcaps[botlid[i][3]].name,
                             };
 
                             if (replace) {
 
                                 var dat1 = {
-                                    Running: botlid[i][2],
+                                    Running: parseInt(botlid[i][2],10),
                                     sku: botlid[i][3],
-                                    Reserved: origcaps[botlid[i][3]].Reserved,
-                                    Completed: origcaps[botlid[i][3]].Completed,
+                                    Reserved: parseInt(origcaps[botlid[i][3]].Reserved,10),
+                                    Completed: parseInt(origcaps[botlid[i][3]].Completed,10),
                                     name: origcaps[botlid[i][3]].name,
                                 };
 
                             }
                         } else if (name) {
                             var dat1 = {
-                                Running: botlid[i][2],
+                                Running: parseInt(botlid[i][2],10),
                                 sku: botlid[i][3],
                                 Reserved: 0,
                                 Completed: 0,
@@ -311,7 +354,7 @@ function QTYInport(id) {
                         } else {
                             var sku = botlid[i][3];
                             var dat1 = {
-                                Running: botlid[i][2],
+                                Running: parseInt(botlid[i][2],10),
                                 Completed: 0,
                                 Reserved: 0,
                                 sku: sku,
@@ -348,19 +391,19 @@ function QTYInport(id) {
                     if (origpremix[premix[i][3]]) {
                         var sku = premix[i][3];
                         var dat1 = {
-                            Running: premix[i][2] + origpremix[premix[i][3]].Running,
+                            Running: parseFloat(premix[i][2]) + parseFloat(origpremix[premix[i][3]].Running),
                             'sku': sku,
-                            Reserved: origpremix[premix[i][3]].Reserved,
-                            Completed: origpremix[premix[i][3]].Completed,
+                            Reserved: parseFloat(origpremix[premix[i][3]].Reserved),
+                            Completed: parseFloat(origpremix[premix[i][3]].Completed),
                             'name': origpremix[premix[i][3]].name,
                         };
                         if (replace) {
 
                             var dat1 = {
-                                Running: premix[i][2],
+                                Running: parseFloat(premix[i][2]),
                                 'sku': sku,
-                                Reserved: origpremix[premix[i][3]].Reserved,
-                                Completed: origpremix[premix[i][3]].Completed,
+                                Reserved: parseFloat(origpremix[premix[i][3]].Reserved),
+                                Completed: parseFloat(origpremix[premix[i][3]].Completed),
                                 'name': origpremix[premix[i][3]].name,
                             };
 
@@ -411,19 +454,19 @@ function QTYInport(id) {
                     if (origunbranded[unbranded[i][3]]) {
                         var sku = unbranded[i][3];
                         var dat1 = {
-                            Running: unbranded[i][2] + origunbranded[unbranded[i][3]].Running,
+                            Running: parseInt(unbranded[i][2],10) + parseInt(origunbranded[unbranded[i][3]].Running,10),
                             'sku': sku,
-                            Reserved: origunbranded[unbranded[i][3]].Reserved,
-                            Completed: origunbranded[unbranded[i][3]].Completed,
+                            Reserved: parseInt(origunbranded[unbranded[i][3]].Reserved,10),
+                            Completed: parseInt(origunbranded[unbranded[i][3]].Completed,10),
                             'name': origunbranded[unbranded[i][3]].name,
                         };
                         if (replace) {
 
                             var dat1 = {
-                                Running: unbranded[i][2],
+                                Running: parseInt(unbranded[i][2],10),
                                 'sku': sku,
-                                Reserved: origunbranded[unbranded[i][3]].Reserved,
-                                Completed: origunbranded[unbranded[i][3]].Completed,
+                                Reserved: parseInt(origunbranded[unbranded[i][3]].Reserved,10),
+                                Completed: parseInt(origunbranded[unbranded[i][3]].Completed,10),
                                 'name': origunbranded[unbranded[i][3]].name,
                             };
 
@@ -477,19 +520,19 @@ function QTYInport(id) {
                     if (origbranded[branded[i][3]]) {
                         var sku = branded[i][3];
                         var dat1 = {
-                            Running: branded[i][2] + origbranded[branded[i][3]].Running,
+                            Running: parseInt(branded[i][2],10) + parseInt(origbranded[branded[i][3]].Running,10),
                             'sku': sku,
-                            Reserved: origbranded[branded[i][3]].Reserved,
-                            Completed: origbranded[branded[i][3]].Completed,
+                            Reserved: parseInt(origbranded[branded[i][3]].Reserved,10),
+                            Completed: parseInt(origbranded[branded[i][3]].Completed,10),
                             'name': origbranded[branded[i][3]].name,
                         };
                         if (replace) {
                            var sku = origbranded[i][3];
                             var dat1 = {
-                                Running: branded[i][2],
+                                Running: parseInt(branded[i][2],10),
                                 'sku': sku,
-                                Reserved: origbranded[branded[i][3]].Reserved,
-                                Completed: origbranded[branded[i][3]].Completed,
+                                Reserved: parseInt(origbranded[branded[i][3]].Reserved,10),
+                                Completed: parseInt(origbranded[branded[i][3]].Completed,10),
                                 'name': origbranded[branded[i][3]].name,
                             };
 
