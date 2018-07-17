@@ -1,11 +1,30 @@
 function CheckPremixed(data) {
+    var suffix = data.batch.substr(-1);
+    var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
     var LOGARR = [];
     if(! data.used){
     data.used=new Array();
     }
     var order= base.getData('Orders/' + data.batch);
     var premix = getPremixSKU(data,false);
-
+    if(!for_premix_stock){
+      toProduction(data);
+      LOGARR.push(['Sent to Production:', data.bottles]);
+      data.used.push(['Lids/', data.lidSKU,data.bottles]);
+      var neg = fromRunningtoReserved('Lids/' + data.lidSKU, data.bottles);
+      LOGARR.push([data.lidSKU, data.bottles]);
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
+        return LOGARR;
+      }
+      data.used.push(['BottleTypes/', data.botSKU,data.bottles]);
+      var neg = fromRunningtoReserved('BottleTypes/' + data.botSKU, data.bottles);
+      LOGARR.push([data.botSKU, data.bottles]);
+      if (neg<0) {
+        LOGARR = LOGARR.concat(returnData(data,neg))
+        return LOGARR;
+      }
+    }
   if(data.Color){
     data.used.push(['Color/', data.Color.sku, data.QTY*10*data.Color.val]);
     LOGARR.push(['Color:',data.QTY*10*data.Color.val]);
@@ -255,12 +274,6 @@ function CheckPremixed(data) {
         }
     }
 
-    toProduction(data);
-    LOGARR.push(['Sent to Production:', data.bottles]);
-    fromRunningtoReserved('Lids/' + data.lidSKU, data.bottles);
-    LOGARR.push([data.lidSKU, data.bottles]);
-    fromRunningtoReserved('BottleTypes/' + data.botSKU, data.bottles);
-    LOGARR.push([data.botSKU, data.bottles]);
 
 
 
