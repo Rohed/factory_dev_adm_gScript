@@ -329,30 +329,35 @@ function runItem(batch,frombulk) {
   } else {
    var labelexists = 1
   }
+  var packagingTypeexists = 1;
   if (data.packagingType) {
-    var packagingTypeexists = null;
-    if(data.packagingType.sku){
-      packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
-      if(!packagingTypeexists){
-        missingmsg+='Missing Package: '+data.botlabelsku+'\n';
-      }else if(!packagingTypeexists.botperPack){
-        missingmsg+='Missing Package Bottles Per Pack: '+data.packagingType.sku+'\n';
-        packagingTypeexists=false;
-      }else{
-        var div = data.bottles/packagingTypeexists.botperPack;
-        if(parseInt(div,10)!=div){
-        missingmsg+='WARNING! Running '+data.bottles+' Bottles with a package that uses '+packagingTypeexists.botperPack+' Bottles per Package. \n Order quantities must be in raw bottles format. Ex: 1 of 3x10ml = 3 raw 10ml bottles ';
-        packagingTypeexists=false;
+    if(data.packagingType.sku !=''){
+      packagingTypeexists=null;
+      if(data.packagingType.sku != undefined){
+        packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
+        if(!packagingTypeexists){
+          missingmsg+='Missing Package: '+data.botlabelsku+'\n';
+        }else if(!packagingTypeexists.botperPack){
+          missingmsg+='Missing Package Bottles Per Pack: '+data.packagingType.sku+'\n';
+          packagingTypeexists=false;
+        }else{
+          var div = data.bottles/packagingTypeexists.botperPack;
+          if(parseInt(div,10)!=div){
+            missingmsg+='WARNING! Running '+data.bottles+' Bottles with a package that uses '+packagingTypeexists.botperPack+' Bottles per Package. \n Order quantities must be in raw bottles format. Ex: 1 of 3x10ml = 3 raw 10ml bottles ';
+            packagingTypeexists=false;
+          }
+          
         }
-      
+        
+      }else{
+        missingmsg+='Missing Package SKU: '+data.batch+'\n';
       }
-      
     }else{
-      missingmsg+='Missing Package SKU: '+data.packagingType.sku+'\n';
+      packagingTypeexists = 1
     }
   } else {
-    var packagingTypeexists = 1
-    }
+    packagingTypeexists = 1
+  }
     if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists ) {
 
       
