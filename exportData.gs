@@ -1,5 +1,5 @@
 function export(tabs) {
-//var tabs=['Recipes'];
+//var tabs=['QTY'];
  var LOGDATA={
     status:true,
     msg:'',
@@ -324,7 +324,7 @@ for(var j=0;j<tabs.length;j++){
         
  
      var data=getQTYFull();
-     var headerRow=['SKU','Name','Running','Reserved','Completed','Stock']
+     var headerRow=['SKU','Name','Running','Reserved','Completed','Stock','Category']
      var values=[];
      for(var i=0;i<data.length;i++)
      {
@@ -334,8 +334,8 @@ for(var j=0;j<tabs.length;j++){
          }else{
          var stock=0;
          }
-         values.push([data[i].sku,data[i].name,data[i].Running,data[i].Reserved,data[i].Completed,stock]);
-       }else{values.push(['-','-','-','-','-','-']);}
+         values.push([data[i].sku,data[i].name,data[i].Running,data[i].Reserved,data[i].Completed,stock,data[i].Category]);
+       }else{values.push(['-','-','-','-','-','-','-']);}
      
      }
      values.unshift(headerRow);
@@ -696,7 +696,7 @@ for(var j=0;j<tabs.length;j++){
   file.deleteSheet(startsheet);
  var Drivefile=DriveApp.getFileById(file.getId());
   folder.addFile(Drivefile);
-  
+  Logger.log(file.getUrl());
   LOGDATA.data.push(['File URL:',file.getUrl()])
   logItem(LOGDATA);
   return 'Spreadsheet created with sheets: '+tabs.toString()+' and URL: '+Drivefile.getUrl();
@@ -755,6 +755,7 @@ var marr=[];
     
 
     for(var i=0;i<result.length;i++){
+  result[i][1].Category='Misc';
       marr.push(result[i][1]);
       
     }
@@ -809,7 +810,7 @@ if(marr[i].name!='VG'&&marr[i].name!='PG'&&marr[i].name!='Nicotine'&&marr[i].nam
 
 }
 
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var packages=base.getData('Labels');
 
 
@@ -821,6 +822,7 @@ var packages=base.getData('Labels');
     
   
     for(var i=0;i<result.length;i++){
+    result[i][1].Category='Labels';
       retArr.push(result[i][1]);
       
     }
@@ -828,7 +830,7 @@ var packages=base.getData('Labels');
 }
 
 
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var packages=base.getData('Boxes');
 
 
@@ -840,6 +842,7 @@ var packages=base.getData('Boxes');
     
   
     for(var i=0;i<result.length;i++){
+        result[i][1].Category='Boxes';
       retArr.push(result[i][1]);
       
     }
@@ -847,7 +850,7 @@ var packages=base.getData('Boxes');
 }
 
 
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var packages=base.getData('Packages');
 
 
@@ -859,12 +862,13 @@ var packages=base.getData('Packages');
     
   
     for(var i=0;i<result.length;i++){
+       result[i][1].Category='Packages';
       retArr.push(result[i][1]);
       
     }
 
 }
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var packages=base.getData('Color');
 
 
@@ -876,12 +880,13 @@ var packages=base.getData('Color');
     
   
     for(var i=0;i<result.length;i++){
+         result[i][1].Category='Colors';
       retArr.push(result[i][1]);
       
     }
 
 }
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var flavours=base.getData('Flavours');
 
 
@@ -893,6 +898,7 @@ var flavours=base.getData('Flavours');
     
    
    for(var i=0;i<result.length;i++){
+   result[i][1].Category='Flavours';
    if(result[i][1].Running){
      result[i][1].Running=parseFloat(result[i][1].Running).toFixed(2);
      }
@@ -907,7 +913,7 @@ var flavours=base.getData('Flavours');
    }
 }
 
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var bottletypes=base.getData('BottleTypes');
 
  if(bottletypes){
@@ -917,12 +923,13 @@ var bottletypes=base.getData('BottleTypes');
     
    
     for(var i=0;i<result.length;i++){
+       result[i][1].Category='Bottles';
       retArr.push(result[i][1]);
       
     }
 
 }
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var lids=base.getData('Lids');
  if(lids){
     var result = Object.keys(lids).map(function(key) {
@@ -931,10 +938,11 @@ var lids=base.getData('Lids');
     
    
     for(var i=0;i<result.length;i++){
+       result[i][1].Category='Caps';
       retArr.push(result[i][1]);
       
     }}
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var premixes=base.getData('PremixesTypes');
 
  if(premixes){
@@ -944,6 +952,7 @@ var premixes=base.getData('PremixesTypes');
     
  
    for(var i=0;i<result.length;i++){
+     result[i][1].Category='Premix Stock';
    if(result[i][1].Running){
      result[i][1].Running=parseFloat(result[i][1].Running).toFixed(2);
      }
@@ -958,7 +967,7 @@ var premixes=base.getData('PremixesTypes');
    }
 }
 
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var unbranded=base.getData('UnbrandedTypes'); 
  if(unbranded){
     var result = Object.keys(unbranded).map(function(key) {
@@ -967,13 +976,14 @@ var unbranded=base.getData('UnbrandedTypes');
     
 
     for(var i=0;i<result.length;i++){
+    result[i][1].Category='Unbranded Stock';
       retArr.push(result[i][1]);
       
     }
   }
 
 
-retArr.push('-','-','-','-');
+retArr.push('-','-','-','-','-');
 var brands=base.getData('BrandedTypes'); 
 
  if(brands){
@@ -983,6 +993,7 @@ var brands=base.getData('BrandedTypes');
     
  
     for(var i=0;i<result.length;i++){
+        result[i][1].Category='Branded Stock';
       retArr.push(result[i][1]);
       
     }
