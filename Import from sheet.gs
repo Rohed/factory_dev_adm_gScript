@@ -81,6 +81,7 @@ function Import_new_FBC() {
 }
 
 function QTYInport(id) {
+
     var LOGDATA = {
         status: true,
         msg: '',

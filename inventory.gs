@@ -1,4 +1,6 @@
 function saveItem(data) {
+
+
     var LOGDATA = {
         status: true,
         msg: '',
@@ -29,7 +31,7 @@ function saveItem(data) {
       if (!QTYitem.Stock) {
         QTYitem.Stock = 0;
       }
-        if(data.key){
+        if(data.key != 'undefined'){
          var olddat=base.getData('Inventory/' + data.key);
            if (data.delivdate&& olddat.quantity!=data.quantity) {
                 LOGDATA.data.push(['Added to Stock:', data.quantity]);
