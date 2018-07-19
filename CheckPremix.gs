@@ -8,7 +8,7 @@ function CheckPremixed(data) {
     var order= base.getData('Orders/' + data.batch);
     var premix = getPremixSKU(data,false);
     
-    if(!for_premix_stock){
+    if(!for_premixed_stock){
       toProduction(data);
       LOGARR.push(['Sent to Production:', data.bottles]);
       data.used.push(['Lids/', data.lidSKU,data.bottles]);

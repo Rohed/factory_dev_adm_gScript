@@ -32,7 +32,4 @@ MailApp.sendEmail({
     htmlBody: "<a href='"+file.getUrl()+"'>"+name+"</a> ",
   });
 });
-
-
-
 }
