@@ -670,20 +670,11 @@ function updateShippingInformation2(batch) {
 }
 
 function getShippingData() {
-    var orders = getOrdersData();
 
-    var shipping = base.getData('Shipping/');
+    var shipping =JSONtoARR( base.getData('Shipping'));
     if (shipping) {
-        var result = Object.keys(shipping).map(function(key) {
-            return [Number(key), shipping[key]];
-        });
-
-        var shippingArr = [];
-        for (var i = 0; i < result.length; i++) {
-            shippingArr.push(result[i][1]);
-        }
-    
-        shippingArr.sort(sortDATEHL('orderdate'));
+       
+        var shippingArr =shipping.filter(function(item){ if(item.orderdate){return true}else{return false}}).sort(sortDATEHL('orderdate'));
         return shippingArr;
 
     } else {

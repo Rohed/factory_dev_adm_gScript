@@ -1,5 +1,5 @@
 function export(tabs) {
-//var tabs=['QTY'];
+//var tabs=['Shipping'];
  var LOGDATA={
     status:true,
     msg:'',
