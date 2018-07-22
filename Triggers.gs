@@ -15,6 +15,8 @@ function createTriggers() {
 
 function exportCompletedItems(){
 var today = new Date();
+var day = today.getDay();
+if(day>0 && day<6){
 var formattedDate = Utilities.formatDate(new Date(), "GMT","dd-MM-yyyy");
 var subject = 'Completed items for today';
 if(today.getHours() == 14){
@@ -36,6 +38,7 @@ MailApp.sendEmail({
     htmlBody: "<a href='"+file.getUrl()+"'>"+name+"</a> ",
   });
 });
+} 
 }
 
 function testsendEmail(){
