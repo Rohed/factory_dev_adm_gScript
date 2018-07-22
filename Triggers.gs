@@ -24,6 +24,7 @@ subject+=' 2PM report ';
 }else{
 subject+=' 8PM report ';
 }
+
 var name = subject+' '+formattedDate;
 var file = createCompletedExport(today.getHours(),name);
 COMPLETED_ITEMS_MAIL.map(function(item){
