@@ -1554,7 +1554,7 @@ for(var s =0;s<sheets.length;s++){
       switch (sheets[s]){
         case 'Orders':  
           values[1][13]=totals[0];
-          values[1][14]=totals[1];
+          values[1][18]=totals[1];
           break;
         case 'MixingTeam':
            values[1][10]=totals[0];
