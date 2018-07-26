@@ -19,7 +19,7 @@ var day = today.getDay();
 if(day>0 && day<6){
 var formattedDate = Utilities.formatDate(new Date(), "GMT","dd-MM-yyyy");
 var subject = 'Completed items for today';
-if(today.getHours() == 14){
+if(today.getHours() <= 15){
 subject+=' 2PM report ';
 }else{
 subject+=' 8PM report ';

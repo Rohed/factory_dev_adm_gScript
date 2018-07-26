@@ -139,6 +139,9 @@ function printShippingNote(data,x){
   var values=[];
   var customer;
   var batches=[];
+  var Filename = '';
+  var customers = [];
+
   for(var i=0;i<data.length;i++){
     for(var j=0;j<list.length;j++){
       
@@ -151,6 +154,16 @@ function printShippingNote(data,x){
         if(orders[list[j].batch]){
           
           customer=list[j].customer;
+          if(customers.length>=1){
+             if(customers[customers.length-1]!=customer){
+              Filename+=", "+data[i]+" '"+customer+"'";
+              customers.push(customer);
+             }
+          }else{
+          Filename+=data[i]+" '"+customer+"'";
+           customers.push(customer);
+          }
+         
           if(orders[list[j].batch].final_status=='Completed'){
             if(orders[list[j].batch+"PO"] ||orders[list[j].batch+"PK"] ){
               if(orders[list[j].batch+"PO"]){
@@ -187,7 +200,8 @@ function printShippingNote(data,x){
     }
     
   }
-  
+  Filename+=' '+formattedDate;
+  SS.rename(Filename);
   
   for(var i=0;i<values.length;i++){
     var first=values[i][0];
