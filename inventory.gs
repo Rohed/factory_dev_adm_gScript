@@ -33,12 +33,28 @@ function saveItem(data) {
       }
         if(data.key != 'undefined'){
          var olddat=base.getData('Inventory/' + data.key);
-           if (data.delivdate&& olddat.quantity!=data.quantity) {
+           if (data.delivdate&& (olddat.quantity!=data.quantity)) {
                 LOGDATA.data.push(['Added to Stock:', data.quantity]);
                 QTYitem.Stock = QTYitem.Stock - data.quantity;
                 QTYitem.Running += data.quantity;
                QTYitem.Stock = QTYitem.Stock + olddat.quantity;
                QTYitem.Running -= olddat.quantity;
+                data.addedtoQTY = 'Added';
+                data.row = olddat.row;
+                data.name = data.desc + " " + data.orderdate + " " + data.quantity;
+                base.removeData('Inventory/' + data.key);
+                base.updateData('Inventory/' + data.key, data);
+                if (data.page == 'Misc') {
+                   base.updateData(data.page + '/' + data.desc, QTYitem); 
+                } else {
+                    base.updateData(data.page + '/' + data.sku, QTYitem);
+                }
+                logItem(LOGDATA);
+                return data.name+" saved and added to QTY Running.";
+            }else if(olddat.delivdate!=data.delivdate){
+                LOGDATA.data.push(['Added to Stock:', data.quantity]);
+                QTYitem.Stock = QTYitem.Stock - data.quantity;
+                QTYitem.Running += data.quantity;
                 data.addedtoQTY = 'Added';
                 data.row = olddat.row;
                 data.name = data.desc + " " + data.orderdate + " " + data.quantity;
