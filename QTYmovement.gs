@@ -389,3 +389,16 @@ Running:orig1-value
 base.updateData(batch,data1);
 
 }
+
+function removeFromReserved(batch,value){
+
+var orig1=base.getData(batch+"/Reserved");
+
+var data1={
+Running:orig1-value
+
+};
+
+base.updateData(batch,data1);
+
+}

@@ -1,4 +1,5 @@
 function CheckPremixed(data) {
+try{
     var suffix = data.batch.substr(-1);
     var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
     var LOGARR = [];
@@ -136,8 +137,11 @@ function CheckPremixed(data) {
             var rounded = Math.ceil(data.QTY);
 
         }
-
-
+      var order = base.getData('Orders/'+data.batch);
+      if(data.QTY==0 && order.premixed==0 && order.unbranded==0 && order.branded==0 && order.backtubed==0){
+      returnData(data,0) 
+      
+      }
 
         var forpremix = rounded - data.QTY;
 
@@ -280,6 +284,11 @@ function CheckPremixed(data) {
 
 
     return LOGARR;
+      }catch(e){
+Logger.log('premix');
+returnData(data,0)
+return e.message;
+}
 }
 function checkColoredPremix(data){
     var LOGARR = [];
@@ -390,8 +399,13 @@ function checkColoredPremix(data){
 function returnData(data,neg) {
     var LOGARR = [];
     for (var i = 0; i < data.used.length; i++) {
+    try{
         fromReservedToRunning(data.used[i][0] + data.used[i][1], data.used[i][2]);
         LOGARR.push(['To Running: ' + data.used[i][0] + data.used[i][1], data.used[i][2]]);
+      }catch(e){
+      
+        LOGARR.push(['To Running Failed: ' + data.used[i][0] + data.used[i][1], data.used[i][2]]);
+      }
     }
       var dat = {
         wentNegative: true,
@@ -407,10 +421,18 @@ function returnData(data,neg) {
     var sheets2 = ['Production', 'Printing', 'Labelling', 'Packaging', 'Shipping'];
 
     for (var i = 0; i < sheets2.length; i++) {
+        try{
         base.removeData(sheets2[i] + '/' + data.batch);
-
+        }catch(e){
+          
+          LOGARR.push(['Removing From Tab Failed: ', sheets2[i] + '/' + data.batch]);
+        }
     }
+    try{
     var name = base.getData(data.used[data.used.length-1][0] + data.used[data.used.length-1][1]+'/name');
+    }catch(e){
+    var name ='none';
+    }
     LOGARR.push(['WENT NEGATIVE', Math.abs(neg)+ ' - '+ data.used[data.used.length-1][0] + data.used[data.used.length-1][1]+' - '+name ])
 
     return LOGARR;

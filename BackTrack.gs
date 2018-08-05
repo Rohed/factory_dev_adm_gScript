@@ -38,9 +38,9 @@ function fromProduction(batch, bottles) {
     var ORIGBOTTLES = prodData.bottles;
     var removeFromProduction = ORIGBOTTLES - bottles;
     LOGARR.push(['Removed bottles:', removeFromProduction]);
-    fromReservedToRunning('Lids/' + prodData.lidSKU, removeFromProduction);
+    removeFromReserved('Lids/' + prodData.lidSKU, removeFromProduction);
     LOGARR.push(['To Running: ' + prodData.lidSKU, removeFromProduction]);
-    fromReservedToRunning('BottleTypes/' + prodData.botSKU, removeFromProduction);
+    removeFromReserved('BottleTypes/' + prodData.botSKU, removeFromProduction);
     LOGARR.push(['To Running: ' + prodData.botSKU, removeFromProduction]);
     //CHECK PRINTING
     var printData = base.getData('Printing/' + batch);
@@ -60,10 +60,10 @@ function fromProduction(batch, bottles) {
                 box = 0;
             }
             if (tube) {
-                fromReservedToRunning('Packages/' + printData.packagingType.sku, tubes);
+                removeFromReserved('Packages/' + printData.packagingType.sku, tubes);
                 LOGARR.push(['To Running: ' + printData.packagingType.sku, tubes]);
                 if (printData.packlabelsku) {
-                    fromReservedToRunning('Labels/' + printData.packlabelsku, tubes);
+                    removeFromReserved('Labels/' + printData.packlabelsku, tubes);
                     LOGARR.push(['To Running: ' + printData.packlabelsku, tubes]);
                 }
             }
@@ -74,9 +74,9 @@ function fromProduction(batch, bottles) {
             if (!order.ppp) {
                 ink += packink;
             }
-            fromReservedToRunning("Misc/printing ink", ink);
+            removeFromReserved("Misc/printing ink", ink);
             LOGARR.push(['To Running: Ink', ink]);
-            fromReservedToRunning('Labels/' + label, removeFromProduction);
+            removeFromReserved('Labels/' + label, removeFromProduction);
             LOGARR.push(['To Running: ' + label, removeFromProduction]);
         }
     }
@@ -99,14 +99,14 @@ function fromProduction(batch, bottles) {
                     box = 0;
                 }
                 if (tube) {
-                    fromReservedToRunning('Packages/' + labelingData.packagingType.sku, tubes);
+                    removeFromReserved('Packages/' + labelingData.packagingType.sku, tubes);
                     LOGARR.push(['To Running: ' + labelingData.packagingType.sku, tubes]);
                     if (labelingData.packlabelsku) {
-                        fromReservedToRunning('Labels/' + labelingData.packlabelsku, tubes);
+                        removeFromReserved('Labels/' + labelingData.packlabelsku, tubes);
                         LOGARR.push(['To Running: ' + labelingData.packlabelsku, tubes]);
                     }
                 }
-                fromReservedToRunning('Labels/' + label, removeFromProduction);
+                removeFromReserved('Labels/' + label, removeFromProduction);
                 LOGARR.push(['To Running: ' + label, removeFromProduction]);
             }
         }
@@ -131,16 +131,16 @@ function fromProduction(batch, bottles) {
             if (!for_branded_stock) {
                 if (order.packagingType) {
                     LOGARR.push(['To Running: ' + order.packagingType.sku, tubes]);
-                    fromReservedToRunning('Packages/' + order.packagingType.sku, tubes);
+                    removeFromReserved('Packages/' + order.packagingType.sku, tubes);
                 }
                 if (boxname) {
                     LOGARR.push(['To Running: ' + boxname, box]);
-                    fromReservedToRunning('Boxes/' + boxname, box);
+                    removeFromReserved('Boxes/' + boxname, box);
                 }
             } else {
                 if (tube) {
                     LOGARR.push(['To Running: ' + packagingData.packagingType.sku, tubes]);
-                    fromReservedToRunning('Packages/' + packagingData.packagingType.sku, tubes);
+                    removeFromReserved('Packages/' + packagingData.packagingType.sku, tubes);
                 }
             }
             /*else {
@@ -194,16 +194,16 @@ function fromPackaging(batch, bottles) {
             if (!for_branded_stock) {
                 if (order.packagingType.sku) {
                     LOGARR.push(['To Running: ' + order.packagingType.sku, tubes]);
-                    fromReservedToRunning('Packages/' + order.packagingType.sku, tubes);
+                    removeFromReserved('Packages/' + order.packagingType.sku, tubes);
                 }
                 if (boxname) {
                     LOGARR.push(['To Running: ' + boxname, box]);
-                    fromReservedToRunning('Boxes/' + boxname, box);
+                    removeFromReserved('Boxes/' + boxname, box);
                 }
             } else {
                 if (tube != 0) {
                     LOGARR.push(['To Running: ' + packagingData.packagingType.sku, tubes]);
-                    fromReservedToRunning('Packages/' + packagingData.packagingType.sku, tubes);
+                    removeFromReserved('Packages/' + packagingData.packagingType.sku, tubes);
                 }
             }
             /*else {
@@ -355,7 +355,7 @@ function getBatchInfo(batches,key) {
     return [rett, key];
 }
 function testDELANREV(){
-deleteAndReverse( getBatchInfo(['901565'])[0]) 
+deleteAndReverse( getBatchInfo(['913768'])[0]) 
 
 }
 function deleteAndReverse(data) {
@@ -408,14 +408,14 @@ Logger.log(sheetItem);
             if (tube != 0) {
                 //WITH PACKAGING
                 if (for_branded_stock) {
-                    fromReservedToRunning('Packages/' + item.packagingType.sku, tubes);
+                    fromReservedToRunning('Packages/' + item.packagingType.sku, tubes - tominBPack);
                 } else {
                     var box = tubes / packData.divTubesForBox;
                     if (boxname) {
                         fromReservedToRunning('Boxes/' + boxname, box);
                     }
           
-                    fromReservedToRunning('Packages/' + item.packagingType.sku, (item.bottles) / tube);
+                    fromReservedToRunning('Packages/' + item.packagingType.sku,tubes - tominBPack);
                     var brandname2 = getBrandName(item, true);
                     if (brandname2 != order.productcode) {
                         fromReservedToRunning('BrandedTypes/' + brandname2, tominusB);
@@ -442,10 +442,12 @@ Logger.log(sheetItem);
             var suffix = item.batch.substr(-1);
             var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
             var tubes = item.bottles / tube;
+            var tominusB = order.branded;
+            var tominBPack = order.backtubed;
             if (tube != 0) {
                 //WITH PACKAGING
                 if (for_branded_stock) {
-                    fromCompletedToRunning('Packages/' + item.packagingType.sku, tubes);
+                    fromCompletedToRunning('Packages/' + item.packagingType.sku, tubes - tominBPack);
                     removeFromRunning('BrandedTypes/' + brandname, tubes);
                 } else {
                     var box = tubes / packData.divTubesForBox;
@@ -457,7 +459,7 @@ Logger.log(sheetItem);
                     var tominusU = order.unbranded;
                     var tominusB = order.branded;
                     var tominBPack = order.backtubed;
-                    fromCompletedToRunning('Packages/' + item.packagingType.sku, (item.bottles) / tube);
+                    fromCompletedToRunning('Packages/' + item.packagingType.sku, tubes - tominBPack);
                     var brandname2 = getBrandName(item, true);
                     if (brandname2 != order.productcode) {
                         fromCompletedToRunning('BrandedTypes/' + brandname2, tominusB);
@@ -485,7 +487,7 @@ Logger.log(sheetItem);
             var tomix = order.mixing;
             var tominusP = order.premixed;
             var tominusU = order.unbranded;
-            var tominusTUBE = order.backtubed;
+            var tominBPack = order.backtubed;
             var leftoverbots = order.branded;
             var botQ2 = item.bottles + leftoverbots;
             var label = order.botlabelsku;
@@ -497,9 +499,10 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if (item.packlabelsku) {
-                fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
+
+                fromReservedToRunning('Labels/' + item.packlabelsku,  tubes );
             }
-            fromReservedToRunning('Labels/' + label, item.bottles);
+            fromReservedToRunning('Labels/' + label, item.bottles );
             var suffix = item.batch.substr(-1);
             var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
             if (for_branded_stock) {
@@ -531,7 +534,7 @@ Logger.log(sheetItem);
             var tomix = order.mixing;
             var tominusP = order.premixed;
             var tominusU = order.unbranded;
-            var tominusTUBE = order.backtubed;
+            var tominBPack = order.backtubed;
             var leftoverbots = order.branded;
             var botQ2 = item.bottles + leftoverbots;
             var label = order.botlabelsku;
@@ -580,7 +583,7 @@ Logger.log(sheetItem);
             var tomix = order.mixing;
             var tominusP = order.premixed;
             var tominusU = order.unbranded;
-            var tominusTUBE = order.backtubed;
+            var tominBPack = order.backtubed;
             var leftoverbots = order.branded;
             var botQ2 = item.bottles + leftoverbots;
             var label = order.botlabelsku;
@@ -592,6 +595,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if (item.packlabelsku) {
+      
                 fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
             }
             fromReservedToRunning('Labels/' + label, item.bottles);
@@ -616,7 +620,7 @@ Logger.log(sheetItem);
                     var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
                     var tubes = item.bottles / tube;
                     //WITH PACKAGING
-                    fromReservedToRunning('Packages/' + item.packagingType.sku, tubes);
+                    fromReservedToRunning('Packages/' + item.packagingType.sku, tubes - tominBPack);
                 }
             }
         } else if (sheet == 'Printing' && sheetItem[4][0] == 'Completed') {

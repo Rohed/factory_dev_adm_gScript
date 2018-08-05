@@ -1,4 +1,5 @@
 var sheets=['MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
+var QTYSHEETS=['Misc','Packages','Flavours','Labels','Lids','Boxes',];
 
 var PASSWORD='PASSWORD';
 var SLSHEETPASSWORD="SLSHEET";

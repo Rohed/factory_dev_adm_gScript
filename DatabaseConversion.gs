@@ -1,4 +1,12 @@
-     
+function testpmix(){
+var list = JSONtoARR(base.getData('Flavours'));
+list.map(function(item){
+if(isNaN(item.Running)){
+Logger.log("item - " + item.sku);
+}
+});
+
+}     
 function runALL(){
 generateRecipeCodes();
 createNewPackages();
