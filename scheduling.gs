@@ -68,6 +68,7 @@ function saveSchedule(dataPaginated, obj) {
   }
   
 }
+
 function updateSchedulesFor(newItem,oldItem){
   var LOGDATA = {
     status: true,
