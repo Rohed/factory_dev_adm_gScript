@@ -1,3 +1,5 @@
+
+
 function testmachinestatus(){
 
   var allMachines = base.getData('Machines');
