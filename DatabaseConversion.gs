@@ -1,3 +1,42 @@
+function deleteItems(){
+var id = '1yv7HQDGvNuLwDUgfMHOMuqLJdUoN7s_nz-09LvrF7V0';
+var sheets = SpreadsheetApp.openById(id).getSheets();
+var batchRow = [3,3,3,3,4,2];
+for(var i =4;i<5;i++){
+var name = sheets[i].getName();
+var data = sheets[i].getDataRange().getValues();
+  for(var d=0;d<data.length;d++){
+    base.removeData(name+'/'+data[d][batchRow[i]]);
+  }
+
+}
+
+
+}
+function deleteItems2(){
+var id = '1NOs0mGpwkoFjMTUEnHjdbVI0_iE7kX2-zdfzJLLcLt4';
+  var SS = SpreadsheetApp.openById(id).getSheets();
+
+  var data = SS[0].getDataRange().getValues();
+  
+    var payload={ 
+      'items':JSON.stringify(data),
+      
+    };
+
+     var params={
+      method:"POST",
+      "Content-Type":'application/json',
+      muteHttpExceptions :true,
+      'payload':payload,
+    }
+    var url='http://212.69.229.10:4000/'+NODE_PATH+'/deletedata';
+    var response=UrlFetchApp.fetch(url, params).getContentText();
+    
+  
+    Logger.log(response);
+
+}
 function testpmix(){
 var list = JSONtoARR(base.getData('Flavours'));
 list.map(function(item){

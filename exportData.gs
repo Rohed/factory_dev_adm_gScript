@@ -1,5 +1,5 @@
 function export(tabs) {
-var tabs=['MixingTeam'];
+//var tabs=['MixingTeam'];
  var LOGDATA={
     status:true,
     msg:'',

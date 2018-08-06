@@ -785,7 +785,7 @@ function removeItemFromARR(arr, index1, index2, amount) {
 
 function getTimesWithBrakes(id){
 
-  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Firday','Saturday'];
+  var days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
   var day=new Date(parseInt(id,10)).getDay();
   var existingTimes = [];
   var timeArr=[];
