@@ -33,8 +33,10 @@ function saveSchedule(dataPaginated, obj) {
   
     for(var j = 0 ; j<dataPaginated.length;j++){
       for(var b = 0 ; b<dataPaginated[j].length;b++){
-        if(dataPaginated[j][b].final_status==0){
+       if(dataPaginated[j][b].batch){ 
+        if(dataPaginated[j][b].movedtoNext!=0){
           return 'Order '+dataPaginated[j][b].batch+' has already been started.';
+        }
         }
         
       }
@@ -154,10 +156,11 @@ function DeleteSchedule(obj){
 function insertNewSchedule(dataPaginated, obj){
   for(var j = 0 ; j<dataPaginated.length;j++){
     for(var b = 0 ; b<dataPaginated[j].length;b++){
-      if(dataPaginated[j][b].final_status==0){
+    if(dataPaginated[j][b].batch){ 
+      if(dataPaginated[j][b].movedtoNext!=0){
       return 'Order '+dataPaginated[j][b].batch+' has already been started.';
       }
-      
+      }
     }
     
   }
