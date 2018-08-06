@@ -31,7 +31,7 @@ function saveSchedule(dataPaginated, obj) {
   
     for(var j = 0 ; j<dataPaginated.length;j++){
       for(var b = 0 ; b<dataPaginated[j].length;b++){
-        if(!dataPaginated[j][b].final_status){
+        if(dataPaginated[j][b].final_status){
           return 'Order '+dataPaginated[j][b].batch+' has already been started.';
         }
         
@@ -42,8 +42,7 @@ function saveSchedule(dataPaginated, obj) {
       'dataPaginated':JSON.stringify(dataPaginated),
       'obj':JSON.stringify(obj),
     };
-    base.updateData('schedulingpayload/payload',payload);
-    return;
+
 
     var params={
       method:"POST",
@@ -152,7 +151,7 @@ function DeleteSchedule(obj){
 function insertNewSchedule(dataPaginated, obj){
   for(var j = 0 ; j<dataPaginated.length;j++){
     for(var b = 0 ; b<dataPaginated[j].length;b++){
-      if(!dataPaginated[j][b].final_status){
+      if(dataPaginated[j][b].final_status){
       return 'Order '+dataPaginated[j][b].batch+' has already been started.';
       }
       
