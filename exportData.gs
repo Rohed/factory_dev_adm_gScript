@@ -1,5 +1,5 @@
 function export(tabs) {
-var tabs=['MixingTeam'];
+//var tabs=['Shipping'];
  var LOGDATA={
     status:true,
     msg:'',
@@ -63,7 +63,7 @@ for(var j=0;j<tabs.length;j++){
        
    }else if(tabs[j]== 'MixingTeam'){
 
-     var data=JSONtoARR(base.getData('MixingTeam'));
+     var data=getSheetData('MixingTeam');
         if(!data){continue;}
      var headerRow=['Completed','Priority','Date of Production','Batch','Mix Batch','Recipe','Flavour','Order Date','QTY(Litres)','VG (MG)','AG (MG)',
      'PG (MG)','Nicotine (MG)','Nicotine Salts (MG)','CBD (MG)','MCT (MG)','Flavour (MG)','Notes - Mixing Dept','Location','Start Date','Completion Date','VG supplier batch','PG supplier batch','Nicotine supplier batch','Flavour supplier batch'];
@@ -75,7 +75,6 @@ for(var j=0;j<tabs.length;j++){
             var orderDates=[];
             var priorities=[];
             var mixARR=[];
-            if(data[i].Batches){
                var result = Object.keys(data[i].Batches).map(function(key) {
                     return [Number(key), data[i].Batches[key]];
                   });
@@ -93,7 +92,6 @@ for(var j=0;j<tabs.length;j++){
             }      
       values.push([data[i].Completed,priorities.join(),data[i].prodDate,batches.join(),data[i].MIXNAME,data[i].RECIPE,data[i].FLAVOUR,orderDates.join(),
       data[i].QTYTOTAL,data[i].VGval,data[i].AGval,data[i].PGval,data[i].Nico,data[i].Nicosalts,data[i].CBDvalue,data[i].MCTval,data[i].flavvalue,data[i].Notes,data[i].Location,formatDateDisplay2(data[i].starttime),data[i].CompletionDate,data[i].vgSupplier,data[i].pgSupplier,data[i].nicSupplier,data[i].flavSupplier]);
-      }
       }
       var sheet=file.insertSheet('Mixing Team');
       sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
