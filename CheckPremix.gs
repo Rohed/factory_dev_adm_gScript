@@ -291,6 +291,9 @@ return e.message;
 }
 }
 function checkColoredPremix(data){
+    if(! data.used){
+    data.used=new Array();
+    }
     var LOGARR = [];
 
 
