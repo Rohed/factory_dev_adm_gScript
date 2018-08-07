@@ -1,5 +1,5 @@
 function testPartial(){
-filter('906427', 7500, 'Packaging')
+filter('911874', 250, 'Production')
 
 }
 
@@ -43,16 +43,19 @@ function fromProduction(batch, bottles) {
   var premix = getPremixSKU(order,false);
   var premixColored = getPremixSKU(order,true);
   var forColored = order.recipe.Color ? true : false;
-  var volume = removeFromProduction* order.fill/ 1000;
+  var volume = bottles* order.fill/ 1000;
    var amount = 0;
+    var helper = 0;
   if(tominusP>0){
     if(tominusP>volume){
       
       amount = volume;
       volume=0;
+       helper=0;
     }else{
       amount = tominusP;
       volume=volume - tominusP;
+      helper=tominusP;
     }
     if(forColored){
       fromReservedToRunning('PremixesTypes/' + premixColored, amount);
@@ -60,7 +63,7 @@ function fromProduction(batch, bottles) {
       fromReservedToRunning('PremixesTypes/' + premix, amount);
     }
     var dat1 ={
-      premixed:volume,
+      premixed:helper,
     }
     base.updateData('Orders/' + batch,dat1);
     
