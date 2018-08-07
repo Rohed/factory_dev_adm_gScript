@@ -31,16 +31,16 @@ function saveSchedule(dataPaginated, obj) {
   };
   try{
   
-    for(var j = 0 ; j<dataPaginated.length;j++){
-      for(var b = 0 ; b<dataPaginated[j].length;b++){
-       if(dataPaginated[j][b].batch){ 
-        if(dataPaginated[j][b].movedtoNext!=0){
-          return 'Order '+dataPaginated[j][b].batch+' has already been started.';
-        }
-        }
-        
-      }
-    }
+//    for(var j = 0 ; j<dataPaginated.length;j++){
+//      for(var b = 0 ; b<dataPaginated[j].length;b++){
+//       if(dataPaginated[j][b].batch){ 
+//        if(dataPaginated[j][b].movedtoNext!=0){
+//          return 'Order '+dataPaginated[j][b].batch+' has already been started.';
+//        }
+//        }
+//        
+//      }
+//    }
   obj.id=obj.entryDate;
     var payload={ 
       'dataPaginated':JSON.stringify(dataPaginated),
@@ -154,16 +154,16 @@ function DeleteSchedule(obj){
 
 }
 function insertNewSchedule(dataPaginated, obj){
-  for(var j = 0 ; j<dataPaginated.length;j++){
-    for(var b = 0 ; b<dataPaginated[j].length;b++){
-    if(dataPaginated[j][b].batch){ 
-      if(dataPaginated[j][b].movedtoNext!=0){
-      return 'Order '+dataPaginated[j][b].batch+' has already been started.';
-      }
-      }
-    }
-    
-  }
+//  for(var j = 0 ; j<dataPaginated.length;j++){
+//    for(var b = 0 ; b<dataPaginated[j].length;b++){
+//    if(dataPaginated[j][b].batch){ 
+//      if(dataPaginated[j][b].movedtoNext!=0){
+//      return 'Order '+dataPaginated[j][b].batch+' has already been started.';
+//      }
+//      }
+//    }
+//    
+//  }
   
   var msg= saveSchedule(dataPaginated, obj);
   Utilities.sleep(5000);
