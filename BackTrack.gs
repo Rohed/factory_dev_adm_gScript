@@ -35,11 +35,59 @@ function fromProduction(batch, bottles) {
     var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
     var order = base.getData('Orders/' + batch);
     var prodData = base.getData('Production/' + batch);
+  var mixingData = base.getData('Mixing/' + batch);
     var ORIGBOTTLES = prodData.bottles;
-    var removeFromProduction = ORIGBOTTLES - bottles;
-    LOGARR.push(['Removed bottles:', removeFromProduction]);
-    removeFromReserved('Lids/' + prodData.lidSKU, removeFromProduction);
-    LOGARR.push(['To Running: ' + prodData.lidSKU, removeFromProduction]);
+  var removeFromProduction = ORIGBOTTLES - bottles;
+  var tomix = order.mixing;
+  var tominusP = order.premixed;
+  var premix = getPremixSKU(order,false);
+  var premixColored = getPremixSKU(order,true);
+  var forColored = order.recipe.Color ? true : false;
+  var volume = removeFromProduction* order.fill/ 1000;
+   var amount = 0;
+  if(tominusP>0){
+    if(tominusP>volume){
+      
+      amount = volume;
+      volume=0;
+    }else{
+      amount = tominusP;
+      volume=volume - tominusP;
+    }
+    if(forColored){
+      fromReservedToRunning('PremixesTypes/' + premixColored, amount);
+    }else{
+      fromReservedToRunning('PremixesTypes/' + premix, amount);
+    }
+    var dat1 ={
+      premixed:volume,
+    }
+    base.updateData('Orders/' + batch,dat1);
+    
+  }
+  if(tomix>0 && volume>0){
+    if(mixingData.movedtoNext != 1){
+      var datMix = {
+        POvolume:volume,
+        POMARKED:true,
+      }
+        var mixingData = base.updateData('Mixing/' + batch,datMix);
+    }else{
+      amount =volume;
+      if(forColored){
+        PtoRunning(premixColored, amount);
+      }else{
+        PtoRunning(premix, amount);
+      }
+    }
+     var dat1 ={
+      mixing:tomix-volume,
+    }
+      base.updateData('Orders/' + batch,dat1);
+  }
+  LOGARR.push(['Removed bottles:', removeFromProduction]);
+  removeFromReserved('Lids/' + prodData.lidSKU, removeFromProduction);
+  LOGARR.push(['To Running: ' + prodData.lidSKU, removeFromProduction]);
     removeFromReserved('BottleTypes/' + prodData.botSKU, removeFromProduction);
     LOGARR.push(['To Running: ' + prodData.botSKU, removeFromProduction]);
     //CHECK PRINTING

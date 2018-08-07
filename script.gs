@@ -730,8 +730,8 @@ function toMixing(data) {
         mixingData.CBDrecipe = data.CBDrecipe;
         mixingData.cbd = data.CBDrecipe;
  
-    if(data.Color){
-     mixingData.Color = data.Color;
+    if(data.recipe.Color){
+     mixingData.Color = data.recipe.Color;
     }
     base.updateData('Mixing/' + data.batch, mixingData);
     var mixing = {
@@ -742,7 +742,7 @@ function toMixing(data) {
 }
 
 function testmove() {
-    MoveItem('322231S', 'PremixColoring')
+    MoveItem('GBVCO31796', 'MixingTeam')
 }
 
 function MoveItem(batch, sheet) {
@@ -817,12 +817,13 @@ function moveMain(item) {
                 };
                 LOGARR.push(['Splits Left:', dat1.split]);
                 base.updateData('Mixing/' + batches[i].batch, dat1);
+                item.split-= 1;
                 var suffix = item.batch.substr(-1);
                 var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
                 var premix = getPremixSKU(order,false);
                 if (for_premixed_stock) {
                 
-                  if(item.Color){
+                  if(item.recipe.Color){
                     PtoComplete(premix, batches[i].QTY);
 
                   }else{
@@ -849,9 +850,12 @@ function moveMain(item) {
                    
                 } else {
                   if(item.split==0){
-                    if(item.Color){
+                    if(item.recipe.Color){
                        var tomix = base.getData('Orders/' + batches[i].batch + '/mixing');
                        batches[i].QTY = batches[i].QTY - tomix;
+                       if(item.POMARKED){
+                      batches[i].QTY-=1;
+                      }
                        LOGARR.push(['Premix to Running:', batches[i].QTY]);
                        PtoComplete(premix, batches[i].QTY);
                        if (item.haspremix) {
@@ -872,10 +876,15 @@ function moveMain(item) {
 
                     }else{
                       var tomix = base.getData('Orders/' + batches[i].batch + '/mixing');
+                      
                       batches[i].QTY = batches[i].QTY - tomix;
+                      if(item.POMARKED){
+                      batches[i].QTY-=1;
+                      }
+                    
                       LOGARR.push(['Premix to Running:', batches[i].QTY]);
                       PtoRunning(premix, batches[i].QTY);
-                      if (item.haspremix) {
+                        if (item.haspremix) {
                         if (!item.markedPremix) {
                           var dmix = base.getData('Orders/' + item.dudpremixCode);
                           dmix.mixing_status = 'Completed';
@@ -898,7 +907,10 @@ function moveMain(item) {
                         movedtoNext: 1
                     };
                     base.updateData('Mixing/' + batches[i].batch, dat2);
+                    if(item.POMARKED){
+                        PtoRunning(premix, item.POvolume);
                     }
+                  }
                 }
                 
                 updateAllTabs(batches[i].batch);
@@ -908,7 +920,12 @@ function moveMain(item) {
             LOGARR.push([item.lidSKU, item.bottles]);
             fromReservedtoCompleted('BottleTypes/' + item.botSKU, item.bottles);
             LOGARR.push([item.botSKU, item.bottles]);
-            var premix = getPremixSKU(order);
+          if(item.recipe.Color){
+          var premix = getPremixSKU(order,true);
+          }else{
+          var premix = getPremixSKU(order,false);
+          }
+            
             var unbrand = getUnbrandName(order);
             LOGARR.push(['Premix SKU:', premix]);
             LOGARR.push(['Unbranded SKU:', unbrand]);
@@ -1154,7 +1171,7 @@ function moveMain(item) {
           var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
           var premix = getPremixSKU(order,true);
     
-          fromReservedtoCompleted("Color/"+item.Color.sku, item.QTY*10*item.Color.val);
+          fromReservedtoCompleted("Color/"+item.recipe.Color.sku, item.QTY*10*item.Color.val);
           
           if (for_premixed_stock) {
             
