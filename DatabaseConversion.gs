@@ -14,6 +14,23 @@ var data = sheets[i].getDataRange().getValues();
 
 
 }
+
+function markCompleted(){
+  var id ='1OLtOk3nwrrnCGaFQEMES85FkeSCliDcwfd8oZlzxZkI';
+  var sheets = SpreadsheetApp.openById(id).getSheets()[0];
+  var data = sheets.getDataRange().getValues();
+  var date = new Date().getTime();
+  var params = {
+    CompletionDate:date,
+    movedtoNext:1,
+    final_status:"Completed",
+    prodDate :date
+  }
+  for(var d=1;d<data.length;d++){
+    base.updateData('Production/'+data[d][0],params);
+  }
+}
+
 function deleteItems2(){
 var id = '1NOs0mGpwkoFjMTUEnHjdbVI0_iE7kX2-zdfzJLLcLt4';
   var SS = SpreadsheetApp.openById(id).getSheets();
