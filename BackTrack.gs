@@ -33,10 +33,10 @@ function fromProduction(batch, bottles) {
             for_unbranded_stock = suffix == UNBRANDED_STOCK_SUFFIX2 ? true : false;
             }
     var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
-    var order = base.getData('Orders/' + batch);
-    var prodData = base.getData('Production/' + batch);
+  var order = base.getData('Orders/' + batch);
+  var prodData = base.getData('Production/' + batch);
   var mixingData = base.getData('Mixing/' + batch);
-    var ORIGBOTTLES = prodData.bottles;
+  var ORIGBOTTLES = prodData.bottles;
   var removeFromProduction = ORIGBOTTLES - bottles;
   var tomix = order.mixing;
   var tominusP = order.premixed;
@@ -50,12 +50,13 @@ function fromProduction(batch, bottles) {
     if(tominusP>volume){
       
       amount = volume;
+         helper=volume;
       volume=0;
-       helper=0;
+    
     }else{
       amount = tominusP;
       volume=volume - tominusP;
-      helper=tominusP;
+      helper=0;
     }
     if(forColored){
       fromReservedToRunning('PremixesTypes/' + premixColored, amount);
