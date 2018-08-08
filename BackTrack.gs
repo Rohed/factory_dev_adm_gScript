@@ -44,6 +44,9 @@ function fromProduction(batch, bottles) {
   var premixColored = getPremixSKU(order,true);
   var forColored = order.recipe.Color ? true : false;
   var volume = bottles* order.fill/ 1000;
+  LOGARR.push(['Volume: ' , volume]);
+  LOGARR.push(['tominusP: ' , tominusP]);
+  LOGARR.push(['tomix: ' , tomix]);
    var amount = 0;
     var helper = 0;
   if(tominusP>0){
@@ -59,10 +62,14 @@ function fromProduction(batch, bottles) {
       helper=0;
     }
     if(forColored){
+     LOGARR.push(['COLORED: ' , "YES "+ premixColored]);
       fromReservedToRunning('PremixesTypes/' + premixColored, amount);
     }else{
+      LOGARR.push(['COLORED: ' , "NO " + premix]);
       fromReservedToRunning('PremixesTypes/' + premix, amount);
     }
+    LOGARR.push(['amount: ' , amount]);
+    LOGARR.push(['premixed: ' , helper]);
     var dat1 ={
       premixed:helper,
     }
@@ -70,6 +77,7 @@ function fromProduction(batch, bottles) {
     
   }
   if(tomix>0 && volume>0){
+   LOGARR.push(['Volume: ' , volume]);
     if(mixingData.movedtoNext != 1){
       var datMix = {
         POvolume:volume,
@@ -79,15 +87,19 @@ function fromProduction(batch, bottles) {
     }else{
       amount =volume;
       if(forColored){
+       LOGARR.push(['COLORED: ' , "YES " + premix]);
         PtoRunning(premixColored, amount);
       }else{
+       LOGARR.push(['COLORED: ' , "NO " + premix]);
         PtoRunning(premix, amount);
       }
     }
+    
      var dat1 ={
       mixing:tomix-volume,
     }
-      base.updateData('Orders/' + batch,dat1);
+     LOGARR.push(['mixing: ' , tomix-volume]);
+    base.updateData('Orders/' + batch,dat1);
   }
   LOGARR.push(['Removed bottles:', removeFromProduction]);
   removeFromReserved('Lids/' + prodData.lidSKU, removeFromProduction);
@@ -99,15 +111,21 @@ function fromProduction(batch, bottles) {
     if (printData) {
         if (printData.movedtoNext == 0) {
             var label = order.botlabelsku;
-            printData.bottles = printData.bottles - removeFromProduction;
-            LOGARR.push(['New in Printing: ', printData.bottles]);
-            base.updateData('Printing/' + batch, printData);
+       
             var packData = getPackagingData(printData.packagingType, removeFromProduction, order.boxname.sku)
             var packink = packData.ink;
             var tube = packData.botperPack;
             var boxname = order.boxname.sku;
             var tubes = removeFromProduction / tube;
             var box = tubes / packData.divTubesForBox;
+            
+            printData.numLabelsBottles = printData.numLabelsBottles - removeFromProduction;
+            printData.numLabelsTubes = printData.numLabelsTubes - (removeFromProduction/tube);
+            printData.bottles = printData.bottles - removeFromProduction;
+            
+            LOGARR.push(['New in Printing: ', printData.bottles]);
+            base.updateData('Printing/' + batch, printData);
+            
             if (!isFinite(box)) {
                 box = 0;
             }
@@ -378,7 +396,7 @@ function getBatchInfo(batches,key) {
             var existsinRett = rett.getIndex(batches[j]);
             if (existsinRett == -1) {
                 existsinRett = rett.length;
-                if(key=='deleteandreverse'){
+                if(key=='deleteandreverse'|| key=='reverse'){
                 rett.push([batches[j]]);
                 }else if(key=='statuscheck'){
                 if( shippingData[batches[j]]){
@@ -407,10 +425,10 @@ function getBatchInfo(batches,key) {
     return [rett, key];
 }
 function testDELANREV(){
-deleteAndReverse( getBatchInfo(['913768'])[0]) 
+deleteAndReverse( getBatchInfo(['913768'])[0],'reverse') 
 
 }
-function deleteAndReverse(data) {
+function deleteAndReverse(data, key) {
        var sheets = ['Packaging', 'Labelling', 'Printing', 'Production', 'MixingTeam', 'Orders'];
     //  var sheetStatus=['final_status','mixing_status','printing_status','labelling_status','packaging_status'];
     var orders = base.getData('Orders');
@@ -424,19 +442,23 @@ function deleteAndReverse(data) {
             } else {
                 var sheetItem = raw[data[j][0]];
             }
-            reverseLineItemMove(item, itemRaw, sheetItem,sheets[i]);
+            reverseLineItemMove(item, itemRaw, sheetItem,sheets[i],key);
         }
     }
+    
    var removed=[]; 
    for (var j = 0; j < data.length; j++) {
    removed.push(data[j][0]);
    }
-   
+   if(key=='delete'){
    return 'Removed: '+removed.join(', ');
-   
+   }else{
+    return 'Reversed: '+removed.join(', ');
+
+   }
 }
 
-function reverseLineItemMove(sheetItem, order, item,sheet) {
+function reverseLineItemMove(sheetItem, order, item,sheet,key) {
 Logger.log(item);
 Logger.log(order);
 Logger.log(sheetItem);
@@ -550,9 +572,11 @@ Logger.log(sheetItem);
             var boxname = order.boxname.sku;
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
-            if (item.packlabelsku) {
-
+            if(tube){
+              if (item.packlabelsku) {
+                
                 fromReservedToRunning('Labels/' + item.packlabelsku,  tubes );
+              }
             }
             fromReservedToRunning('Labels/' + label, item.bottles );
             var suffix = item.batch.substr(-1);
@@ -597,8 +621,10 @@ Logger.log(sheetItem);
             var boxname = order.boxname.sku;
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
-            if (item.packlabelsku) {
+            if(tube){
+              if (item.packlabelsku) {
                 fromCompletedToRunning('Labels/' + item.packlabelsku, tubes);
+              }
             }
             fromCompletedToRunning('Labels/' + label, item.bottles);
             var suffix = item.batch.substr(-1);
@@ -646,9 +672,11 @@ Logger.log(sheetItem);
             var boxname = order.boxname.sku;
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
+                if(tube){
             if (item.packlabelsku) {
       
                 fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
+            }
             }
             fromReservedToRunning('Labels/' + label, item.bottles);
             var suffix = item.batch.substr(-1);
@@ -889,6 +917,7 @@ Logger.log(sheetItem);
                   fromCompletedToRunning('PremixesTypes/'+premix, order.coloredpremix);
                 }
                
+               
               }else{
                fromReservedToRunning("Color/"+item.Color.sku, item.QTY*10*item.Color.val);
                 if (for_premixed_stock) {
@@ -900,17 +929,43 @@ Logger.log(sheetItem);
               }
                 base.removeData('PremixColoring/' + sheetItem[0]);
             }
-        
-        
-        
+            
+            
+          base.removeData('Mixing/' + sheetItem[0]);
+          base.removeData('Production/' + sheetItem[0]);
+          base.removeData('Printing/' + sheetItem[0]);
+          base.removeData('Labelling/' + sheetItem[0]);
+          base.removeData('Packaging/' + sheetItem[0]);
+          base.removeData('Shipping/' + sheetItem[0]);
+          if(key=='delete'){
+            
             base.removeData('Orders/' + sheetItem[0]);
-            base.removeData('Mixing/' + sheetItem[0]);
-        
-            base.removeData('Production/' + sheetItem[0]);
-            base.removeData('Printing/' + sheetItem[0]);
-            base.removeData('Labelling/' + sheetItem[0]);
-            base.removeData('Packaging/' + sheetItem[0]);
-            base.removeData('Shipping/' + sheetItem[0]);
+          
+          }else{
+            var data= {
+              final_status:0,
+              runtime: 0,
+              started: 0,
+            }
+            data.removedProduction = 0
+            data.partialProduction = 0;
+            data.partialPackaging = 0;
+            data.removedPackaging = 0
+            data.saved = true;
+            data.unbranded = 0;
+            data.branded = 0;
+            data.premixed = 0;
+            data.coloredpremix = 0;
+            data.mixing = 0;
+            data.backtubed = 0;
+            data.mixing_status = 0;
+            data.production_status = 0;
+            data.printing_status = 0;
+            data.labeling_status = 0;
+            data.packaging_status = 0;
+              data.wentNegative=false;
+              base.updateData('Orders/' + sheetItem[0],data);
+          }
         }
    
 }
