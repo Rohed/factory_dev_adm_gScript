@@ -1,5 +1,5 @@
 function testPartial(){
-filter('911874', 250, 'Production')
+filter('913933', 5, 'Production')
 
 }
 
@@ -24,6 +24,8 @@ function filter(batch, newBottles, sheet) {
 }
 
 function fromProduction(batch, bottles) {
+    var USAGE = {};
+    
     var LOGARR = [];
     var suffix = batch.substr(-1);
     var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
@@ -63,8 +65,16 @@ function fromProduction(batch, bottles) {
     }
     if(forColored){
      LOGARR.push(['COLORED: ' , "YES "+ premixColored]);
+      USAGE.ColoredPremix={
+        sku:premixColored,
+        qty:amount
+      }
       fromReservedToRunning('PremixesTypes/' + premixColored, amount);
     }else{
+      USAGE.Premix={
+        sku:premix,
+        qty:amount
+      }
       LOGARR.push(['COLORED: ' , "NO " + premix]);
       fromReservedToRunning('PremixesTypes/' + premix, amount);
     }
@@ -88,6 +98,7 @@ function fromProduction(batch, bottles) {
       amount =volume;
       if(forColored){
        LOGARR.push(['COLORED: ' , "YES " + premix]);
+       
         PtoRunning(premixColored, amount);
       }else{
        LOGARR.push(['COLORED: ' , "NO " + premix]);
@@ -102,8 +113,16 @@ function fromProduction(batch, bottles) {
     base.updateData('Orders/' + batch,dat1);
   }
   LOGARR.push(['Removed bottles:', removeFromProduction]);
+    USAGE.Caps={
+        sku:prodData.lidSKU,
+        qty:removeFromProduction
+      }
   removeFromReserved('Lids/' + prodData.lidSKU, removeFromProduction);
   LOGARR.push(['To Running: ' + prodData.lidSKU, removeFromProduction]);
+     USAGE.Bottles={
+        sku:prodData.botSKU,
+        qty:removeFromProduction
+      }
     removeFromReserved('BottleTypes/' + prodData.botSKU, removeFromProduction);
     LOGARR.push(['To Running: ' + prodData.botSKU, removeFromProduction]);
     //CHECK PRINTING
@@ -130,9 +149,25 @@ function fromProduction(batch, bottles) {
                 box = 0;
             }
             if (tube) {
+              USAGE.Packages={
+                sku:printData.packagingType.sku,
+                qty:tubes
+              }
                 removeFromReserved('Packages/' + printData.packagingType.sku, tubes);
                 LOGARR.push(['To Running: ' + printData.packagingType.sku, tubes]);
                 if (printData.packlabelsku) {
+                 if(order.ppp){
+                    USAGE.PrePackLabel = {
+                      sku:printData.packlabelsku,
+                      qty:tubes
+                    };
+                  }else{
+                    USAGE.PackLabel = {
+                      sku:printData.packlabelsku,
+                      qty:tubes
+                    };
+                    
+                  }
                     removeFromReserved('Labels/' + printData.packlabelsku, tubes);
                     LOGARR.push(['To Running: ' + printData.packlabelsku, tubes]);
                 }
@@ -144,8 +179,16 @@ function fromProduction(batch, bottles) {
             if (!order.ppp) {
                 ink += packink;
             }
+          USAGE.ink={
+            
+            qty:ink
+          }
             removeFromReserved("Misc/printing ink", ink);
             LOGARR.push(['To Running: Ink', ink]);
+              USAGE.BottleLabel={
+                    sku:label,
+                    qty:removeFromProduction
+                  }
             removeFromReserved('Labels/' + label, removeFromProduction);
             LOGARR.push(['To Running: ' + label, removeFromProduction]);
         }
@@ -169,13 +212,33 @@ function fromProduction(batch, bottles) {
                     box = 0;
                 }
                 if (tube) {
+                  USAGE.Packages={
+                    sku:labelingData.packagingType.sku,
+                    qty:tubes
+                  }
                     removeFromReserved('Packages/' + labelingData.packagingType.sku, tubes);
                     LOGARR.push(['To Running: ' + labelingData.packagingType.sku, tubes]);
                     if (labelingData.packlabelsku) {
+                      if(order.ppp){
+                        USAGE.PrePackLabel = {
+                          sku:labelingData.packlabelsku,
+                          qty:tubes
+                        };
+                      }else{
+                        USAGE.PackLabel = {
+                          sku:labelingData.packlabelsku,
+                          qty:tubes
+                        };
+                        
+                      }
                         removeFromReserved('Labels/' + labelingData.packlabelsku, tubes);
                         LOGARR.push(['To Running: ' + labelingData.packlabelsku, tubes]);
                     }
                 }
+                    USAGE.BottleLabel={
+                    sku:label,
+                    qty:removeFromProduction
+                  }
                 removeFromReserved('Labels/' + label, removeFromProduction);
                 LOGARR.push(['To Running: ' + label, removeFromProduction]);
             }
@@ -200,15 +263,27 @@ function fromProduction(batch, bottles) {
             }
             if (!for_branded_stock) {
                 if (order.packagingType) {
+                    USAGE.Packages={
+                      sku:order.packagingType.sku,
+                      qty:tubes
+                    }
                     LOGARR.push(['To Running: ' + order.packagingType.sku, tubes]);
                     removeFromReserved('Packages/' + order.packagingType.sku, tubes);
                 }
                 if (boxname) {
+                 USAGE.Boxes={
+                      sku:boxname,
+                      qty:box
+                    }
                     LOGARR.push(['To Running: ' + boxname, box]);
                     removeFromReserved('Boxes/' + boxname, box);
                 }
             } else {
                 if (tube) {
+                   USAGE.Packages={
+                      sku:order.packagingType.sku,
+                      qty:tubes
+                    }
                     LOGARR.push(['To Running: ' + packagingData.packagingType.sku, tubes]);
                     removeFromReserved('Packages/' + packagingData.packagingType.sku, tubes);
                 }
@@ -234,10 +309,13 @@ function fromProduction(batch, bottles) {
     prodData.bottles = prodData.bottles - removeFromProduction;
     LOGARR.push(['New in Production: ', prodData.bottles]);
     base.updateData('Production/' + batch, prodData);
+    var usageArr =  convertUsageToArr(order,USAGE);
+    LogPOTransaction(usageArr);
     return LOGARR;
 }
 
 function fromPackaging(batch, bottles) {
+var USAGE ={};
     var LOGARR = [];
     var suffix = batch.substr(-1);
     var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
@@ -263,15 +341,27 @@ function fromPackaging(batch, bottles) {
             }
             if (!for_branded_stock) {
                 if (order.packagingType.sku) {
+                   USAGE.Packages={
+                      sku:order.packagingType.sku,
+                      qty:tubes
+                    }
                     LOGARR.push(['To Running: ' + order.packagingType.sku, tubes]);
                     removeFromReserved('Packages/' + order.packagingType.sku, tubes);
                 }
                 if (boxname) {
+                   USAGE.Boxes={
+                      sku:boxname,
+                      qty:box
+                    }
                     LOGARR.push(['To Running: ' + boxname, box]);
                     removeFromReserved('Boxes/' + boxname, box);
                 }
             } else {
                 if (tube != 0) {
+                 USAGE.Packages={
+                      sku:order.packagingType.sku,
+                      qty:tubes
+                    }
                     LOGARR.push(['To Running: ' + packagingData.packagingType.sku, tubes]);
                     removeFromReserved('Packages/' + packagingData.packagingType.sku, tubes);
                 }
@@ -294,6 +384,8 @@ function fromPackaging(batch, bottles) {
                         }*/
         }
     }
+        var usageArr =  convertUsageToArr(order,USAGE);
+    LogPOTransaction(usageArr);
     return LOGARR;
 }
 
