@@ -225,7 +225,7 @@ function bulkrun(arr, page) {
             for (var i = 0; i < arr.length; i++) {
 
                 var exec = runItem(arr[i], true);
-                var resp = exec.LogData;
+                var resp = exec[0];
               
 //                var usageArr =  convertUsageToArr(data,rett.USAGE);
 //                LogTransaction([usageArr]);
@@ -236,13 +236,13 @@ function bulkrun(arr, page) {
                         started: 0,
                         wentNegative: true,
                     };
-                    msg += arr[i] + " - " + resp[1] + " \n";
+                 
                     base.updateData('Orders/' + arr[i], dat1);
 
                 }else{
-                 USAGE.push(exec.USAGE);
+                 USAGE.push(exec[1]);
                  }
-                msg += arr[i] + " - " + resp + "\n";
+                msg += arr[i] + " - " + resp[1] + "\n";
             }
         } else {
 
@@ -259,8 +259,8 @@ function bulkrun(arr, page) {
                 base.updateData('FlavourMixOrders/' + arr[i], dat1);
 
             }
-            msg += arr[i] + " - " + resp + "\n";
-
+            msg += arr[i] + " - " + resp[1] + "\n";
+          
         }
     }
   if(USAGE.length>0 &&  page == 'Orders'){
@@ -272,7 +272,7 @@ function bulkrun(arr, page) {
 
 
 function testrun() {
-    runItem('914080', false);
+    runItem('914430', false);
 
 }
 
@@ -383,10 +383,9 @@ function runItem(batch, frombulk) {
 
                 var msg = 'MISSING: ' + LOGDATA.data[LOGDATA.data.length - 1][1];
                 logItem(LOGDATA);
-                return {
-                    LogData: ['BREAK', msg],
-                    USAGE:  USAGE,
-                };
+              return [
+                ['BREAK', msg],
+                USAGE];
 
 
             } else {
@@ -401,44 +400,48 @@ function runItem(batch, frombulk) {
                 base.updateData('Orders/' + batch, dat1);
                 var msg = 'MISSING: ' + LOGDATA.data[LOGDATA.data.length - 1][1];
                 logItem(LOGDATA);
-                var rett = {
-                    LogData: msg,
-                    USAGE: USAGE,
-                }
-                return rett;
+              
+                return msg;
             }
 
         } else {
 
             logItem(LOGDATA);
             var rett = { LogData: 'Success'};
-          if (frombulk) {
-            
-           
-              rett.USAGE= convertUsageToArr(data,USAGE);
-         
-            
+            if (frombulk) {
+              
+              
+              var retUSAGE= convertUsageToArr(data,USAGE);
+              return [['','Success'],retUSAGE];
+              
             }else{
-            
+              
               var usageArr =  convertUsageToArr(data,USAGE);
               LogTransaction([usageArr]);
-              
+              return 'Success';
             }
          
-            return rett;
+        
         }
     } else {
         LOGDATA.status = false;
         LOGDATA.msg += 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg;
         LOGDATA.data.push(['FAILED:', 'Can not run Order. Contains parts that are not indexed in the database \n' + missingmsg]);
         logItem(LOGDATA);
-        var rett = {
-            LogData: 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg,
-            USAGE: USAGE,
+ 
+            var msg = 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg;
+          if (frombulk) {
+           return [['BREAK',msg],USAGE];    
+       
+        
+        }else{
+         return msg;
+        
         }
-        return rett;
         //return 'Can not run Order. Contains parts that are not indexed in the database. \n'+missingmsg;
     }
+    
+   
 }
 
 function assignMixture2(data) {
@@ -1152,96 +1155,9 @@ function runflavourmixItem(batch, frombulk) {
     data.final_status = 0;
     base.updateData('FlavourMixMixingTeam/' + data.batch, data);
 
-    return "Success";
+    return ["","Success"];
 
 
 }
 
-function testUSAGE(){
-var USAGE ={
-  Mixing:{
-  vg:4,
-  pg:5,
-  nic:2
-  },
-  Flavour:{
-  sku:'asdadsdsa',
-  name:'flava flave',
-  qty:4
-  },
-  Branded:{
-    sku:'Branded asdsad',
-    name:'Branded flave',
-    qty:4
-  }
 
-}
-var data = {
-batch:"asddsa",
-orderID:"23123123",
-
-}
-convertUsageToArr(data,USAGE)
-}
-function convertUsageToArr(data,usage){
-  var arr = [data.batch,data.orderID];
-  var pages=['Packaged Branded','Branded','Unbranded','Premix','Colored Premix',
-             'Mixing','Flavour','Colour','Bottles','Caps',
-             'Packages','Bottle Label','Pack Label','Pre Bottle Label','Pre Pack Label']
-  
-  var standardItems = ['sku','name','qty'];
-  var mixingItems = ['vg','pg','ag','nic','nicsalt','cbd','mct'];
-  for(var i=0;i<pages.length;i++){
-  var page = pages[i].replace(/ /g,'');
-    if(pages[i]!='Mixing'){
-      standardItems.map(function (item){
-        arr.push(usage[page] ? (usage[page][item] || usage[page][item] == 0 ? usage[page][item] : "") : "");
-        
-      });
-      
-    }else{
-      mixingItems.map(function (item){
-       arr.push(usage[page] ? (usage[page][item] ? usage[page][item] : 0) : 0);
-        
-      });
-    }
-    
-  }
-
-  return arr;
-}
-
-
-function LogTransaction(usageArr){
-  var sheet = SpreadsheetApp.openById(TRANSACTION_SHEET).getSheetByName('Main');
-  
-  var formattedDate = Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy HH:mm:ss");
-  for(var i=0;i<usageArr.length;i++){
-  usageArr[i].unshift(formattedDate);
-  }
-
-  var lastRow= sheet.getLastRow();
-  lastRow = lastRow > 2 ? lastRow +=4 : lastRow +1;
-  sheet.insertRowsAfter(sheet.getMaxRows(), usageArr.length);
-//  sheet.getRange(lastRow, 1).setBackground('#D9A744').setValue('NEW LOG ' + formattedDate);
-  sheet.getRange(lastRow+1, 1, usageArr.length, usageArr[0].length).setValues(usageArr);
-
-}
-
-function LogPOTransaction(usageArr){
-  var sheet = SpreadsheetApp.openById(TRANSACTION_SHEET).getSheetByName('Main');
-  var data = sheet.getDataRange().getValues();
-  for(var i=data.length-1;i>0;i--){
-    if(data[i][1]==usageArr[0]){
-      for(var j=2;j<usageArr.length;j++){
-        if(!isNaN(usageArr[j]) && !isNaN(data[i][j+1]) && data[i][j+1] > 0 && usageArr[j] > 0){
-        sheet.getRange(i+1, j+2).setValue(data[i][j+1]-usageArr[j]);
-        
-        }
-      }
-      break;
-    }
-    
-  } 
-  
-}
