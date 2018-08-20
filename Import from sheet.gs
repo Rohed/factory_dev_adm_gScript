@@ -753,13 +753,44 @@ function createRefferenceDBORIG(id) {
     return msg + ' \n Updated.';
 }
 function MANUALcreateRefferenceDB(){
-var id = '1nLMH2C3lPCMHqoVTnxLqsI0iB6DJLfs5nnsZZ1C8m0c';
+var id = '1pONQ9usFnKUnsoMzFkjz8pM41-7llpLJsL-JPasVTd4';
 
 createRefferenceDB(id)
 }
+function createRefferenceDB(id) {
+    // base.removeData('References');
+    var LOGDATA = {
+        status: true,
+        msg: '',
+        action: 'Import PC/PD',
+        batch: 'Spreadsheet',
+        page: 'PC/PD',
+        user: Session.getActiveUser().getEmail(),
+        data: new Array()
+    };
+    //id = '1pcHJxFnwUVD8Wvgw6c_VvUsy2dKefx-FhJS_WNI_5iY';
+    var ss = SpreadsheetApp.openById(id);
+    LOGDATA.batch = ss.getId();
+    var data = ss.getSheets()[0].getDataRange().getValues();
+    var payload={ 
+      'data':JSON.stringify(data),
+      'id':id.toString(),
+    };
+    
+    var params={
+      method:"POST",
+      "Content-Type":'application/json',
+      muteHttpExceptions :true,
+      'payload':payload,
+    }
+        var url='http://212.69.229.10:4000/'+NODE_PATH+'/createrefferencedb';
+    var response=UrlFetchApp.fetch(url, params).getContentText();
+    LOGDATA.msg = response;
+      logItem(LOGDATA);
+    return response;
+}
 
-
-function createRefferenceDB(id,id1,id2) {
+function createRefferenceDBxx(id,id1,id2) {
     // base.removeData('References');
     var LOGDATA = {
         status: true,
