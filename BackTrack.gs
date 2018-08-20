@@ -391,6 +391,7 @@ var USAGE ={};
 }
 
 function updateOrder(batch, bottles, sheet,originalItem) {
+bottles = parseInt(bottles,10);
         var LOGARR = [];
         var order = base.getData('Orders/' + batch);
       
