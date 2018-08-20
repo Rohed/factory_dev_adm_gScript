@@ -4,6 +4,7 @@ filter('913933', 5, 'Production')
 }
 
 function filter(batch, newBottles, sheet) {
+newBottles = parseInt(newBottles,10);
     var LOGDATA = {
         status: true,
         msg: '',
@@ -391,7 +392,7 @@ var USAGE ={};
 }
 
 function updateOrder(batch, bottles, sheet,originalItem) {
-bottles = parseInt(bottles,10);
+
         var LOGARR = [];
         var order = base.getData('Orders/' + batch);
       
