@@ -55,6 +55,7 @@ function JSONtoARR(data) {
     }else{
       
       var result = Object.keys(data).map(function(key) {
+      
         return data[key];
       });
           result=result.filter(function(item){

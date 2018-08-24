@@ -897,7 +897,7 @@ if(params.equalTo == 'all'||page=='QTY'||page=='Locations'||page=='Finctions'){
     if(params.equalTo == 'Not Run'||params.equalTo == 'Busy'||params.equalTo == 'Completed'){
       return [page,JSONtoARR(base.getData(page))];
     }else{
-        if(params.orderBy[0] != 'word'){
+        if(params.orderBy != 'word'){
       return [page,JSONtoARR(base.getData(page,params))];
       }
     }
@@ -905,8 +905,8 @@ if(params.equalTo == 'all'||page=='QTY'||page=='Locations'||page=='Finctions'){
   }
 var neg=false;
 var forord=false;
-    if (params.orderBy[0] != null) {
-        if (params.orderBy[0] == 'word') {
+    if (params.orderBy != null) {
+        if (params.orderBy == 'word') {
             var data = JSONtoARR(base.getData(page));
             var arr = [];
             for (var i = 0; i < data.length; i++) {
@@ -915,7 +915,7 @@ var forord=false;
                 }
             }
             return [page, arr];
-        } else if(params.orderBy[0] == 'priority'){
+        } else if(params.orderBy == 'priority'){
           var data = JSONtoARR(base.getData(page));
           var arr = [];
           for (var i = 0; i < data.length; i++) {
@@ -929,21 +929,21 @@ var forord=false;
         
         
         } else {
-            if (params.orderBy[0] == 'final_status') {
+            if (params.orderBy == 'final_status') {
                 if (page == 'Orders'||page == 'FlavourMixOrders') {
                     if (params.equalTo == 'Not Run') {
-                        params.orderBy[0] = 'final_status';
+                        params.orderBy = 'final_status';
                         params.equalTo = 0;
                         var data = JSONtoARR(base.getData(page)).filter(function(item){
                         return item.final_status==0;
                       });
                         return [page, data];
                     } else if (params.equalTo == 'Busy') {
-                        params.orderBy[0] = 'final_status';
+                        params.orderBy = 'final_status';
                         params.equalTo = 'started';
                         
                     } else if(params.equalTo=='wentNegative'){
-                      params.orderBy[0] = 'wentNegative';
+                      params.orderBy = 'wentNegative';
                       params.equalTo = true;
                       neg=true;
                       var data =  JSONtoARR(base.getData(page)).filter(function(item){
@@ -953,37 +953,37 @@ var forord=false;
                     }
                 } else if (page == 'MixingTeam') {
                     if (params.equalTo == 'Busy') {
-                        params.orderBy[0] = 'movedtoNext';
+                        params.orderBy = 'movedtoNext';
 
                     } else if (params.equalTo == 'Not Run') {
-                        params.orderBy[0] = 'movedtoNext';
+                        params.orderBy = 'movedtoNext';
                         params.equalTo = 0;
                     } else if (params.equalTo == 'Completed') {
-                        params.orderBy[0] = 'Completed';
+                        params.orderBy = 'Completed';
                         params.equalTo = 'Completed';
                     }
 
                 } else {
                     if (params.equalTo == 'Busy') {
-                        params.orderBy[0] = 'movedtoNext';
+                        params.orderBy = 'movedtoNext';
                     } else if (params.equalTo == 'Not Run') {
                         params.equalTo = 0;
-                        params.orderBy[0] = 'movedtoNext';
+                        params.orderBy = 'movedtoNext';
                     } else if (params.equalTo == 'Completed') {
                         params.equalTo = 1;
-                        params.orderBy[0] = 'movedtoNext';
+                        params.orderBy = 'movedtoNext';
                     }
                 }
             }
 
 
-            if (params.orderBy[0] == 'flavour' && page == 'MixingTeam') {
-                params.orderBy[0] = 'FLAVOUR';
+            if (params.orderBy == 'flavour' && page == 'MixingTeam') {
+                params.orderBy = 'FLAVOUR';
             }
 
 
-            if (params.orderBy[0] == 'recipe/name' && page == 'MixingTeam') {
-                params.orderBy[0] = 'RECIPE';
+            if (params.orderBy == 'recipe/name' && page == 'MixingTeam') {
+                params.orderBy = 'RECIPE';
             }
             
      
@@ -1039,11 +1039,11 @@ function TESTSEARCHFOR() {
 //    searcharr.push(['Shipping', params]);
 
     var params = {
-        orderBy: ['final_status'],
+        orderBy: 'final_status',
         equalTo: "Not Run",
 
     }
-    searcharr.push(['Orders', params]);
+    searcharr.push(['MixingTeam', params]);
 
    var data=searchFor(searcharr);
     Logger.log(data);

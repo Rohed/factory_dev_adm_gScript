@@ -204,7 +204,7 @@ filterpage();
 
 //THREE SUB TABS
 var BASEPARAM={
-orderBy : ['final_status'],
+orderBy : 'final_status',
 equalTo: 'Not Run'
 
 };
@@ -4554,7 +4554,7 @@ var page=event.getAttribute('page');
 var val=$('#searchVAL'+page+i).val();
 var key=$('option:selected', '#sarchKey'+page+i).attr('key');
 var params={
-orderBy : [key],
+orderBy : key,
 equalTo: val
 
 };
