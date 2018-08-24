@@ -1285,15 +1285,8 @@ function importBoxesFromSheet(id) {
 }
 
 function cliearItems(){
-var id='136dlENcEjsAoDTt9TK_gv2e5Yj9WWPssBGOfh5n-T-0';
-  var ss = SpreadsheetApp.openById(id);
-    var data = ss.getSheets()[0].getDataRange().getValues();
-    var options = "{";
-    for (var i = 1; i < data.length; i++) {
-    if(data[i][0]){
-    base.removeData('Recipes/'+data[i][0])
-    }
-    }
+var id='1r13dgGWnC3RVfAy9fiSeccjtECU02C6ZIGIX5Yq1VD0';
+importPackagesFromSheet(id)
 }
 function importPackagesFromSheet(id) {
 

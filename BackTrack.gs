@@ -53,6 +53,7 @@ function fromProduction(batch, bottles) {
   LOGARR.push(['tomix: ' , tomix]);
    var amount = 0;
     var helper = 0;
+ 
   if(tominusP>0){
     if(tominusP>volume){
       
