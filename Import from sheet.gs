@@ -79,7 +79,10 @@ function Import_new_FBC() {
     var upload = JSON.parse(options1);
     base.updateData('Brands', upload)
 }
-
+function TESTQTY(){
+var id = '1E0VSVvqHKnZ310VY0Wk914INpQ23Wb-48rrUgrvWOaw';
+QTYInport(id)
+}
 function QTYInport(id) {
     var LOGDATA = {
         status: true,
@@ -104,8 +107,11 @@ function QTYInport(id) {
         if (flavours) {
             flavours = flavours.getDataRange().getValues();
             var origflavours = base.getData(sheets[s][1]);
+            if(!origflavours){
+            origflavours = {};
+            }
             var origFlavoursString = JSON.stringify(origflavours);
-            var options = '{';
+         
             for (var i = 1; i < flavours.length; i++) {
                 var replace = false;
                 if (flavours[i][4] == 'Replace') {
@@ -127,105 +133,80 @@ function QTYInport(id) {
                     var foundSKU = origflavours[flavours[i][3]];
                     if (foundSKU) {
                       if(sheets[s][3]=='float'){
-                        var dat1 = {
-                            Running: parseFloat(flavours[i][2]) + parseFloat(origflavours[flavours[i][3]].Running),
-                            Reserved: parseFloat(origflavours[flavours[i][3]].Reserved),
-                            Completed: parseFloat(origflavours[flavours[i][3]].Completed),
-                            name: flav,
-                            sku: flavours[i][3],
-                        };
+                        if(foundSKU.Running ){
+                           foundSKU.Running =  parseFloat(foundSKU.Running)+parseFloat(flavours[i][2])
                         }else{
-                        var dat1 = {
-                            Running: parseInt(flavours[i][2],10) + parseInt(origflavours[flavours[i][3]].Running,10),
-                            Reserved: parseInt(origflavours[flavours[i][3]].Reserved,10),
-                            Completed: parseInt(origflavours[flavours[i][3]].Completed,10),
-                            name: flav,
-                            sku: flavours[i][3],
-                        };
+                          foundSKU.Running = parseFloat(flavours[i][2])
                         }
+                        
+                        
+                      }else{
+                        if(foundSKU.Running ){
+                         foundSKU.Running = parseInt(foundSKU.Running,10)+ parseInt(flavours[i][2],10);
+                        }else{
+                          foundSKU.Running =  parseInt(flavours[i][2],10)
+                        }
+                        
+                        
+                        
+                      }
                         if (replace) {
                          if(sheets[s][3]=='float'){
-                            var dat1 = {
-                                Running: parseFloat(flavours[i][2]),
-                                Reserved: parseFloat(origflavours[flavours[i][3]].Reserved),
-                                Completed: parseFloat(origflavours[flavours[i][3]].Completed),
-                                name: flav,
-                                sku: flavours[i][3],
-                            };
+                          foundSKU.Running = parseFloat(flavours[i][2]);
                           }else{
-                           var dat1 = {
-                                Running: parseInt(flavours[i][2],10),
-                                Reserved: parseInt(origflavours[flavours[i][3]].Reserved,10),
-                                Completed: parseInt(origflavours[flavours[i][3]].Completed,10),
-                                name: flav,
-                                sku: flavours[i][3],
-                            };
-                          
+                          foundSKU.Running = parseInt(flavours[i][2],10);
                           
                           }
                         }
+                         origflavours[foundSKU.sku]=foundSKU;
                     } else if (flav) {
+                      foundSKU={};
+                      foundSKU.name = flav;
+                      foundSKU.sku =flavours[i][3];
                     if(sheets[s][3]=='float'){
-                        var dat1 = {
-                            Running: parseFloat(flavours[i][2]),
-                            sku: flavours[i][3],
-                            Reserved: 0,
-                            Completed: 0,
-                            name: flav,
-                        };
+              
+                       foundSKU.Running =  parseFloat(flavours[i][2]);
+               
                       }else{
-                      
-                       var dat1 = {
-                            Running: parseInt(flavours[i][2],10),
-                            sku: flavours[i][3],
-                            Reserved: 0,
-                            Completed: 0,
-                            name: flav,
-                        };
+                       foundSKU.Running =  parseInt(flavours[i][2],10);
+             
                       
                       }
+                       origflavours[foundSKU.sku]=foundSKU;
                         newitems += 'Updated SKU for: ' + flav + ' to ' + flavours[i][3] + '<br>';
-                    } else {
-                        var sku = flavours[i][3];
+                    } else if(flavours[i][3]) {
+                      foundSKU={};
+                      foundSKU.name = "None";
+                      foundSKU.sku =flavours[i][3];
+                      if(sheets[s][3]=='float'){
                         
-                       if(sheets[s][3]=='float'){ 
-                        var dat1 = {
-                            Running: parseFloat(flavours[i][2]),
-                            Completed: 0,
-                            Reserved: 0,
-                            sku: sku,
-                            name: flav
-                        };
-                        }else{
+                        foundSKU.Running =  parseFloat(flavours[i][2]);
                         
-                        var dat1 = {
-                            Running: parseInt(flavours[i][2],10),
-                            Completed: 0,
-                            Reserved: 0,
-                            sku: sku,
-                            name: flav
-                        };
+                      }else{
+                        foundSKU.Running =  parseInt(flavours[i][2],10);
                         
                         
-                        }
+                      }
 
-                        base.updateData(sheets[s][1]+'/' + dat1.sku, dat1);
+                      //  base.updateData(sheets[s][1]+'/' + dat1.sku, dat1);
                         // generateForSingleFlavour(flav);
+                         origflavours[foundSKU.sku]=foundSKU;
                         newitems += 'Added New '+sheets[s][1]+': ' + flav + '<br>';
                     }
-                    options += '"' + dat1.sku + '":' + JSON.stringify(dat1) + ',';
+                   
+                  
                 } catch (e) {
-                    faileditems += 'Couldnt proccess ' + flav + '  ' + e.toString() + '<br/>';
+                    faileditems += 'Couldnt proccess ' + flav + ' - ' +flavours[i][3]+"  " + e.toString() + '<br/>';
                 }
             }
-            options += '}';
-            var upload = JSON.parse(options);
-            base.updateData(sheets[s][1], upload)
+           
+      
+            base.updateData(sheets[s][1], origflavours)
             LOGDATA.data.push(['Imported:', sheets[s][1]]);
         }
     } catch (e) {
         LOGDATA.data.push(['Failed To Import:', sheets[s][1]]);
-        faileditems += 'Couldnt Upload Flavours.   ' + e.toString() + '<br/>';
+        faileditems += 'Couldnt Upload '+sheets[s][1]+'.   ' + e.toString() + '<br/>';
     }
     }
     //Bottles/Lids
@@ -1285,7 +1266,7 @@ function importBoxesFromSheet(id) {
 }
 
 function cliearItems(){
-var id='1r13dgGWnC3RVfAy9fiSeccjtECU02C6ZIGIX5Yq1VD0';
+var id='1LeJpOtNom_Sm8YP8Dj1CkVYPxKGaZ3-6dep8GAkf9FY';
 importPackagesFromSheet(id)
 }
 function importPackagesFromSheet(id) {
