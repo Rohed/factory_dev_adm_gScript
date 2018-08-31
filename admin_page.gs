@@ -887,6 +887,33 @@ function getLocations() {
 
 }
 
+
+
+function fixwentNEG(){
+var ordersBASE=base.getData('Orders');
+var packagingBASE=base.getData('Production');
+
+var orderLIST=JSONtoARR(ordersBASE);
+//var packagingLIST=JSONtoARR(packagingBASE);
+for(var i=0;i<orderLIST.length;i++){
+  if(packagingBASE[orderLIST[i].batch]){
+    if(ordersBASE[orderLIST[i].batch].wentNegative) {
+      ordersBASE[orderLIST[i].batch].wentNegative=false;
+    }
+    
+  }
+  if(ordersBASE[orderLIST[i].batch].runtime==0 || !ordersBASE[orderLIST[i].batch].runtime){
+   if(ordersBASE[orderLIST[i].batch].wentNegative) {
+      ordersBASE[orderLIST[i].batch].wentNegative=false;
+    }
+  }
+
+}
+
+base.updateData('Orders',ordersBASE);
+}
+
+
 function getSearchedArray(page, params) {
 
 if(params.equalTo == 'all'||page=='QTY'||page=='Locations'||page=='Finctions'){
@@ -1002,31 +1029,6 @@ var forord=false;
 
 
 }
-
-function fixwentNEG(){
-var ordersBASE=base.getData('Orders');
-var packagingBASE=base.getData('Production');
-
-var orderLIST=JSONtoARR(ordersBASE);
-//var packagingLIST=JSONtoARR(packagingBASE);
-for(var i=0;i<orderLIST.length;i++){
-  if(packagingBASE[orderLIST[i].batch]){
-    if(ordersBASE[orderLIST[i].batch].wentNegative) {
-      ordersBASE[orderLIST[i].batch].wentNegative=false;
-    }
-    
-  }
-  if(ordersBASE[orderLIST[i].batch].runtime==0 || !ordersBASE[orderLIST[i].batch].runtime){
-   if(ordersBASE[orderLIST[i].batch].wentNegative) {
-      ordersBASE[orderLIST[i].batch].wentNegative=false;
-    }
-  }
-
-}
-
-base.updateData('Orders',ordersBASE);
-}
-
 function TESTSEARCHFOR() {
     var searcharr = [];
 
@@ -1040,7 +1042,7 @@ function TESTSEARCHFOR() {
 
     var params = {
         orderBy: 'final_status',
-        equalTo: "Not Run",
+        equalTo: "Completed",
 
     }
     searcharr.push(['MixingTeam', params]);

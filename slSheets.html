@@ -724,7 +724,7 @@ width: 100%;
        return '';
       }
       }catch(e){
-      console.log('Unable to format date: ',datems);
+      //console.log('Unable to format date: ',datems);
       return '';
       }
     }
@@ -751,7 +751,7 @@ width: 100%;
     return '';
     }
     }catch(e){
-    console.log('Unable to format date: ',datems);
+    //console.log('Unable to format date: ',datems);
     return '';
     }
     }
@@ -1324,6 +1324,8 @@ html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><t
          html += '</thead>';
 html+='<tbody>';
 for(var i=0;i<data.length;i++){
+
+if(data[i].Batches){
   if (data[i].movedtoNext == 0) {
          html+='<tr>'
          }else if (data[i].movedtoNext == 'Busy') {
@@ -1348,6 +1350,7 @@ html+=' </div></div></td>';
             var customers=[];
             var orderIDs=[];
             var brands=[];
+            
                var result = Object.keys(data[i].Batches).map(function(key) {
                     return [Number(key), data[i].Batches[key]];
                   });
@@ -1387,7 +1390,7 @@ html+='<td>'+data[i].FLAVOUR+'</td><td>'+ orderDates.join()+'</td><td>'+data[i].
 html+='<td>'+data[i].flavvalue+'</td><td>'+data[i].Notes+'</td><td>'+data[i].factory+'</td><td>'+data[i].Location+'</td><td>'+formatDateDisplay2(data[i].starttime)+'</td><td>'+formatDateDisplay2(data[i].CompletionDate)+'</td><td>'+data[i].vgSupplier+'</td><td>'+data[i].pgSupplier+'</td><td>'+data[i].nicSupplier+'</td><td>'+data[i].flavSupplier+'</td></tr>';
 
 qtyTotal+=parseInt(data[i].QTYTOTAL,10);
-
+}
 }
 rowsTotal=i;
 
@@ -3566,7 +3569,7 @@ var dates={
  
  
  }
-console.log(logitem.getTime(),start.getTime(),end.getTime(),dates.search);
+//console.log(logitem.getTime(),start.getTime(),end.getTime(),dates.search);
 
     if(start.getTime()<=logitem.getTime() && end.getTime()>=logitem.getTime()){
           ret.push(data[i]);
