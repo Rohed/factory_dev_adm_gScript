@@ -16,7 +16,7 @@ function testIMPORTVlank() {
 //  base.removeData('References/AllItems');
 //  return
   var id = '1bemCwUzgEr3AMc3pfQSIMwdL7ohD5RYO59b7PPAFpsc';
-  return updateGeneratedDataPing(id);
+  return importBlankPCPC2Ping(id);
   
 }
 function importBlankPCPC2(id) {
@@ -163,6 +163,7 @@ function updateGeneratedData(items, id) {
   }
 }
 function updateGeneratedDataPing() {
+
   Utilities.sleep(20000);
   var LOGDATA = {
     status: true,
@@ -190,7 +191,7 @@ function updateGeneratedDataPing() {
     logItem(LOGDATA);
     base.removeData('importBlankPCPD');
   //  var resp2=createRefferenceDB2(resp.id,data)
-    return  [true,'updateGeneratedData',resp2];
+    return  [true,'updateGeneratedData',"Creating Refference DB"];
   } catch (e) {
     Logger.log(e);
     LOGDATA.status = false;
