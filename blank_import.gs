@@ -13,13 +13,15 @@ function importBlankPCPC(id) {
 }
 
 function testIMPORTVlank() {
-  
-  var id = '1PnIYk0nmUqEnmxNZ1sW2ZtqRi6IADqTbs_8bJKIArPI';
-  return importBlankPCPC2(id);
+//  base.removeData('References/AllItems');
+//  return
+  var id = '1bemCwUzgEr3AMc3pfQSIMwdL7ohD5RYO59b7PPAFpsc';
+  return updateGeneratedDataPing(id);
   
 }
 function importBlankPCPC2(id) {
-  
+
+    var key = new Date().getTime().toString();
   var sheet = SpreadsheetApp.openById(id).getSheets()[0];
   var data = sheet.getDataRange().getValues();
   //    var dataToSend = "";
@@ -28,6 +30,7 @@ function importBlankPCPC2(id) {
   //      });
   var payload={ 
     'data':JSON.stringify(data),
+    'key':key
     
   };
   var params={
@@ -37,7 +40,7 @@ function importBlankPCPC2(id) {
     'payload':payload
   }
   base.removeData('importBlankPCPD');
-  var url='http://212.69.229.10:4000/'+NODE_PATH+'/importblankpcpdpath';
+  var url=SERVER_URL+NODE_PATH+'/importblankpcpdpath';
   var response=UrlFetchApp.fetch(url, params).getContentText();
   Logger.log(response);
   return [false,'importBlankPCPC2'];
@@ -45,6 +48,7 @@ function importBlankPCPC2(id) {
 }
 
 function importBlankPCPC2Ping(id){
+
   Utilities.sleep(20000);
   try {
     var status=base.getData('importBlankPCPD/status');
@@ -53,7 +57,19 @@ function importBlankPCPC2Ping(id){
     }
     
     var sheet = SpreadsheetApp.openById(id).getSheets()[0];
-    var response =JSON.parse(base.getData('importBlankPCPD/data'));
+    var key =base.getData('importBlankPCPD/key');
+    
+    var params={
+      method:"GET",
+      "Content-Type":'application/json',
+      muteHttpExceptions :true,
+     
+    }
+  
+    var url=SERVER_URL+NODE_PATH+'/importblankpcpdpathping?key='+key;
+    var response=UrlFetchApp.fetch(url, params).getContentText();
+  
+    response =JSON.parse(response);
     
     var LOGDATA = {
       status: true,
@@ -67,10 +83,7 @@ function importBlankPCPC2Ping(id){
     
     var values=[];
     var resp=[[],[],[],[],'',[],[]];
-    var keys=Object.keys(response);
-    keys.map(function(item){
-      resp[item]=response[item];
-    });
+    resp = response.data;
     
     for(var i=0;i<resp[6].length;i++){
       if(i>0){
@@ -84,7 +97,7 @@ function importBlankPCPC2Ping(id){
           
           if(resp[6][i][j].match(' GEN')){
             resp[6][i][j] = resp[6][i][j].replace(' GEN','');
-            sheet.getRange(i+1,j+3).setBackground('#D9A744');
+            sheet.getRange(i+2,j+3).setBackground('#D9A744');
             //values.push([i+1,j+1]);
           }
         }
@@ -107,6 +120,7 @@ function importBlankPCPC2Ping(id){
 
 
 function updateGeneratedData(items, id) {
+
   var LOGDATA = {
     status: true,
     msg: '',
@@ -124,6 +138,7 @@ function updateGeneratedData(items, id) {
       'data':JSON.stringify(data),
       'items':JSON.stringify(items),
       'id':id.toString(),
+   
     };
     
     var params={
@@ -132,7 +147,7 @@ function updateGeneratedData(items, id) {
       muteHttpExceptions :true,
       'payload':payload,
     }
-    var url='http://212.69.229.10:4000/'+NODE_PATH+'/updategenerateddatapath';
+    var url=SERVER_URL+NODE_PATH+'/updategenerateddatapath';
     var response=UrlFetchApp.fetch(url, params).getContentText();
     
     logItem(LOGDATA);

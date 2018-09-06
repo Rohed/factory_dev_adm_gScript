@@ -48,7 +48,7 @@ var id = '1NOs0mGpwkoFjMTUEnHjdbVI0_iE7kX2-zdfzJLLcLt4';
       muteHttpExceptions :true,
       'payload':payload,
     }
-    var url='http://212.69.229.10:4000/'+NODE_PATH+'/deletedata';
+    var url=SERVER_URL+NODE_PATH+'/deletedata';
     var response=UrlFetchApp.fetch(url, params).getContentText();
     
   

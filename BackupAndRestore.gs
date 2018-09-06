@@ -5,7 +5,7 @@ function createBackup() {
     "Content-Type":'application/json',
     muteHttpExceptions :true,
   }
-  var url='http://212.69.229.10:4000/'+NODE_PATH+'/createbackup?path='+NODE_PATH;
+  var url=SERVER_URL+NODE_PATH+'/createbackup?path='+NODE_PATH;
   var response=UrlFetchApp.fetch(url, params).getContentText();
   Utilities.sleep(30000);
   return 'Created';
@@ -18,7 +18,7 @@ function deleteBackup(filename) {
     muteHttpExceptions :true,
    
   }
-  var url='http://212.69.229.10:4000/'+NODE_PATH+'/deletebackup?path='+NODE_PATH+"&name="+filename;
+  var url=SERVER_URL+NODE_PATH+'/deletebackup?path='+NODE_PATH+"&name="+filename;
   var response=UrlFetchApp.fetch(url, params).getContentText();
    Utilities.sleep(10000);
   return 'Deleted';
@@ -31,7 +31,7 @@ function getFileList() {
     muteHttpExceptions :true,
    
   }
-  var url='http://212.69.229.10:4000/'+NODE_PATH+'/filelist?path='+NODE_PATH;
+  var url=SERVER_URL+NODE_PATH+'/filelist?path='+NODE_PATH;
   var response=UrlFetchApp.fetch(url, params).getContentText();
   
   var arr = JSON.parse(response);
@@ -48,7 +48,7 @@ function restorePoint(filename) {
     muteHttpExceptions :true,
    
   }
-  var url='http://212.69.229.10:4000/'+NODE_PATH+'/restorepoint?path='+NODE_PATH+"&name="+filename;
+  var url=SERVER_URL+NODE_PATH+'/restorepoint?path='+NODE_PATH+"&name="+filename;
   var response=UrlFetchApp.fetch(url, params).getContentText();
   
    return [false,'restorePoint'];

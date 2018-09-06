@@ -764,7 +764,7 @@ function createRefferenceDB(id) {
       muteHttpExceptions :true,
       'payload':payload,
     }
-        var url='http://212.69.229.10:4000/'+NODE_PATH+'/createrefferencedb';
+        var url=SERVER_URL+NODE_PATH+'/createrefferencedb';
     var response=UrlFetchApp.fetch(url, params).getContentText();
     LOGDATA.msg = response;
       logItem(LOGDATA);

@@ -54,7 +54,7 @@ function saveSchedule(dataPaginated, obj) {
       muteHttpExceptions :true,
       'payload':payload,
     }
-    var url='http://212.69.229.10:4000/'+NODE_PATH+'/saveschedulepath';
+    var url=SERVER_URL+NODE_PATH+'/saveschedulepath';
     var response=UrlFetchApp.fetch(url, params).getContentText();
     
   
@@ -96,7 +96,7 @@ function updateSchedulesFor(newItem,oldItem){
       muteHttpExceptions :true,
       'payload':payload,
     }
-    var url='http://212.69.229.10:4000/'+NODE_PATH+'/updateschedulesforpath';
+    var url=SERVER_URL+NODE_PATH+'/updateschedulesforpath';
     var response=UrlFetchApp.fetch(url, params).getContentText();
 
     Logger.log(response);
@@ -137,7 +137,7 @@ function DeleteSchedule(obj){
       muteHttpExceptions :true,
       'payload':payload,
     }
-    var url='http://212.69.229.10:4000/'+NODE_PATH+'/deleteschedulepath';
+    var url=SERVER_URL+NODE_PATH+'/deleteschedulepath';
     var response=UrlFetchApp.fetch(url, params).getContentText();
 
 
@@ -222,7 +222,7 @@ function testSAVESCHEDYLEANDMOVE() {
         muteHttpExceptions :true,
         'payload':payload,
       }
-      var url='http://212.69.229.10:4000/'+NODE_PATH+'/saveschedulepath';
+      var url=SERVER_URL+NODE_PATH+'/saveschedulepath';
        var response=UrlFetchApp.fetch(url, params).getContentText();
      Utilities.sleep(5000);
        //saveSchedule(, obj);
