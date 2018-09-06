@@ -747,7 +747,7 @@ function toMixing(data) {
 }
 
 function testmove() {
-    MoveItem('GBVCO31796', 'MixingTeam')
+    MoveItem('914932', 'Production')
 }
 
 function MoveItem(batch, sheet) {
@@ -1101,6 +1101,12 @@ function moveMain(item) {
             var suffix = item.batch.substr(-1);
             var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
             var tubes = item.bottles / tube;
+          var tomix = order.mixing;
+          var tominusP = order.premixed;
+          var tominusU = order.unbranded;
+          var tominusB = order.branded;
+          var tominBPack = order.backtubed;
+          tubes = tubes - tominBPack;
             if (tube != 0) {
                 //WITH PACKAGING
                 if (for_branded_stock) {
@@ -1114,13 +1120,9 @@ function moveMain(item) {
                         fromReservedtoCompleted('Boxes/' + boxname, box);
                         LOGARR.push([boxname, box]);
                     }
-                    var tomix = order.mixing;
-                    var tominusP = order.premixed;
-                    var tominusU = order.unbranded;
-                    var tominusB = order.branded;
-                    var tominBPack = order.backtubed;
-                    fromReservedtoCompleted('Packages/' + item.packagingType.sku, (item.bottles) / tube);
-                    LOGARR.push([item.packagingType.sku, (item.bottles) / tube]);
+               
+                    fromReservedtoCompleted('Packages/' + item.packagingType.sku, tubes);
+                    LOGARR.push([item.packagingType.sku, tubes]);
                     var brandname2 = getBrandName(item, true);
                     if (brandname2 != order.productcode) {
                         BtoCompleteX(brandname2, tominusB);

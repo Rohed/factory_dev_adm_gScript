@@ -482,3 +482,58 @@ base.updateData('SAVED',upload2);
     }
   }
 }
+
+function resetForTesting(){
+var obj1= {
+  Running:15,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('Labels/JESTS1001L',obj1);
+
+var obj1= {
+  Running:15,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('Packages/JESTS1001B',obj1);
+
+var obj1= {
+  Running:15,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('BottleTypes/R&CBOTTLE',obj1);
+
+var obj1= {
+  Running:15,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('Lids/R&CCAP',obj1);
+
+var obj1= {
+  Running:1,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('PremixesTypes/GBMIX104',obj1);
+
+var obj1= {
+  Running:3,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('UnbrandedTypes/UBGBMIX104R&CCAP10',obj1);
+
+var obj1= {
+  Running:2,
+  Reserved:0,
+  Completed:0
+}
+base.updateData('BrandedTypes/JESTS1001',obj1);
+
+
+
+
+}

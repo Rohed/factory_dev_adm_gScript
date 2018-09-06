@@ -1,5 +1,5 @@
 function testPartial(){
-filter('913933', 5, 'Production')
+filter('914932', 6, 'Production')
 
 }
 
@@ -53,18 +53,19 @@ function fromProduction(batch, bottles) {
   LOGARR.push(['tomix: ' , tomix]);
    var amount = 0;
     var helper = 0;
- 
+   var helper2=0;
   if(tominusP>0){
     if(tominusP>volume){
       
       amount = volume;
          helper=volume;
       volume=0;
-    
+    helper2 = order.premixed-helper;
     }else{
       amount = tominusP;
       volume=volume - tominusP;
       helper=0;
+      helper2 = 0;
     }
     if(forColored){
      LOGARR.push(['COLORED: ' , "YES "+ premixColored]);
@@ -73,6 +74,7 @@ function fromProduction(batch, bottles) {
         qty:amount
       }
       fromReservedToRunning('PremixesTypes/' + premixColored, amount);
+
     }else{
       USAGE.Premix={
         sku:premix,
@@ -82,9 +84,9 @@ function fromProduction(batch, bottles) {
       fromReservedToRunning('PremixesTypes/' + premix, amount);
     }
     LOGARR.push(['amount: ' , amount]);
-    LOGARR.push(['premixed: ' , helper]);
+    LOGARR.push(['premixed: ' , helper2]);
     var dat1 ={
-      premixed:helper,
+      premixed:helper2,
     }
     base.updateData('Orders/' + batch,dat1);
     
@@ -130,7 +132,9 @@ function fromProduction(batch, bottles) {
     LOGARR.push(['To Running: ' + prodData.botSKU, removeFromProduction]);
     //CHECK PRINTING
     var printData = base.getData('Printing/' + batch);
-    if (printData) {
+     var labelingData = base.getData('Labelling/' + batch);
+     var removedFromPrinting = true;
+    if (printData && !labelingData) {
         if (printData.movedtoNext == 0) {
             var label = order.botlabelsku;
        
@@ -195,11 +199,28 @@ function fromProduction(batch, bottles) {
             removeFromReserved('Labels/' + label, removeFromProduction);
             LOGARR.push(['To Running: ' + label, removeFromProduction]);
         }
+    }else{
+      removedFromPrinting=false;
+      var packData = getPackagingData(printData.packagingType, removeFromProduction, order.boxname.sku)
+      var packink = packData.ink;
+      var ink = 0;
+      if (!order.ppb) {
+        ink += removeFromProduction * 0.001;
+      }
+      if (!order.ppp) {
+        ink += packink;
+      }
+      USAGE.ink={
+        
+        qty:ink
+      }
+      removeFromReserved("Misc/printing ink", ink);
+      LOGARR.push(['To Running: Ink', ink]);
     }
     //CHECK LABELLING
-    var labelingData = base.getData('Labelling/' + batch);
+   var removedFromLabelling=true;
     if (labelingData) {
-        if (printData.movedtoNext != 0 || !printData) {
+        if (!removedFromPrinting) {
             if (labelingData.movedtoNext == 0) {
                 var label = order.botlabelsku;
                 labelingData.bottles = labelingData.bottles - removeFromProduction;
@@ -245,11 +266,14 @@ function fromProduction(batch, bottles) {
                 removeFromReserved('Labels/' + label, removeFromProduction);
                 LOGARR.push(['To Running: ' + label, removeFromProduction]);
             }
+        }else{
+        removedFromLabelling = false;
         }
     }
     //CHECK PACKAGING
     var packagingData = base.getData('Packaging/' + batch);
     if (packagingData) {
+       
         if (packagingData.movedtoNext == 0) {
             var origbottles = packagingData.bottles;
             packagingData.bottles = origbottles - removeFromProduction;
@@ -265,7 +289,7 @@ function fromProduction(batch, bottles) {
                 box = 0;
             }
             if (!for_branded_stock) {
-                if (order.packagingType) {
+                if (order.packagingType && !removedFromLabelling) {
                     USAGE.Packages={
                       sku:order.packagingType.sku,
                       qty:tubes
@@ -282,7 +306,7 @@ function fromProduction(batch, bottles) {
                     removeFromReserved('Boxes/' + boxname, box);
                 }
             } else {
-                if (tube) {
+                if (tube  && !removedFromLabelling) {
                    USAGE.Packages={
                       sku:order.packagingType.sku,
                       qty:tubes
@@ -307,7 +331,8 @@ function fromProduction(batch, bottles) {
                                 fromReservedToRunning('Packages/' + order.packagingType, packagingData.bottles);
                         }
                         }*/
-        }
+          }
+     
     }
     prodData.bottles = prodData.bottles - removeFromProduction;
     LOGARR.push(['New in Production: ', prodData.bottles]);
@@ -1054,7 +1079,6 @@ Logger.log(sheetItem);
             data.unbranded = 0;
             data.branded = 0;
             data.premixed = 0;
-            data.recipe.Coloredpremix = 0;
             data.mixing = 0;
             data.backtubed = 0;
             data.mixing_status = 0;
