@@ -1212,6 +1212,10 @@ function importBoxesFromSheet(id) {
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
     var options = "{";
+          var origItems = base.getData('Boxes');
+  if(!origItems){
+    origItems = {};
+  }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1223,9 +1227,9 @@ function importBoxesFromSheet(id) {
             continue;
         }
         if (data[i][3] == 'Y') {
+   
             base.removeData('Boxes/' + sku);
-
-            base.removeData('Boxes/' + sku);
+              delete origItems[sku];
             LOGDATA.data.push(['Removed:', sku]);
             continue;
         }
@@ -1240,7 +1244,15 @@ function importBoxesFromSheet(id) {
             Reserved: 0,
             Completed: 0,
         };
-
+        if(!origItems[sku]){
+          
+          origItems[sku]=box;
+          
+        }else{
+          
+          origItems[sku].name=name;
+          origItems[sku].divTubesForBox= divTubesForBox;
+        }
         options += '"' + box.sku + '":' + JSON.stringify(box) + ',';
 
 
@@ -1251,7 +1263,7 @@ function importBoxesFromSheet(id) {
     options += '}';
     try {
         var upload = JSON.parse(options);
-        base.updateData('Boxes', upload);
+        base.updateData('Boxes', origItems);
         logItem(LOGDATA);
 
     } catch (e) {
@@ -1286,6 +1298,11 @@ function importPackagesFromSheet(id) {
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
     var options = "{";
+    
+      var origItems = base.getData('Packages');
+  if(!origItems){
+    origItems = {};
+  }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1297,9 +1314,9 @@ function importPackagesFromSheet(id) {
             continue;
         }
         if (data[i][3] == 'Y') {
-            base.removeData('Packages/' + sku);
 
             base.removeData('Packages/' + sku);
+            delete origItems[sku];
             LOGDATA.data.push(['Removed:', sku]);
             continue;
         }
@@ -1316,7 +1333,15 @@ function importPackagesFromSheet(id) {
             Reserved: 0,
             Completed: 0,
         }
-
+        if(!origItems[sku]){
+          
+          origItems[sku]=pack;
+          
+        }else{
+          
+          origItems[sku].name=name;
+          origItems[sku].botperPack= botperPack;
+        }
         options += '"' + pack.sku + '":' + JSON.stringify(pack) + ',';
 
 
@@ -1328,7 +1353,7 @@ function importPackagesFromSheet(id) {
     var msg='';
     try {
         var upload = JSON.parse(options);
-        base.updateData('Packages', upload);
+        base.updateData('Packages', origItems);
         msg=LOGDATA.msg;
         logItem(LOGDATA);
 
@@ -1361,6 +1386,10 @@ function importFlavoursFromSheet(id) {
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
     var options = "{";
+  var origItems = base.getData('Flavours');
+  if(!origItems){
+    origItems = {};
+  }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1372,9 +1401,9 @@ function importFlavoursFromSheet(id) {
             continue;
         }
         if (data[i][2] == 'Y') {
-            base.removeData('Flavours/' + sku);
+              base.removeData('Flavours/' + sku);
 
-            base.removeData('Flavours/' + sku);
+             delete origItems[sku];
             LOGDATA.data.push(['Removed:', sku]);
             continue;
         }
@@ -1387,7 +1416,15 @@ function importFlavoursFromSheet(id) {
             Completed: 0,
 
         }
-
+        if(!origItems[sku]){
+          
+          origItems[sku]=flav;
+          
+        }else{
+          
+          origItems[sku].name=name;
+ 
+        }
         options += '"' + flav.sku + '":' + JSON.stringify(flav) + ',';
 
 
@@ -1398,7 +1435,7 @@ function importFlavoursFromSheet(id) {
     options += '}';
     try {
         var upload = JSON.parse(options);
-        base.updateData('Flavours', upload);
+        base.updateData('Flavours', origItems);
         logItem(LOGDATA);
 
     } catch (e) {
@@ -1428,7 +1465,11 @@ function importBottlesFromSheet(id) {
     var ss = SpreadsheetApp.openById(id);
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
-    var options = "{";
+  //  var options = "{";
+    var origItems = base.getData('BottleTypes');
+    if(!origItems){
+    origItems = {};
+    }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1441,7 +1482,7 @@ function importBottlesFromSheet(id) {
         }
         if (data[i][2] == 'Y') {
             base.removeData('BottleTypes/' + sku);
-
+            delete origItems[sku];
 
             LOGDATA.data.push(['Removed:', sku]);
             continue;
@@ -1455,18 +1496,25 @@ function importBottlesFromSheet(id) {
             Completed: 0,
 
         }
-
-        options += '"' + bottle.sku + '":' + JSON.stringify(bottle) + ',';
+        if(!origItems[sku]){
+        
+        origItems[sku]=bottle;
+        
+        }else{
+          
+          origItems[sku].name=name;
+        }
+      //  options += '"' + bottle.sku + '":' + JSON.stringify(bottle) + ',';
 
 
         LOGDATA.data.push(['Added:', sku + ' - ' + name]);
         LOGDATA.msg += 'Added ' + sku + '- ' + name + ' \n ';
     }
 
-    options += '}';
+    //options += '}';
     try {
-        var upload = JSON.parse(options);
-        base.updateData('BottleTypes', upload);
+     //   var upload = JSON.parse(options);
+        base.updateData('BottleTypes', origItems);
         logItem(LOGDATA);
 
     } catch (e) {
@@ -1497,6 +1545,10 @@ function importLidsFromSheet(id) {
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
     var options = "{";
+  var origItems = base.getData('Lids');
+  if(!origItems){
+    origItems = {};
+  }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1509,7 +1561,7 @@ function importLidsFromSheet(id) {
         }
         if (data[i][2] == 'Y') {
             base.removeData('Lids/' + sku);
-
+            delete origItems[sku];
             LOGDATA.data.push(['Removed:', sku]);
             continue;
         }
@@ -1522,7 +1574,14 @@ function importLidsFromSheet(id) {
             Completed: 0,
 
         }
-
+       if(!origItems[sku]){
+        
+        origItems[sku]=lid;
+        
+        }else{
+          
+          origItems[sku].name=name;
+        }
         options += '"' + lid.sku + '":' + JSON.stringify(lid) + ',';
 
 
@@ -1533,7 +1592,7 @@ function importLidsFromSheet(id) {
     options += '}';
     try {
         var upload = JSON.parse(options);
-        base.updateData('Lids', upload);
+        base.updateData('Lids', origItems);
         logItem(LOGDATA);
 
     } catch (e) {
@@ -1564,6 +1623,10 @@ function importLabelsFromSheet(id) {
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
     var options = "{";
+    var origItems = base.getData('Labels');
+    if(!origItems){
+      origItems = {};
+    }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1575,9 +1638,9 @@ function importLabelsFromSheet(id) {
             continue;
         }
         if (data[i][2] == 'Y') {
-            base.removeData('Labels/' + sku);
 
             base.removeData('Labels/' + sku);
+            delete origItems[sku];
             LOGDATA.data.push(['Removed:', sku]);
             continue;
         }
@@ -1590,7 +1653,14 @@ function importLabelsFromSheet(id) {
             Completed: 0,
 
         }
-
+      if(!origItems[sku]){
+        
+        origItems[sku]=label;
+        
+        }else{
+          
+          origItems[sku].name=name;
+        }
         options += '"' + label.sku + '":' + JSON.stringify(label) + ',';
 
 
@@ -1601,7 +1671,7 @@ function importLabelsFromSheet(id) {
     options += '}';
     try {
         var upload = JSON.parse(options);
-        base.updateData('Labels', upload);
+        base.updateData('Labels', origItems);
         logItem(LOGDATA);
 
     } catch (e) {
@@ -1632,6 +1702,10 @@ function importColorsFromSheet(id) {
     LOGDATA.batch = ss.getName();
     var data = ss.getSheets()[0].getDataRange().getValues();
     var options = "{";
+  var origItems = base.getData('Color');
+  if(!origItems){
+    origItems = {};
+  }
     for (var i = 1; i < data.length; i++) {
         var sku = data[i][0];
 
@@ -1643,9 +1717,10 @@ function importColorsFromSheet(id) {
             continue;
         }
         if (data[i][2] == 'Y') {
-            base.removeData('Color/' + sku);
+
 
             base.removeData('Color/' + sku);
+            delete origItems[sku];
             LOGDATA.data.push(['Removed:', sku]);
             continue;
         }
@@ -1658,7 +1733,14 @@ function importColorsFromSheet(id) {
             Completed: 0,
 
         }
-
+      if(!origItems[sku]){
+        
+        origItems[sku]=color;
+        
+        }else{
+          
+          origItems[sku].name=name;
+        }
         options += '"' + color.sku + '":' + JSON.stringify(color) + ',';
 
 
@@ -1669,7 +1751,7 @@ function importColorsFromSheet(id) {
     options += '}';
     try {
         var upload = JSON.parse(options);
-        base.updateData('Color', upload);
+        base.updateData('Color', origItems);
         logItem(LOGDATA);
 
     } catch (e) {
