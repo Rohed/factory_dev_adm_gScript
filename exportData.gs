@@ -1096,9 +1096,8 @@ arr.push('');
 }
 return arr;
 }
-function testCompExp(){
-
- createCompletedExport(20,'test')
+function testEXPORT(){
+createCompletedExport(14,'test')
 }
 function createCompletedExport(H,name){
   var folder=DriveApp.getFolderById(COMPLETED_ITEMS_FOLDER);
@@ -1112,7 +1111,7 @@ function createCompletedExport(H,name){
     range = [14,20];
   }
   
-  var d2=new Date().setHours(0,0,0,0)-(60*60*1000*4);
+  var d2=new Date().setHours(0,0,0,0);
   
   
   var sheets=['Orders','MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
@@ -1154,7 +1153,7 @@ function createCompletedExport(H,name){
 var TOTALS_FINAL = [[],[],[],[],[],[],[]];
 for(var s =0;s<sheets.length;s++){
      var params = {
-        orderBy: ['final_status'],
+        orderBy: 'final_status',
         equalTo: "Completed",
 
     }
@@ -1162,14 +1161,14 @@ for(var s =0;s<sheets.length;s++){
     switch (sheets[s]){
       case 'Shipping':
         params = {
-          orderBy: ['shipping_status'],
+          orderBy: 'shipping_status',
           equalTo: "Shipped",
           
         }
         break;
       case 'Production':
         params = {
-          orderBy: ['final_status'],
+          orderBy: 'final_status',
           equalTo: "Completed",
           
         }
@@ -1177,7 +1176,7 @@ for(var s =0;s<sheets.length;s++){
         break;
       case 'Orders':
         params = {
-          orderBy: ['final_status'],
+          orderBy: 'final_status',
           equalTo: "Completed",
           
         }
@@ -1185,7 +1184,7 @@ for(var s =0;s<sheets.length;s++){
         break;
       default:
         params = {
-          orderBy: ['final_status'],
+          orderBy: 'final_status',
           equalTo: "Completed",
           
         }
@@ -1203,11 +1202,14 @@ for(var s =0;s<sheets.length;s++){
          var d1=new Date(list[i].CompletionDate).getTime();
            var t1=(d1>d2);
 
-       
+
          if(t1 && t2 && t3){
          data.push(list[i]);
+  
+    
          }
        }
+
 
      var values=[];
     values.push(headers[s]);

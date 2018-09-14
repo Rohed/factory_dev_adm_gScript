@@ -31,6 +31,7 @@ function saveItem(data) {
       if (!QTYitem.Stock) {
         QTYitem.Stock = 0;
       }
+       QTYitem.Running = QTYitem.Running? QTYitem.Running: 0;
         if(data.key != 'undefined'){
          var olddat=base.getData('Inventory/' + data.key);
            if (data.delivdate&& (olddat.quantity!=data.quantity)) {

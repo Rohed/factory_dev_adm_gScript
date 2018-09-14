@@ -26,15 +26,15 @@ var raw=base.getData(sheets[i]);
 var list=JSONtoARR(raw);
   for(var j=0;j<list.length;j++){
   
-    if(list[j].Running<0){
-    raw[list[j].sku].Running=Math.abs(list[j].Running)
+    if(list[j].Running == undefined){
+    raw[list[j].sku].Running=0
     }
-    if(list[j].Reserved<0){
-    raw[list[j].sku].Reserved=Math.abs(list[j].Reserved)
-    }
-    if(list[j].Completed<0){
-    raw[list[j].sku].Completed=Math.abs(list[j].Completed)
-    }
+//    if(list[j].Reserved<0){
+//    raw[list[j].sku].Reserved=Math.abs(list[j].Reserved)
+//    }
+//    if(list[j].Completed<0){
+//    raw[list[j].sku].Completed=Math.abs(list[j].Completed)
+//    }
   }
   base.updateData(sheets[i],raw);
 }
