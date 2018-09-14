@@ -1,13 +1,13 @@
 function createTriggers() {
   ScriptApp.newTrigger("exportCompletedItems")
   .timeBased()
-  .atHour(14)
+  .atHour(15)
   .everyDays(1) 
   .create();
   
   ScriptApp.newTrigger("exportCompletedItems")
   .timeBased()
-  .atHour(20)
+  .atHour(21)
   .everyDays(1) 
   .create();
 }

@@ -1105,10 +1105,10 @@ function createCompletedExport(H,name){
   var SS=SpreadsheetApp.openById(create.getId());
   
   var range = [];
-  if(H == 14){
-    range = [1,14];
+  if(H == 15){
+    range = [1,15];
   }else{
-    range = [14,20];
+    range = [15,21];
   }
   
   var d2=new Date().setHours(0,0,0,0);
