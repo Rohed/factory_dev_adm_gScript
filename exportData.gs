@@ -1096,6 +1096,10 @@ arr.push('');
 }
 return arr;
 }
+function testCompExp(){
+
+ createCompletedExport(20,'test')
+}
 function createCompletedExport(H,name){
   var folder=DriveApp.getFolderById(COMPLETED_ITEMS_FOLDER);
   var create=DriveApp.getFileById(COMPLETED_FILE_ID).makeCopy(name,folder);
@@ -1108,7 +1112,7 @@ function createCompletedExport(H,name){
     range = [14,20];
   }
   
-  var d2=new Date().setHours(0,0,0,0)-(60*60*1000*H);
+  var d2=new Date().setHours(0,0,0,0)-(60*60*1000*4);
   
   
   var sheets=['Orders','MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
