@@ -1108,7 +1108,7 @@ function createCompletedExport(H,name){
     range = [14,20];
   }
   
-  var d2=new Date().setHours(0,0,0,0)-(60*60*1000*24);
+  var d2=new Date().setHours(0,0,0,0)-(60*60*1000*H);
   
   
   var sheets=['Orders','MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];

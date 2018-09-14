@@ -80,7 +80,7 @@ function Import_new_FBC() {
     base.updateData('Brands', upload)
 }
 function TESTQTY(){
-var id = '1E0VSVvqHKnZ310VY0Wk914INpQ23Wb-48rrUgrvWOaw';
+var id = '11fCoEZYTvbEDiSjxlhn4yxswRme2PyFGCbYKrSe5mX0';
 QTYInport(id)
 }
 function QTYInport(id) {
@@ -99,7 +99,8 @@ function QTYInport(id) {
     // id='1sWqguyu1TsaGgxKAo6zzDYCwQg-FkGIA_57P7J8L7WA';
     var ss = SpreadsheetApp.openById(id);
     LOGDATA.batch = id;
-    var sheets = [['Flavour Concentrates','Flavours','FLAV','float'],['Packages','Packages','PAC','int'],['Boxes','Boxes','BOX','int'],['Labels','Labels','LAB','int'],['Colors','Color','COL','float']];
+    var sheets = [['Flavours','Flavours','FLAV','float'],['Packages','Packages','PAC','int'],['Boxes','Boxes','BOX','int'],['Labels','Labels','LAB','int'],
+    ['Colors','Color','COL','float'],['Premix','PremixesTypes','GBMIX','float'],['Unbranded','UnbrandedTypes','UB','int'],['Branded','BrandedTypes','BRA','int'],['Bottles','BottleTypes','BOT','int'],['Caps','Lids','CAP','int']];
     for(var s=0;s<sheets.length;s++){
     try {
         var flavours = ss.getSheetByName(sheets[s][0]);
@@ -114,8 +115,10 @@ function QTYInport(id) {
          
             for (var i = 1; i < flavours.length; i++) {
                 var replace = false;
-                if (flavours[i][4] == 'Replace') {
+                if(flavours[i][4]){
+                if (flavours[i][4].toLowerCase()  == 'replace') {
                     replace = true;
+                }
                 }
                 try {
                     var flav = flavours[i][1];
@@ -209,343 +212,7 @@ function QTYInport(id) {
         faileditems += 'Couldnt Upload '+sheets[s][1]+'.   ' + e.toString() + '<br/>';
     }
     }
-    //Bottles/Lids
-    try {
-        var botlid = ss.getSheetByName('Bottles and caps');
-        if (botlid) {
-            botlid = botlid.getDataRange().getValues();
-            var origbottles = base.getData('BottleTypes');
-            var origcaps = base.getData('Lids');
-            var origcapsString = JSON.stringify(origcaps);
-            var origbottlesString = JSON.stringify(origbottles);
-            for (var i = 1; i < botlid.length; i++) {
-                var replace = false;
-                if (botlid[i][4] == 'Replace') {
-                    replace = true;
-                }
-                if (botlid[i][0] == 'Bottles' || botlid[i][0] == 'Nib') {
-                    try {
 
-
-                        var name = botlid[i][1];
-                        if (!name) {
-                            name = origbottles[botlid[i][3]].name;
-                        }
-                        if (!name) {
-                            try {
-                                name = origbottles[botlid[i][3]].name;
-                            } catch (e) {
-                                faileditems += 'Bottle SKU is not in the database: ' + botlid[i][3] + '<br/>'
-                            }
-                        }
-
-                        if (botlid[i][3] == '') {
-                            botlid[i][3] = 'BOT' + getRandom() + name.substr(0, 1);
-                        }
-                        var foundSKU = origbottles[botlid[i][3]];
-                        if (foundSKU > 0) {
-                            var dat1 = {
-                                Running:  parseInt(botlid[i][2],10) +  parseInt(origbottles[botlid[i][3]].Running,10),
-                                'sku': botlid[i][3],
-                                Reserved:  parseInt(origbottles[botlid[i][3]].Reserved,10),
-                                Completed:  parseInt(origbottles[botlid[i][3]].Completed,10),
-                                'name': origbottles[botlid[i][3]].name,
-                            };
-
-                            if (replace) {
-
-                                var dat1 = {
-                                    Running:  parseInt(botlid[i][2],10),
-                                    'sku': botlid[i][3],
-                                    Reserved:  parseInt(origbottles[botlid[i][3]].Reserved,10),
-                                    Completed:  parseInt(origbottles[botlid[i][3]].Completed,10),
-                                    'name': origbottles[botlid[i][3]].name,
-                                };
-
-                            }
-                        } else if (name) {
-                            var dat1 = {
-                                Running:  parseInt(botlid[i][2],10),
-                                'sku': botlid[i][3],
-                                Reserved: 0,
-                                Completed: 0,
-                                'name': name,
-                            };
-
-                            newitems += 'Updated SKU for: ' + name + ' to ' + botlid[i][3] + '<br>';
-                        } else {
-                            var sku = botlid[i][3];
-                            var dat1 = {
-                                Running:  parseInt(botlid[i][2],10),
-                                Completed: 0,
-                                Reserved: 0,
-                                sku: sku,
-                                name: flav
-                            };
-                            base.updateData('BottleTypes/' + dat1.sku, dat1);
-                            //generateForSingleBottle(name);
-                            newitems += 'Added New Bottle: ' + name + '<br>';
-                        }
-                        base.updateData('BottleTypes/' + name, dat1);
-                    } catch (e) {
-                        faileditems += 'Couldnt proccess ' + name + '  ' + e.toString() + '<br/>';
-                    }
-                } else if (botlid[i][0] == 'Cap') {
-                    try {
-
-
-                        var name = botlid[i][1];
-                        if (!name) {
-                            name = origcaps[botlid[i][3]].name;
-                        }
-                        if (botlid[i][3] == '') {
-                            botlid[i][3] = 'CAP' + getRandom() + name.substr(0, 1);
-                        }
-                        var foundSKU = origcaps[botlid[i][3]];
-                        if (foundSKU > 0) {
-                            var dat1 = {
-                                Running: parseInt(botlid[i][2],10) + parseInt(origcaps[botlid[i][3]].Running,10),
-                                'sku': botlid[i][3],
-                                Reserved: parseInt(origcaps[botlid[i][3]].Reserved,10),
-                                Completed: parseInt(origcaps[botlid[i][3]].Completed,10),
-                                name: origcaps[botlid[i][3]].name,
-                            };
-
-                            if (replace) {
-
-                                var dat1 = {
-                                    Running: parseInt(botlid[i][2],10),
-                                    sku: botlid[i][3],
-                                    Reserved: parseInt(origcaps[botlid[i][3]].Reserved,10),
-                                    Completed: parseInt(origcaps[botlid[i][3]].Completed,10),
-                                    name: origcaps[botlid[i][3]].name,
-                                };
-
-                            }
-                        } else if (name) {
-                            var dat1 = {
-                                Running: parseInt(botlid[i][2],10),
-                                sku: botlid[i][3],
-                                Reserved: 0,
-                                Completed: 0,
-                                name: name,
-                            };
-
-                            newitems += 'Updated SKU for: ' + name + ' to ' + botlid[i][3] + '<br>';
-                        } else {
-                            var sku = botlid[i][3];
-                            var dat1 = {
-                                Running: parseInt(botlid[i][2],10),
-                                Completed: 0,
-                                Reserved: 0,
-                                sku: sku,
-                                name: name
-                            };
-                            newitems += 'Added New Cap: ' + name + '<br>';
-                        }
-                        base.updateData('Lids/' + dat1.sku, dat1)
-                    } catch (e) {
-                        faileditems += 'Couldnt proccess ' + name + '  ' + e.toString() + '<br/>';
-                    }
-                }
-            }
-        }
-        LOGDATA.data.push(['Imported:', 'Bottles and Caps']);
-    } catch (e) {
-        LOGDATA.data.push(['Failed to Import:', 'Bottles and Caps']);
-        faileditems += 'Couldnt Upload Bottles/Lids. ' + e.toString() + ' <br/>';
-    }
-    //PREMIX
-    try {
-        var premix = ss.getSheetByName('Premix');
-        if (premix) {
-            premix = premix.getDataRange().getValues();
-            var origpremix = base.getData('PremixesTypes');
-            var origpremixString = JSON.stringify(origpremix);
-            var options = '{';
-            for (var i = 1; i < premix.length; i++) {
-                var replace = false;
-                if (premix[i][4] == 'Replace') {
-                    replace = true;
-                }
-                try {
-                    if (origpremix[premix[i][3]]) {
-                        var sku = premix[i][3];
-                        var dat1 = {
-                            Running: parseFloat(premix[i][2]) + parseFloat(origpremix[premix[i][3]].Running),
-                            'sku': sku,
-                            Reserved: parseFloat(origpremix[premix[i][3]].Reserved),
-                            Completed: parseFloat(origpremix[premix[i][3]].Completed),
-                            'name': origpremix[premix[i][3]].name,
-                        };
-                        if (replace) {
-
-                            var dat1 = {
-                                Running: parseFloat(premix[i][2]),
-                                'sku': sku,
-                                Reserved: parseFloat(origpremix[premix[i][3]].Reserved),
-                                Completed: parseFloat(origpremix[premix[i][3]].Completed),
-                                'name': origpremix[premix[i][3]].name,
-                            };
-
-                        }
-
-                        options += '"' + dat1.sku + '":' + JSON.stringify(dat1) + ',';
-                    }else{
-                      var sku = premix[i][3];
-                      var dat1 = {
-                        Running: 0,
-                        'sku': sku,
-                        Reserved: 0,
-                        Completed: 0,
-                        'name': premix[i][1],
-                      };
-                       options += '"' + dat1.sku + '":' + JSON.stringify(dat1) + ',';
-                    }
-                } catch (e) {
-                    faileditems += 'Couldnt proccess ' + name + '  ' + e.toString() + '<br/>';
-                }
-            }
-            options += '}';
-            var upload = JSON.parse(options);
-            base.updateData('PremixesTypes', upload)
-        }
-        LOGDATA.data.push(['Imported:', 'Premixes']);
-    } catch (e) {
-        LOGDATA.data.push(['Failed to Import:', 'Premixes']);
-
-        faileditems += 'Couldnt Upload Premixes.' + e.toString() + ' <br/>';
-    }
-    //UNBRANDED
-    try {
-        var unbranded = ss.getSheetByName('Unbranded');
-        if (unbranded) {
-            unbranded = unbranded.getDataRange().getValues();
-            var origunbranded = base.getData('UnbrandedTypes');
-            var origunbrandedString = JSON.stringify(origunbranded);
-            var options = '{';
-            for (var i = 1; i < unbranded.length; i++) {
-
-                var replace = false;
-                if (unbranded[i][4] == 'Replace') {
-                    replace = true;
-                }
-                try {
-
-                    if (origunbranded[unbranded[i][3]]) {
-                        var sku = unbranded[i][3];
-                        var dat1 = {
-                            Running: parseInt(unbranded[i][2],10) + parseInt(origunbranded[unbranded[i][3]].Running,10),
-                            'sku': sku,
-                            Reserved: parseInt(origunbranded[unbranded[i][3]].Reserved,10),
-                            Completed: parseInt(origunbranded[unbranded[i][3]].Completed,10),
-                            'name': origunbranded[unbranded[i][3]].name,
-                        };
-                        if (replace) {
-
-                            var dat1 = {
-                                Running: parseInt(unbranded[i][2],10),
-                                'sku': sku,
-                                Reserved: parseInt(origunbranded[unbranded[i][3]].Reserved,10),
-                                Completed: parseInt(origunbranded[unbranded[i][3]].Completed,10),
-                                'name': origunbranded[unbranded[i][3]].name,
-                            };
-
-                        }
-                       
-                    }else{
-                      var sku = unbranded[i][3];
-                      var dat1 = {
-                        Running: 0,
-                        'sku': sku,
-                        Reserved: 0,
-                        Completed: 0,
-                        'name': unbranded[i][1],
-                      };
-                      
-                    }
-                     var stringified = JSON.stringify(dat1);
-                    options += '"' + dat1.sku + '":' + stringified + ',';
-                } catch (e) {
-                    faileditems += 'Couldnt proccess ' + unbranded[i][3] + '  ' + e.toString() + '<br/>';
-                }
-            }
-            options += '}';
-            var upload = JSON.parse(options);
-            //     var opt=JSON.parse(upload);
-
-            base.updateData('UnbrandedTypes', upload)
-        }
-        LOGDATA.data.push(['Imported:', 'Unbranded']);
-    } catch (e) {
-        LOGDATA.data.push(['Failed to Import:', 'Unbranded']);
-
-        faileditems += 'Couldnt Upload Unbranded.' + e.toString() + ' <br/>';
-    }
-    //Branded
-    var options = '{';
-    try {
-
-        var branded = ss.getSheetByName('Branded');
-        if (branded) {
-            branded = branded.getDataRange().getValues();
-            var origbranded = base.getData('BrandedTypes');
-            var origbrandedString = JSON.stringify(origbranded);
-            var options = '{';
-            for (var i = 1; i < branded.length; i++) {
-                var replace = false;
-                if (branded[i][4] == 'Replace') {
-                    replace = true;
-                }
-                try {
-                    if (origbranded[branded[i][3]]) {
-                        var sku = branded[i][3];
-                        var dat1 = {
-                            Running: parseInt(branded[i][2],10) + parseInt(origbranded[branded[i][3]].Running,10),
-                            'sku': sku,
-                            Reserved: parseInt(origbranded[branded[i][3]].Reserved,10),
-                            Completed: parseInt(origbranded[branded[i][3]].Completed,10),
-                            'name': origbranded[branded[i][3]].name,
-                        };
-                        if (replace) {
-                           var sku = origbranded[i][3];
-                            var dat1 = {
-                                Running: parseInt(branded[i][2],10),
-                                'sku': sku,
-                                Reserved: parseInt(origbranded[branded[i][3]].Reserved,10),
-                                Completed: parseInt(origbranded[branded[i][3]].Completed,10),
-                                'name': origbranded[branded[i][3]].name,
-                            };
-
-                        }
-                    }else{
-                      var sku = origbranded[i][3];
-                      var dat1 = {
-                        Running: 0,
-                        'sku': sku,
-                        Reserved: 0,
-                        Completed: 0,
-                        'name': origbranded[i][1],
-                      };
-                      
-                    }
-
-                    options += '"' + sku + '":' + JSON.stringify(dat1) + ',';
-
-                } catch (e) {
-                    faileditems += 'Couldnt proccess ' + name + '  ' + e.toString() + '<br/>';
-                }
-            }
-            options += '}';
-            var upload = JSON.parse(options);
-            base.updateData('BrandedTypes', upload)
-        }
-        LOGDATA.data.push(['Imported:', 'Branded']);
-    } catch (e) {
-        LOGDATA.data.push(['Failed to Import:', 'Branded']);
-
-        faileditems += 'Couldnt Upload Branded.' + e.toString() + ' <br/>';
-    }
 
     var text = newitems + '<br/>' + faileditems;
     LOGDATA.msg = text;
@@ -1278,7 +945,7 @@ function importBoxesFromSheet(id) {
 }
 
 function cliearItems(){
-var id='1LeJpOtNom_Sm8YP8Dj1CkVYPxKGaZ3-6dep8GAkf9FY';
+var id='1QyZ2Epsq_MfhAhA43NCi4JDB_ymzgb0j2jKwHlu5Ac0';
 importPackagesFromSheet(id)
 }
 function importPackagesFromSheet(id) {

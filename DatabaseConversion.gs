@@ -1522,3 +1522,27 @@ for(var i=0;i<keys.length;i++){
 
 
 }
+
+function findCopy(){
+  var data = SpreadsheetApp.openById('169RNGWHbEQp2VNpRtTu5PibUWDBk7_K9nT7oyjAgH_4').getSheets()[0].getDataRange().getValues();
+  for(var i=1;i<data.length;i++){
+    for(var j=i+1;j<data.length;j++){
+      if(data[i][4]==data[j][4]&&data[i][10]==data[j][10]){
+      
+      Logger.log(data[i])
+      Logger.log(data[j])
+      break;
+      }
+      
+      
+    }
+    
+    
+  }
+  
+}
+
+function remoAll(){
+base.removeData('References/AllItems');
+
+}
