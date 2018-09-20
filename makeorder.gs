@@ -347,7 +347,7 @@ function runItem(batch, frombulk) {
     var packagingTypeexists = 1;
     if (data.packagingType) {
         if (data.packagingType.sku != '') {
-          if (data.botlabelsku != "") {
+          if (data.packlabelsku != "") {
             var labelexists2 = base.getData('Labels/' + data.packlabelsku);
             if (!labelexists) {
               missingmsg += 'Missing Label: ' + data.packlabelsku + '\n';
