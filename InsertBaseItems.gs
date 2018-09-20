@@ -297,11 +297,13 @@ function generateForSingleBrand2(prod,descr) {
     base.updateData('BrandedTypes/'+item.sku, item);
     LOGARR.push(['Generated braned type:',item.sku]);
        var link=base.getData('References/ProductCodes/'+prod+'/linkedBB');
-    var exists2=base.getData('BrandedTypes/'+link+'BB');
+       
+       if(link){
+    var exists2=base.getData('BrandedTypes/'+link);
     if(!exists){
       var sku=''
       var item = {
-        "sku": prod+'BB',
+        "sku":link,
         "name": 'BB '+descr.replace('3 x 10ml','10ml').replace('4 x 10ml','10ml').replace(/\./g, ""),
         "Running": 0,
         "Reserved": 0,
@@ -314,17 +316,18 @@ function generateForSingleBrand2(prod,descr) {
         LOGARR.push(['Generated linked branded type:',item.sku]);
    
     }
-    
+    }
     
     
   }else{
     
     var link=base.getData('References/ProductCodes/'+prod+'/linkedBB');
+    if(link){
     var exists2=base.getData('BrandedTypes/'+link);
     if(!exists){
       var sku=''
       var item = {
-        "sku": link+'BB',
+        "sku": link,
         "name": 'BB '+descr.replace('3 x 10ml','10ml').replace('4 x 10ml','10ml').replace(/\./g, ""),
         "Running": 0,
         "Reserved": 0,
@@ -336,6 +339,7 @@ function generateForSingleBrand2(prod,descr) {
       LOGARR.push(['Generated linked branded type:',item.sku]);
     }  
     
+  }
   }
   return LOGARR;
 }
