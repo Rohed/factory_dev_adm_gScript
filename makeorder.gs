@@ -343,9 +343,17 @@ function runItem(batch, frombulk) {
     } else {
         var labelexists = 1
     }
+     var labelexists2 = 1
     var packagingTypeexists = 1;
     if (data.packagingType) {
         if (data.packagingType.sku != '') {
+          if (data.botlabelsku != "") {
+            var labelexists2 = base.getData('Labels/' + data.packlabelsku);
+            if (!labelexists) {
+              missingmsg += 'Missing Label: ' + data.packlabelsku + '\n';
+            }
+          }
+        
             packagingTypeexists = null;
             if (data.packagingType.sku != undefined) {
                 packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
@@ -372,7 +380,7 @@ function runItem(batch, frombulk) {
     } else {
         packagingTypeexists = 1
     }
-    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists) {
+    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists && labelexists2) {
 
         var RUNITEM = assignMixture2(data);
         LOGDATA.data = RUNITEM.LogData;
