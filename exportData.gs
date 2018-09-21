@@ -1097,7 +1097,7 @@ arr.push('');
 return arr;
 }
 function testEXPORT(){
-createCompletedExport(14,'test')
+createCompletedExport(15,'test')
 }
 function createCompletedExport(H,name){
   var folder=DriveApp.getFolderById(COMPLETED_ITEMS_FOLDER);
@@ -1105,13 +1105,13 @@ function createCompletedExport(H,name){
   var SS=SpreadsheetApp.openById(create.getId());
   
   var range = [];
-  if(H == 15){
+  if(H <= 15){
     range = [1,15];
   }else{
     range = [15,21];
   }
   
-  var d2=new Date().setHours(0,0,0,0);
+  var d2=new Date().getTime()-(range[1]*60*60*1000);
   
   
   var sheets=['Orders','MixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
@@ -1193,7 +1193,7 @@ for(var s =0;s<sheets.length;s++){
      var list=searchFor([[sheets[s], params]])[1];
        var data =[];
        for(var i =0;i<list.length;i++){
-         
+        
            var t2=new Date(list[i].CompletionDate).getHours()>=range[0];
            var t3=new Date(list[i].CompletionDate).getHours()<range[1];
            
@@ -1201,8 +1201,7 @@ for(var s =0;s<sheets.length;s++){
          
          var d1=new Date(list[i].CompletionDate).getTime();
            var t1=(d1>d2);
-
-
+ 
          if(t1 && t2 && t3){
          data.push(list[i]);
   
