@@ -1,7 +1,7 @@
 function fromRunningtoReserved(item, value){
 
 var orig1=base.getData(item);
-
+if(orig1){
 orig1.Running= orig1.Running-value;
 orig1.Reserved= orig1.Reserved+value;
 
@@ -12,6 +12,9 @@ return 1;
 }else{
 return orig1.Running;
 }
+}else{
+return -404
+}
 }
 
 
@@ -19,12 +22,12 @@ return orig1.Running;
 function fromReservedtoCompleted(item, value){
 
 var orig1=base.getData(item);
-
+if(orig1){
 orig1.Reserved= orig1.Reserved-value;
 orig1.Completed= orig1.Completed+value;
 
 base.updateData(item,orig1);
-
+}
 }
 
 
@@ -32,10 +35,11 @@ function toRunning(page,value){
   
   
   var orig =base.getData(page);
+  if(orig){
   orig.Running= orig.Running+value;
   
   base.updateData(page,orig);
-  
+  }
 }
 
 //Premix move
@@ -103,34 +107,38 @@ function UtoComplete(batch,value){
 
 function BtoRunning(batch,value){
         var orig =base.getData('BrandedTypes/'+batch);
+         if(orig){
         if(orig){
         orig.Running+=value;
         }else{
          orig.Running=value;
         }
         base.updateData('BrandedTypes/'+batch,orig);
+        }
      
 }
 
 function BtoReserved(batch,value){
   var orig =base.getData('BrandedTypes/'+batch);
-  
+   if(orig){
   orig.Running-=value;
   
   orig.Reserved+=value;
   
   base.updateData('BrandedTypes/'+batch,orig);
+  }
 }
 
 
 function BtoComplete(batch,value){
     var orig =base.getData('BrandedTypes/'+batch);
-  
+   if(orig){
   orig.Reserved-=value;
   
   orig.Completed+=value;
   
   base.updateData('BrandedTypes/'+batch,orig);
+  }
 }
 
 
@@ -153,12 +161,13 @@ function BtoRunningX(batch,value){
 function BtoCompleteX(batch,value){
 
      var orig =base.getData('BrandedTypes/'+batch);
-  
+  if(orig){
   orig.Reserved-=value;
   
   orig.Completed+=value;
   
   base.updateData('BrandedTypes/'+batch,orig);
+  }
 }
 
 
@@ -168,11 +177,12 @@ function BtoCompleteX(batch,value){
 function fromReservedToRunning(batch,value){
 
 var orig1=base.getData(batch);
+if(orig1){
 orig1.Running+=value;
 orig1.Reserved-=value;
 
 base.updateData(batch,orig1);
-
+}
 
 }
 
@@ -180,27 +190,28 @@ base.updateData(batch,orig1);
 function fromCompletedToRunning(batch,value){
 
 var orig1=base.getData(batch);
+if(orig1){
 orig1.Running+=value;
 orig1.Completed-=value;
 
 base.updateData(batch,orig1);
-
+}
 
 }
 function removeFromRunning(batch,value){
 
 var orig1=base.getData(batch);
-
+if(orig1){
 orig1.Running-=value;
 base.updateData(batch,orig1);
-
+}
 }
 
 function removeFromReserved(batch,value){
 
 var orig1=base.getData(batch);
-
+if(orig1){
 orig1.Reserved-=value;
 base.updateData(batch,orig1);
-
+}
 }
