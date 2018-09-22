@@ -272,12 +272,13 @@ function bulkrun(arr, page) {
 
 
 function testrun() {
-    runItem('914142', false);
+    runItem('914984', false);
 
 }
 
 
 function runItem(batch, frombulk) {
+try{
     var LOGDATA = {
         status: true,
         msg: '',
@@ -352,13 +353,16 @@ function runItem(batch, frombulk) {
             if (!labelexists) {
               missingmsg += 'Missing Label: ' + data.packlabelsku + '\n';
             }
+          }else{
+          labelexists2=false;
+           missingmsg += 'Missing Label: ' + data.packlabelsku + '\n';
           }
         
             packagingTypeexists = null;
             if (data.packagingType.sku != undefined) {
                 packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
                 if (!packagingTypeexists) {
-                    missingmsg += 'Missing Package: ' + data.botlabelsku + '\n';
+                    missingmsg += 'Missing Package: ' +data.packagingType.sku + '\n';
                 } else if (!packagingTypeexists.botperPack) {
                     missingmsg += 'Missing Package Bottles Per Pack: ' + data.packagingType.sku + '\n';
                     packagingTypeexists = false;
@@ -448,6 +452,16 @@ function runItem(batch, frombulk) {
         }
         //return 'Can not run Order. Contains parts that are not indexed in the database. \n'+missingmsg;
     }
+    }catch(e){
+        LOGDATA.status = false;
+        LOGDATA.msg += 'Can not run Order.';
+        var dat1 = {
+          final_status: 0,
+          runtime: "",
+        };
+        base.updateData('Orders/' + data.batch, dat1);
+        logItem(LOGDATA);
+        }
     
    
 }
@@ -588,7 +602,11 @@ function assignMixture2(data) {
         };
     } catch (e) {
         LOGARR.push(['Failed:', e.message]);
-
+        var dat1 = {
+          final_status: 0,
+          runtime: "",
+        };
+        base.updateData('Orders/' + data.batch, dat1);
         return {
             LogData: LOGARR,
             USAGE: USAGE
