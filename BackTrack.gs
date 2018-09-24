@@ -162,7 +162,7 @@ function fromProduction(batch, bottles) {
               }
                 removeFromReserved('Packages/' + printData.packagingType.sku, tubes);
                 LOGARR.push(['To Running: ' + printData.packagingType.sku, tubes]);
-                if (printData.packlabelsku != "") {
+                if (printData.packlabelsku != "" && printData.packlabelsku != undefined) {
                  if(order.ppp){
                     USAGE.PrePackLabel = {
                       sku:printData.packlabelsku,
@@ -175,7 +175,7 @@ function fromProduction(batch, bottles) {
                     };
                     
                   }
-                    if(printData.packlabelsku != ""){
+                    if(printData.packlabelsku != "" && printData.packlabelsku != undefined){
                     removeFromReserved('Labels/' + printData.packlabelsku, tubes);
                     LOGARR.push(['To Running: ' + printData.packlabelsku, tubes]);
                     }
@@ -244,7 +244,7 @@ function fromProduction(batch, bottles) {
                   }
                     removeFromReserved('Packages/' + labelingData.packagingType.sku, tubes);
                     LOGARR.push(['To Running: ' + labelingData.packagingType.sku, tubes]);
-                    if (labelingData.packlabelsku != "") {
+                    if (labelingData.packlabelsku != "" && labelingData.packlabelsku != undefined) {
                       if(order.ppp){
                         USAGE.PrePackLabel = {
                           sku:labelingData.packlabelsku,
@@ -257,7 +257,7 @@ function fromProduction(batch, bottles) {
                         };
                         
                       }
-                      if(labelingData.packlabelsku != ""){
+                      if(labelingData.packlabelsku != ""  && labelingData.packlabelsku != undefined){
                         removeFromReserved('Labels/' + labelingData.packlabelsku, tubes);
                         LOGARR.push(['To Running: ' + labelingData.packlabelsku, tubes]);
                       }
@@ -701,7 +701,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if(tube){
-              if (item.packlabelsku != "" ) {
+              if (item.packlabelsku != ""   && item.packlabelsku != undefined ) {
                 
                 fromReservedToRunning('Labels/' + item.packlabelsku,  tubes );
               }
@@ -750,7 +750,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if(tube){
-              if (item.packlabelsku != "") {
+              if (item.packlabelsku != ""   && item.packlabelsku != undefined ) {
                 fromCompletedToRunning('Labels/' + item.packlabelsku, tubes);
               }
             }
@@ -801,7 +801,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
                 if(tube){
-            if (item.packlabelsku != "") {
+            if (item.packlabelsku != ""   && item.packlabelsku != undefined ) {
       
                 fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
             }

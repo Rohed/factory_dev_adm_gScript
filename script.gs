@@ -1047,7 +1047,7 @@ function moveMain(item) {
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if(tube){
-            if (item.packlabelsku) {
+            if (item.packlabelsku != ""  && item.packlabelsku != undefined  ) {
                 LOGARR.push([item.packlabelsku, tubes]);
                 fromReservedtoCompleted('Labels/' + item.packlabelsku, tubes);
             }
