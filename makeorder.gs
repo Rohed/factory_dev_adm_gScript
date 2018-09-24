@@ -455,10 +455,17 @@ try{
     }catch(e){
         LOGDATA.status = false;
         LOGDATA.msg += 'Can not run Order.';
-        var dat1 = {
-          final_status: 0,
-          runtime: "",
-        };
+      var dat1 = {
+        final_status: 0,
+        runtime: "",
+        unbranded : 0,
+        branded : 0,
+        premixed : 0,
+        coloredpremix : 0,
+        mixing : 0,
+        backtubed : 0,
+      }
+ 
         base.updateData('Orders/' + data.batch, dat1);
         logItem(LOGDATA);
         }

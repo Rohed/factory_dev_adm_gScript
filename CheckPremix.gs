@@ -1,5 +1,5 @@
 function CheckPremixed(data) {
-
+try{
     var USAGE ={};
     var suffix = data.batch.substr(-1);
     var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
@@ -311,9 +311,27 @@ function CheckPremixed(data) {
 
 
     return {LogData:LOGARR,USAGE:USAGE};
+     }catch(e){
+    var dat1 = {
+      final_status: 0,
+      runtime: "",
+      unbranded : 0,
+      branded : 0,
+      premixed : 0,
+      coloredpremix : 0,
+      mixing : 0,
+      backtubed : 0,
+    }
+    
+    base.updateData('Orders/' + data.batch, dat1);
+    LOGARR.push(['FAILED', e.message]);
+    return {LogData:LOGARR,USAGE:USAGE};
+    
+  }
 
 }
 function checkColoredPremix(data){
+try{
     var USAGE ={};
     if(! data.used){
     data.used=new Array();
@@ -424,7 +442,23 @@ function checkColoredPremix(data){
 
      return {LogData:LOGARR,USAGE:USAGE};
 
-
+ }catch(e){
+    var dat1 = {
+      final_status: 0,
+      runtime: "",
+      unbranded : 0,
+      branded : 0,
+      premixed : 0,
+      coloredpremix : 0,
+      mixing : 0,
+      backtubed : 0,
+    }
+    
+    base.updateData('Orders/' + data.batch, dat1);
+    LOGARR.push(['FAILED', e.message]);
+    return {LogData:LOGARR,USAGE:USAGE};
+    
+  }
 
 
 
