@@ -162,7 +162,7 @@ function fromProduction(batch, bottles) {
               }
                 removeFromReserved('Packages/' + printData.packagingType.sku, tubes);
                 LOGARR.push(['To Running: ' + printData.packagingType.sku, tubes]);
-                if (printData.packlabelsku) {
+                if (printData.packlabelsku != "") {
                  if(order.ppp){
                     USAGE.PrePackLabel = {
                       sku:printData.packlabelsku,
@@ -175,8 +175,10 @@ function fromProduction(batch, bottles) {
                     };
                     
                   }
+                    if(printData.packlabelsku != ""){
                     removeFromReserved('Labels/' + printData.packlabelsku, tubes);
                     LOGARR.push(['To Running: ' + printData.packlabelsku, tubes]);
+                    }
                 }
             }
             var ink = 0;
@@ -242,7 +244,7 @@ function fromProduction(batch, bottles) {
                   }
                     removeFromReserved('Packages/' + labelingData.packagingType.sku, tubes);
                     LOGARR.push(['To Running: ' + labelingData.packagingType.sku, tubes]);
-                    if (labelingData.packlabelsku) {
+                    if (labelingData.packlabelsku != "") {
                       if(order.ppp){
                         USAGE.PrePackLabel = {
                           sku:labelingData.packlabelsku,
@@ -255,8 +257,10 @@ function fromProduction(batch, bottles) {
                         };
                         
                       }
+                      if(labelingData.packlabelsku != ""){
                         removeFromReserved('Labels/' + labelingData.packlabelsku, tubes);
                         LOGARR.push(['To Running: ' + labelingData.packlabelsku, tubes]);
+                      }
                     }
                 }
                     USAGE.BottleLabel={
@@ -697,7 +701,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if(tube){
-              if (item.packlabelsku) {
+              if (item.packlabelsku != "" ) {
                 
                 fromReservedToRunning('Labels/' + item.packlabelsku,  tubes );
               }
@@ -746,7 +750,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
             if(tube){
-              if (item.packlabelsku) {
+              if (item.packlabelsku != "") {
                 fromCompletedToRunning('Labels/' + item.packlabelsku, tubes);
               }
             }
@@ -797,7 +801,7 @@ Logger.log(sheetItem);
             var tubes = botQ2 / tube;
             var box = tubes / packData.divTubesForBox;
                 if(tube){
-            if (item.packlabelsku) {
+            if (item.packlabelsku != "") {
       
                 fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
             }

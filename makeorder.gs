@@ -344,19 +344,11 @@ try{
     } else {
         var labelexists = 1
     }
-     var labelexists2 = 1
+     
     var packagingTypeexists = 1;
     if (data.packagingType) {
         if (data.packagingType.sku != '') {
-          if (data.packlabelsku != "") {
-            var labelexists2 = base.getData('Labels/' + data.packlabelsku);
-            if (!labelexists) {
-              missingmsg += 'Missing Label: ' + data.packlabelsku + '\n';
-            }
-          }else{
-          labelexists2=false;
-           missingmsg += 'Missing Label: ' + data.packlabelsku + '\n';
-          }
+          
         
             packagingTypeexists = null;
             if (data.packagingType.sku != undefined) {
@@ -384,7 +376,7 @@ try{
     } else {
         packagingTypeexists = 1
     }
-    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists && labelexists2) {
+    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists ) {
 
         var RUNITEM = assignMixture2(data);
         LOGDATA.data = RUNITEM.LogData;

@@ -516,7 +516,7 @@ function checkStockValues(BATCHES) {
                         TubesArr[exists2][3] += tubes;
                     }
 
-                    if (data.packlabelsku) {
+                    if (data.packlabelsku != "") {
                         var LabelsCheck = base.getData("Labels/" + data.packlabelsku);
                         if (!LabelsCheck) {
                             var LabelsCheck = {
@@ -942,7 +942,7 @@ function checkStockValues(BATCHES) {
                                     TubesArr[exists2][3] += tubes;
                                 }
 
-                                if (data.packlabelsku) {
+                                if (data.packlabelsku != "") {
                                     var LabelsCheck = base.getData("Labels/" + data.packlabelsku);
                                     if (!LabelsCheck) {
                                         var LabelsCheck = {
