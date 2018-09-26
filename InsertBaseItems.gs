@@ -300,7 +300,7 @@ function generateForSingleBrand2(prod,descr) {
     if(fullProd.packagingType){
       if(fullProd.packagingType.sku){
         
-        var link=fillProd.linkedBB;
+        var link=fullProd.linkedBB;
         var exists2=base.getData('BrandedTypes/'+link );
         if(!exists2){
           var sku=''
