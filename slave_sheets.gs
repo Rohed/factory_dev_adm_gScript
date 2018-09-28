@@ -255,38 +255,3 @@ function overProd(batch, newBottles, sheet) {
         base.updateData('Production/' + batch, data);
     }
 }
-
-function testbulkComplete(){
-var arr = [911098];
-var page = 'Production';
-bulkComplete(arr, page)
-
-}
-function bulkComplete(arr, page) {
-  //  arr = ['912126'];
-  var USAGE = [];
-  Logger.log(arr);
-  var l = arr.length;
-  
-  var ref = 1000;
-  
-  var time = l * ref;
-  var msg = '';
-  if (time > 300000) {
-    return "Runtime would exceed. Please select fewer batches.";
-  } else {
-    for(var i = 0 ; i < arr.length;i++){
-      
-      
-      
-      var obj = {
-        Completed: "Completed",
-        batch:arr[i]
-      }
-      msg+=saveItemSL(obj, page)  + "\n";
-    }    
-  }
-  
-  return msg;
-  
-}

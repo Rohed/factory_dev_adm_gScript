@@ -768,10 +768,10 @@ function MoveItem(batch, sheet) {
         LOGDATA.data = LOGDATA.data.concat(data);
         LOGDATA.data.push(['SUCCESS:', "Line Item has been moved."]);
         logItem(LOGDATA);
-        result.push(batch+' Success');
+        result.push('Success');
     } catch (e) {
         LOGDATA.status = false;
-        result.push(batch+' Failed ' + e.message);
+        result.push('Failed ' + e.message);
         LOGDATA.data.push(['Failed:', 'Failed ' + e.message]);
         logItem(LOGDATA);
     }

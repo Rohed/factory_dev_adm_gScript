@@ -185,54 +185,7 @@ display: inline-block;
 }   
 
 
-.loader {
-            z-index: 1500;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            margin-top: -60px;
-            margin-left: -60px;
 
-            margin: 0 auto;
-            border: 16px solid #f3f3f3;
-            border-radius: 50%;
-            border-top: 16px solid #3498db;
-            width: 120px;
-            height: 120px;
-            -webkit-animation: spin 2s linear infinite;
-            animation: spin 2s linear infinite;
-        }
-
-        @-webkit-keyframes spin {
-            0% {
-                -webkit-transform: rotate(0deg);
-            }
-            100% {
-                -webkit-transform: rotate(360deg);
-            }
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        #updating {
-            background: #b2b7ba;
-            display: none;
-            position: fixed;
-            top: 0;
-            right: 0;
-            bottom: 0;
-            left: 0;
-            opacity: 0.5;
-            height: 100%;
-            width: 100;
-        }
 /*
 .modal.show .modal-dialog {
 -webkit-transform: translate(0,0);
@@ -291,9 +244,7 @@ width: 100%;
             </div>
         </div>-->
         
- <div id="updating">
-        <div class="loader"></div>
-    </div>
+
     <button onclick="topFunction()" id="myBtn" title="Go to top">Back To Top</button>        
         
         
@@ -662,8 +613,6 @@ width: 100%;
                          <div id='selButton' style='display:none;'>
                            <div id='selection'>
                            </div>
-                           <button type="button" id='selectAll' onclick="selectAll()">Select All</button>
-                           <button type="button" id='runMulti' onclick="runmulti()">Run Selected Order(s)</button>
                            <button type="button" id='printPage' style="display:none;" onclick="printP()" ><span id='btntext'></span></button>
                            <div id="packNote" style="display:none;">Please select all items that are part of the same box before clicking Generate Packing List.</div>
                          </div>
@@ -686,7 +635,7 @@ width: 100%;
                 <button type="button" id='getOrderIDs2' class="btn btn-info btn-lg" data-toggle="modal" data-target="#statusModal">Check Order Status</button>
                 <button type="button" id='checkstock'  onclick="printOrders()" >Print Selected Order(s)</button>
                 <button type="button" id='selectAllOrders'  onclick="selectAll()">Select All</button>
-            
+
                 </div>
                 </li>
                 
@@ -928,16 +877,8 @@ var SEARCHNUM=0;
 
   $('#mixingTabs').hide();
   }
-    if(selPage=='Production' || selPage=='Packaging'){
-    $('#selectAll').show();
-      $('#runMulti').show();
-    }else{
-    $('#selectAll').hide();
-     $('#runMulti').hide();
-    }
   filterpage('xx',true);
   }else{
-
   $('.tab-links').hide();
   populateSlSheetTable();
   }
@@ -3039,10 +2980,10 @@ var selPage=sheet;
     }  
 var SelAllOrders;
 function selectAll(){
-for(var i=0;i<thisData.length;i++){
+for(var i=0;i<SelAllOrders.length;i++){
     
     
-     addToSelected(thisData[i].batch);
+     addToSelected(SelAllOrders[i].batch);
     
   }
 
@@ -3066,18 +3007,8 @@ for(var i=0;i<thisData.length;i++){
     }
     
     
-    function runmulti(){
-    $("#updating").css("display", "block");
-    google.script.run.withSuccessHandler(multRun).bulkComplete(SELECTED,selPage);
     
-    }    
-    function multRun(msg){
     
-    alert(msg);
-    filterpage('xx',true);
-    //buildOrders(SelAllOrders);
-    $("#updating").css("display", "none");
-    }
     ///SEARCH///
     
     
