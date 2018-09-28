@@ -1412,7 +1412,7 @@ function getOrderIDs(flag) {
     ret = uniq2(ret);
     switch(flag){
     case 'priority':
-    ret=ret.sort(sortgetOrderIDsDATE);
+    ret=ret.sort(sortgetOrderIDsPRIORTY);
     break;
     case 'xero':
     ret=ret.sort(sortgetOrderIDsDATE);
@@ -1544,19 +1544,12 @@ return 'Success';
 }
 
 function setPriority(priority,oldpriority,increase,orderID){
+if(priority){
 priority=priority.toString();
+} 
 oldpriority=oldpriority.toString();
 orderID=orderID.toString();
-//priority='1';
-//oldpriority='4'; 
-//orderID='SO-00000701';
-//increase=true;
-  //var params1={
-  //
-  //orderBy : ['priority'],
-  //equalTo: priority
-  //
-  //};
+ 
   var params2={
     
     orderBy : ['orderID'],
