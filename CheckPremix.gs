@@ -324,6 +324,7 @@ try{
     }
     
     base.updateData('Orders/' + data.batch, dat1);
+     LOGARR = LOGARR.concat(returnData(data, 0));
     LOGARR.push(['FAILED', e.message]);
     return {LogData:LOGARR,USAGE:USAGE};
     
@@ -455,6 +456,7 @@ try{
     }
     
     base.updateData('Orders/' + data.batch, dat1);
+     LOGARR = LOGARR.concat(returnData(data, 0));
     LOGARR.push(['FAILED', e.message]);
     return {LogData:LOGARR,USAGE:USAGE};
     

@@ -378,7 +378,15 @@ ordersByOrderID = {};
       orderID='';
       dat1='';
        newPRIORITIES = uniq3(newPRIORITIES);
-       setPriorityARR(newPRIORITIES);
+       for(var i =0 ; i < newPRIORITIES.length; i++){
+         if(newPRIORITIES[i][0]){
+         
+          setPriorityARR(newPRIORITIES);
+          break;
+         }
+       
+       }
+        //setPriorityARR(newPRIORITIES);
       return msg+' '+i;
     } catch (e) {
      LOGDATA.data.push(['Failed: ',e.toString()]); 
