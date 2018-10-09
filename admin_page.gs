@@ -1751,3 +1751,25 @@ var list=JSONtoARR(base.getData('Orders')).filter(function(item){
   }
 return "Completed";
 }
+
+function getRoundups(){
+var RU = base.getData('Roundups');
+if(RU){
+return [RU,'Roundups'];
+
+}else{
+ return  [{nic:5,cbd:1},'Roundups'];
+}
+ 
+}
+
+function updateRoundups(obj){
+if(!obj.nic){
+obj.nic = 1;
+}
+if(!obj.cbd){
+obj.cbd = 1;
+}
+base.updateData('Roundups',obj);
+return 'Saved';
+}

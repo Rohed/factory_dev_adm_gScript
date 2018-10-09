@@ -146,11 +146,12 @@ try{
       
         data.QTY = newmixvol;
         data.tomixing = 'Sent';
+       var RU = getRoundups()[0];   
         if (data.Nico||data.Nicosalts) {
-            var rounded = Math.ceil(data.QTY / 5) * 5;
+            var rounded = Math.ceil(data.QTY / RU.nic) * RU.nic;
 
         } else {
-            var rounded = Math.ceil(data.QTY);
+            var rounded = Math.ceil(data.QTY / RU.cbd) * RU.cbd;
 
         }
       var order = base.getData('Orders/'+data.batch);

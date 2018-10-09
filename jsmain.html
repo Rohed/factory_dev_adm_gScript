@@ -5464,6 +5464,9 @@ switch (type){
     case 'PackagePrint':
     built= buildPackagePrint(data);
     break;
+     case 'Roundups':
+    built= buildRoundups(data);
+    break;
   default:
 
   break;
@@ -6554,5 +6557,33 @@ google.script.run.withSuccessHandler(refreshOrdersMSG).refreshOrderPC();
 function refreshOrdersMSG(msg){
 alert(msg);
 $("#updating").css("display", "none");
+}
+
+
+function getRoundups(){
+google.script.run.withSuccessHandler(buildhtmlmodal).getRoundups();
+
+};
+
+function buildRoundups(data){
+var html = '';
+html+='\
+<div style="margin:0 auto; width:500px;"><h2>Round Up Amounts</h2>';
+html+='<div  ><p> Regular: <input  class="form-control" id="roundupnic" value="'+data.nic+'"/>';
+html+='<p> CBD: <input  class="form-control" id="roundupcbd" value="'+data.cbd+'"/><div>';
+html+='<hr></div>\
+<div>\
+<button type="button" class="btn btn-success sarButton" onclick="saveRoundups()">Save Current</button>';
+return html;
+}
+
+function saveRoundups(){
+var obj ={
+nic:parseInt($("#roundupnic").val(),10),
+cbd:parseInt($("#roundupcbd").val(),10),
+
+}
+google.script.run.withSuccessHandler(refreshOrdersMSG).updateRoundups(obj);
+
 }
 </script>
