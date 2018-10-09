@@ -1546,8 +1546,6 @@ return 'Success';
 function setPriority(priority,oldpriority,increase,orderID){
 if(priority){
 priority=priority.toString();
-}else{
-return;
 } 
 oldpriority=oldpriority.toString();
 orderID=orderID.toString();
