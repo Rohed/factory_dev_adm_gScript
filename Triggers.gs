@@ -7,7 +7,7 @@ function createTriggers() {
   
   ScriptApp.newTrigger("exportCompletedItems")
   .timeBased()
-  .atHour(17)
+  .atHour(21)
   .everyDays(1) 
   .create();
 }
@@ -22,7 +22,7 @@ var subject = 'Completed items for today';
 if(today.getHours() <= 15){
 subject+=' 2PM report ';
 }else{
-subject+=' 6PM report ';
+subject+=' 8PM report ';
 }
 
 var name = subject+' '+formattedDate;
