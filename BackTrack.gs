@@ -1,9 +1,10 @@
 function testPartial(){
-filter('914932', 6, 'Production')
+filter('915551', 200, 'Production')
 
 }
 
 function filter(batch, newBottles, sheet) {
+try{
 newBottles = parseInt(newBottles,10);
     var LOGDATA = {
         status: true,
@@ -23,6 +24,11 @@ newBottles = parseInt(newBottles,10);
     }
    LOGDATA.data = LOGDATA.data.concat(updateOrder(batch, newBottles, sheet,item));
     logItem(LOGDATA);
+    
+    }catch(e){
+    LOGDATA.status = false;
+    msg= " Failed." + e.message;
+    }
 }
 
 function fromProduction(batch, bottles) {
