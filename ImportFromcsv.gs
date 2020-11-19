@@ -12,16 +12,21 @@ var d3=new Date(f3);
 d3=Utilities.formatDate(new Date(f3), "GMT", "dd-MM-yyyy");
 }
 
+function testgetlarges(){
+var orders = JSONtoARR(base.getData('Orders'));
+getLargestBatch(orders)
+}
 function getLargestBatch(orders){
 
    var largestBatch=base.getData('highestBatch'); 
-  
+  largestBatch = isNaN(largestBatch) ? 0 : largestBatch;
   var batches=orders.map(function(obj) { 
     var ret;
     ret= obj.batch;
     return ret;
   });
-  batches=batches.sort();
+  batches=batches.filter(function(item){ if(item !='undefined' && item !='NaN'){return true}}).sort();
+  var last = batches.slice(batches.length-10,batches.length);
   var largest= parseInt(batches[batches.length-1],10);
   if(largestBatch){
     if(largestBatch>largest){
@@ -137,7 +142,7 @@ function saveFileCsv(data, name) {
   };
   
 
-    try {
+ try {
       var msg = '';
   
  
@@ -174,9 +179,10 @@ function saveFileCsv(data, name) {
 
       var orders=JSONtoARR(rawOrders);
           var largestBatch=getLargestBatch(orders); 
-   
+       
       //var orderID=getNewOrderID2(orders);
-     var ordersByOrderID=orders.sort(sortOrderIDsHL)
+     var ordersByOrderID=orders.filter(function(item){ return item.orderID}).sort(sortOrderIDsHL)
+     
       if(ordersByOrderID.length>=1){
         var LastorderID=ordersByOrderID[0].orderID;
         if(LastorderID){
@@ -388,11 +394,11 @@ ordersByOrderID = {};
        }
         //setPriorityARR(newPRIORITIES);
       return msg+' '+i;
-    } catch (e) {
-     LOGDATA.data.push(['Failed: ',e.toString()]); 
+   } catch (e) {
+    LOGDATA.data.push(['Failed: ',msg+' - '+e.toString()]); 
       logItem(LOGDATA);
-      return msg+' '+i;
-    }
+     return msg+' '+i;
+   }
 }
 
 

@@ -138,14 +138,14 @@ for(var i=0;i<recipes.length;i++){
 function getBrandDropdown(){
 var data=base.getData('Brands');
 
-return JSONtoARR(data).sort(sortSTRINGLH('name'));//.sort(superSort1('name'));
+return JSONtoARR(data).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));//.sort(superSort1('name'));
 }
 
 
 
 function getCustomerDropdown(){
 
-var data=JSONtoARR(base.getData('Customers')).sort(sortSTRINGLH('name'));
+var data=JSONtoARR(base.getData('Customers')).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 return data;//.sort(superSort1('name'));
 
 
@@ -158,7 +158,7 @@ function getPackagingDropdown(){
 var data=JSONtoARR(base.getData('Packages'));
 
 
-return data.sort(sortSTRINGLH('name'));
+return data.filter(function(item){return item.name }).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 
 
 
@@ -168,25 +168,25 @@ return data.sort(sortSTRINGLH('name'));
 
 
 function getLidDropdown(){
-var data=JSONtoARR(base.getData('Lids')).sort(sortSTRINGLH('name'));
+var data=JSONtoARR(base.getData('Lids')).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 return data;//.sort(superSort1('name'));
 
 }
 
 
 function getLidDropdown2(){
-var data=JSONtoARR(base.getData('Lids')).sort(sortSTRINGLH('name'));
+var data=JSONtoARR(base.getData('Lids')).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 return data;//.sort(superSort1('name'));
 }
 function getBottlesDropdown2(){
 
-var data=JSONtoARR(base.getData('BottleTypes')).sort(sortSTRINGLH('name'));
+var data=JSONtoARR(base.getData('BottleTypes')).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 return data;//.sort(superSort1('name'));
 
 }
 function getBottlesDropdown(){
 
-var data=JSONtoARR(base.getData('BottleTypes')).sort(sortSTRINGLH('name'));
+var data=JSONtoARR(base.getData('BottleTypes')).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 return data;//.sort(superSort1('name'));
 }
 
@@ -196,7 +196,7 @@ function getFlavourDropdown(){
 
 var data=base.getData('Flavours');
 if (data) {
-        var result = JSONtoARR(data).sort(sortSTRINGLH('name'));
+        var result = JSONtoARR(data).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
 
       
 return result;
@@ -216,7 +216,7 @@ function getRecipeDropdown(){
 
 var data=base.getData('Recipes');
   if (data) {
-    var result = JSONtoARR(data).sort(sortSTRINGLH('name'));
+    var result = JSONtoARR(data).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
     var retArr = [];
     for (var i = 0; i < result.length; i++) {
       

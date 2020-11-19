@@ -1,3 +1,8 @@
+function getPremixDropdown(){
+var data = JSONtoARR(base.getData('PremixesTypes'));
+
+return [data,'premixSafety'];
+}
 function getFormData() {
     var PD = getProductDescriptions();
     var PC = getProductCodes();
@@ -27,6 +32,26 @@ function getFormData() {
 }
 
 function getSearchBoxKeys(page) {
+
+if(page == 'Inventory'){
+
+    var arr = [
+        ['word', 'Keyword', 'word'],
+        ['Flavours', 'Flavour', 'flavour/name'],
+        ['Recipes', 'Recipe', 'recipe/name'],
+        ['Brands', 'Brand', 'brand'],
+        ['BottleTypes', 'Bottle Type', 'botSKU'],
+        ['Lids', 'Cap Type', 'lidSKU'],
+        ['Packages', '	Pack Type', 'packagingType/name'],
+        ['Labels', 'Labels', 'label/name']
+
+    ];
+
+    return [arr, page];
+
+
+
+}
     var arr = [
         ['word', 'Keyword', 'word'],
         ['Flavours', 'Flavour', 'flavour/name'],
@@ -37,6 +62,7 @@ function getSearchBoxKeys(page) {
         ['Lids', 'Cap Type', 'lidSKU'],
         ['Packages', '	Pack Type', 'packagingType/name'],
         ['priority', 'Priority', 'priority'],
+        ['notes', 'Notes', 'notes'],
 
     ];
 
@@ -49,6 +75,12 @@ function getSearchValues(page, DBpage, key, num) {
         arr = [page, [], 'word', num];
     } else if (DBpage == 'priority'){
         arr = [page, [], 'priority', num];
+    } else if (DBpage == 'notes'){
+         arr = [page, [{
+            name: 'Have Notes'
+        }, {
+            name: "Don't Have Notes"
+        }], 'final_status', num];
     } else if (DBpage == 'final_status') {
         arr = [page, [{
             name: 'Completed'
@@ -58,7 +90,7 @@ function getSearchValues(page, DBpage, key, num) {
             name: 'Busy'
         }], 'final_status', num];
     } else {
-        var list = JSONtoARR(base.getData(DBpage)).sort(sortSTRINGLH('name'));
+        var list = JSONtoARR(base.getData(DBpage)).filter(function(item){return item.name}).sort(sortSTRINGLH('name'));
         arr = [page, list, key, num];
     }
 
@@ -920,6 +952,18 @@ if(params.equalTo == 'all'||page=='QTY'||page=='Locations'||page=='Finctions'){
 
  return [page,JSONtoARR(base.getData(page))];
 }
+if(page=='Inventory'){
+      var data = JSONtoARR(base.getData(page));
+            var arr = [];
+            for (var i = 0; i < data.length; i++) {
+                if (JSON.stringify(data[i]).toLowerCase().match(params.equalTo.toLowerCase())) {
+                    arr.push(data[i]);
+                }
+            }
+            
+            return [page, arr];
+
+}
   if(page == 'Shipping'){
     if(params.equalTo == 'Not Run'||params.equalTo == 'Busy'||params.equalTo == 'Completed'){
       return [page,JSONtoARR(base.getData(page))];
@@ -949,6 +993,28 @@ var forord=false;
             if (data[i].priority==params.equalTo) {
               arr.push(data[i]);
             }
+          }
+          return [page, arr];
+          
+          
+        
+        
+        } else if(params.orderBy == 'notes'){
+          var notes  = getNotesObj();
+          var data = JSONtoARR(base.getData(page));
+          var arr = [];
+          for (var i = 0; i < data.length; i++) {
+            if(params.equalTo == 'Have Notes' && notes[data[i].orderID]){
+              
+              arr.push(data[i]);
+              
+              
+            }else if(params.equalTo == "Don't Have Notes"  && !notes[data[i].orderID]){
+              
+              arr.push(data[i]);
+              
+            }
+            
           }
           return [page, arr];
           
@@ -1041,17 +1107,24 @@ function TESTSEARCHFOR() {
 //    searcharr.push(['Shipping', params]);
 
     var params = {
-        orderBy: 'final_status',
-        equalTo: "Completed",
+        orderBy: 'word',
+        equalTo: "VG",
 
     }
-    searcharr.push(['MixingTeam', params]);
+     
+    searcharr.push(['Inventory', params]);
 
    var data=searchFor(searcharr);
     Logger.log(data);
 }
 
 function searchFor(searchARR) {
+if(searchARR[0][0] =='Reporting'|| searchARR[0][0] == 'Finctions'){
+return [,]
+}
+
+if(searchARR[0][0] =='Inventory'){
+
     var searched = [];
     for (var i = 0; i < searchARR.length; i++) {
 
@@ -1059,6 +1132,45 @@ function searchFor(searchARR) {
 
     }
     var rett = searched[0];
+
+
+    for (var i = 1; i < searched.length; i++) {
+     
+            rett[1] = rett[1].concat(searched[i][1]);
+        
+    }
+    var sorted = rett[1].sort(function(a, b) {
+            return (a.row ? a.row : 0 ) - (b.row ? b.row : 0)
+        });
+        rett[1] = sorted.reverse();
+    return rett;
+
+}
+    var oderdatestart = base.getData("globalFilter/1");
+    if(oderdatestart){
+      if(oderdatestart.months){
+        if(oderdatestart.months!=0){
+          var params = {
+            orderBy: 'orderdate',
+            startAt: new Date().getTime()-(oderdatestart.months*60*60*1000*24*31),
+            
+          }
+        if( searchARR[0][1].equalTo == 'all'){
+         searchARR[0] = [searchARR[0][0],params] ;
+        }else{
+        searchARR.push([searchARR[0][0],params]);
+        }
+        }
+      }
+    }
+    var searched = [];
+    for (var i = 0; i < searchARR.length; i++) {
+
+        searched.push(getSearchedArray(searchARR[i][0], searchARR[i][1]))
+
+    }
+    var rett = searched[0];
+
 
     for (var i = 1; i < searched.length; i++) {
         if (searchARR[i][1].orderBy == searchARR[i - 1][1].orderBy) {
@@ -1422,6 +1534,8 @@ function getOrderIDs(flag) {
     }
     return ret;
 }
+
+
 function uniq2(a) {
     var prims = {
             "boolean": {},
@@ -1714,7 +1828,7 @@ var list=JSONtoARR(base.getData('Orders')).filter(function(item){
   for(var i=0;i<list.length;i++){
     if(list[i].final_status==0){
       var dataPC = base.getData("References/ProductCodes/"+list[i].productcode)
-
+   if(dataPC){
           list[i].boxname=dataPC.boxname;
           list[i].fill=dataPC.fill;
           list[i].brand= dataPC.brand;
@@ -1746,7 +1860,7 @@ var list=JSONtoARR(base.getData('Orders')).filter(function(item){
       
       base.updateData('Orders/'+list[i].batch,list[i]);
       }
-      
+     } 
     
   }
 return "Completed";
@@ -1771,5 +1885,22 @@ if(!obj.cbd){
 obj.cbd = 1;
 }
 base.updateData('Roundups',obj);
+return 'Saved';
+}
+
+function getglobalFilter(){
+var GF = base.getData('globalFilter/1');
+if(GF){
+return [GF,'globalFilter'];
+
+}else{
+ return  [{months:0},'globalFilter'];
+}
+ 
+}
+
+function updateglobalFilter(obj){
+obj.id= '1';
+base.updateData('globalFilter/1',obj);
 return 'Saved';
 }

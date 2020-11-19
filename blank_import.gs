@@ -1,7 +1,7 @@
 
 
 //IMPORT BLANK PCPD
-function importBlankPCPC(id) {
+function importBlankPCPD(id) {
   var premixARR = [];
   var unbrandedARR = [];
   var linkedBBARR = [];
@@ -15,11 +15,11 @@ function importBlankPCPC(id) {
 function testIMPORTVlank() {
 //  base.removeData('References/AllItems');
 //  return
-  var id = '1bemCwUzgEr3AMc3pfQSIMwdL7ohD5RYO59b7PPAFpsc';
-  return importBlankPCPC2Ping(id);
+  var id = '1pMaZD7k0TKebo4VLHyU2J8PuhYL_Ix_L7pL61y-s5fs';
+  return importBlankPCPD2Ping(id);
   
 }
-function importBlankPCPC2(id) {
+function importBlankPCPD2(id) {
 
     var key = new Date().getTime().toString();
   var sheet = SpreadsheetApp.openById(id).getSheets()[0];
@@ -43,17 +43,17 @@ function importBlankPCPC2(id) {
   var url=SERVER_URL+NODE_PATH+'/importblankpcpdpath';
   var response=UrlFetchApp.fetch(url, params).getContentText();
   Logger.log(response);
-  return [false,'importBlankPCPC2'];
+  return [false,'importBlankPCPD2'];
   
 }
 
-function importBlankPCPC2Ping(id){
+function importBlankPCPD2Ping(id){
 
   Utilities.sleep(20000);
   try {
     var status=base.getData('importBlankPCPD/status');
     if(!status){
-      return [false,'importBlankPCPC2'];
+      return [false,'importBlankPCPD2'];
     }
     
     var sheet = SpreadsheetApp.openById(id).getSheets()[0];
@@ -107,7 +107,7 @@ function importBlankPCPC2Ping(id){
     Logger.log('here1');
     logItem(LOGDATA);
     base.removeData('importBlankPCPD');
-    return  [true,'importBlankPCPC2',[ resp ,"createAutoPUB"]];
+    return  [true,'importBlankPCPD2',[ resp ,"createAutoPUB"]];
   } catch (e) {
     Logger.log(e);
     LOGDATA.status = false;

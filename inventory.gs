@@ -32,7 +32,8 @@ function saveItem(data) {
         QTYitem.Stock = 0;
       }
        QTYitem.Running = QTYitem.Running? QTYitem.Running: 0;
-        if(data.key != 'undefined'){
+        if(data.key != 'undefined' && data.key != undefined && data.key != ''){
+        LOGDATA.action = 'Inventory Item Edit';
          var olddat=base.getData('Inventory/' + data.key);
            if (data.delivdate&& (olddat.quantity!=data.quantity)) {
                 LOGDATA.data.push(['Added to Stock:', data.quantity]);
@@ -89,7 +90,7 @@ function saveItem(data) {
                 for (var i = 0; i < result.length; i++) {
                     Rows.push(result[i][1].row);
                 }
-                var max = Rows.reduce(function(a, b) {
+                var max = Rows.filter(function(item){return item}).reduce(function(a, b) {
                     return Math.max(a, b);
                 });
             } else {
@@ -155,7 +156,7 @@ function getInventoryData() {
 
         }
         retArr.sort(function(a, b) {
-            return (a.row) - (b.row)
+            return (a.row ? a.row : 0 ) - (b.row ? b.row : 0)
         });
         return retArr;
     } else {

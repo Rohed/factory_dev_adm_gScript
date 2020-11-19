@@ -4,14 +4,12 @@ function checkStockValues(BATCHES) {
     Logger.log(BATCHES);
 
     var results = [];
-/*ar BATCHES = [901007, 901014, 901018, 901028, 901033, 901055, 901057, 901069, 901074, 901111, 901120, 901126,
- 901145, 901153, 901157, 901174, 901183, 901186, 901188, 901189, 901196, 901206, 901214, 901224, 901227,
- 901260, 901261, 901266, 901280, 901283, 901287, 901288, 901296, 901318, 901334, 901342, 901344, 901346, 901354, 901371, 901374, 901409, 901412, 901421, 901426];
-   */
-//  BATCHES=['322231S'];
-
-//BATCHES=['901517', '901282', '901684', '901685', '901283', '901351', '901284', '901518'];
-
+//BATCHES = [ "931156",
+// "931157",
+// "931158",
+// "931159",
+// "931160",
+// "931161"];
     var requiredFlavour = 0;
     var requiredVG = 0;
     var requiredPG = 0;
@@ -81,13 +79,13 @@ function checkStockValues(BATCHES) {
     var NicotChecksalts = base.getData('Misc/Nicotine Salts');
     var CBDCheck = base.getData('Misc/CBD');
     var MCTCheck = base.getData('Misc/MCT');
-    availableVG = VGCheck.Running;
-    availablePG = PGCheck.Running;
-        availableAG = AGCheck.Running;
-    availableNico = NicotCheck.Running;
-     availableNicosalts = NicotChecksalts.Running;
-    availableCBD = CBDCheck.Running;
-    availableMCT = MCTCheck.Running;
+    availableVG = VGCheck.Running || 0;
+    availablePG = PGCheck.Running || 0;
+        availableAG = AGCheck.Running || 0;
+    availableNico = NicotCheck.Running || 0;
+     availableNicosalts = NicotChecksalts.Running || 0;
+    availableCBD = CBDCheck.Running || 0;
+    availableMCT = MCTCheck.Running || 0;
     for (var i = 0; i < BATCHES.length; i++) {
         try {
             var data = base.getData('Orders/' + BATCHES[i]);
@@ -107,7 +105,7 @@ function checkStockValues(BATCHES) {
                 var exists1 = OrigPmixArr.getIndex(premix);
                 if (exists1 == -1) {
                   
-                  OrigPmixArr.push([premix, premixCheck.Running]);
+                  OrigPmixArr.push([premix, premixCheck.Running || 0]);
                   exists1 = OrigPmixArr.getIndex(premix);
                 }
                 
@@ -134,7 +132,7 @@ function checkStockValues(BATCHES) {
                   var exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                   if (exists1 == -1) {
                     
-                    OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running]);
+                    OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running || 0]);
                     exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                   }
                   
@@ -162,7 +160,7 @@ function checkStockValues(BATCHES) {
                   var exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                   if (exists1 == -1) {
                     
-                    OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running]);
+                    OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running || 0]);
                     exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                   }
                   
@@ -209,7 +207,7 @@ function checkStockValues(BATCHES) {
                 var exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                 if (exists1 == -1) {
 
-                    OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running]);
+                    OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running || 0]);
                     exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                 }
 
@@ -236,7 +234,7 @@ function checkStockValues(BATCHES) {
                   var exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                   if (exists1 == -1) {
                     
-                    OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running]);
+                    OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running || 0]);
                     exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                   }
                   
@@ -286,7 +284,7 @@ function checkStockValues(BATCHES) {
                       var exists1 = OrigPmixArr.getIndex(premix);
                       if (exists1 == -1) {
                         
-                        OrigPmixArr.push([premix, premixCheck.Running]);
+                        OrigPmixArr.push([premix, premixCheck.Running || 0]);
                         exists1 = OrigPmixArr.getIndex(premix);
                       }
                       
@@ -310,7 +308,7 @@ function checkStockValues(BATCHES) {
                        var exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        if (exists1 == -1) {
                          
-                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running]);
+                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running || 0]);
                          exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        }
                        
@@ -342,7 +340,7 @@ function checkStockValues(BATCHES) {
                 var exists1 = OrigPmixArr.getIndex(premix);
                 if (exists1 == -1) {
 
-                    OrigPmixArr.push([premix, premixCheck.Running]);
+                    OrigPmixArr.push([premix, premixCheck.Running || 0]);
                     exists1 = OrigPmixArr.getIndex(premix);
                 }
 
@@ -367,7 +365,7 @@ function checkStockValues(BATCHES) {
                     var exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                     if (exists1 == -1) {
 
-                        OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running]);
+                        OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running || 0]);
                         exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                     }
 
@@ -409,7 +407,7 @@ function checkStockValues(BATCHES) {
                 var exists3 = OrigLidsArr.getIndex(data.lidSKU);
                 if (exists3 == -1) {
 
-                    OrigLidsArr.push([data.lidSKU, LidCheck.Running]);
+                    OrigLidsArr.push([data.lidSKU, LidCheck.Running || 0]);
                     exists3 = OrigLidsArr.getIndex(data.lidSKU);
                 }
                 var LidOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -436,7 +434,7 @@ function checkStockValues(BATCHES) {
                 var exists3 = OrigBottlesArr.getIndex(data.botSKU);
                 if (exists3 == -1) {
 
-                    OrigBottlesArr.push([data.botSKU, BottleCheck.Running]);
+                    OrigBottlesArr.push([data.botSKU, BottleCheck.Running || 0]);
                     exists3 = OrigBottlesArr.getIndex(data.botSKU);
                 }
                 var BotOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -467,7 +465,7 @@ function checkStockValues(BATCHES) {
                 var exists1 = OrigUbottlesArr.getIndex(unbranded);
                 if (exists1 == -1) {
 
-                    OrigUbottlesArr.push([unbranded, unbrandedCheck.Running]);
+                    OrigUbottlesArr.push([unbranded, unbrandedCheck.Running || 0]);
                     exists1 = OrigUbottlesArr.getIndex(unbranded);
                 }
 
@@ -495,20 +493,20 @@ function checkStockValues(BATCHES) {
                     var tubes = data.bottles / tube;
                     var box = tubes / packData.divTubesForBox;
 
-                    var TubesCheck = base.getData("Packages/" + data.packagingType);
-                    var exists3 = OrigTubesArr.getIndex(data.packagingType);
+                    var TubesCheck = base.getData("Packages/" +  data.packagingType.sku);
+                    var exists3 = OrigTubesArr.getIndex( data.packagingType.sku);
                     if (exists3 == -1) {
 
-                        OrigTubesArr.push([data.packagingType, TubesCheck.Running]);
-                        exists3 = OrigTubesArr.getIndex(data.packagingType);
+                        OrigTubesArr.push([data.packagingType, TubesCheck.Running || 0]);
+                        exists3 = OrigTubesArr.getIndex( data.packagingType.sku);
                     }
                     var TubeOBJ = checkALL(OrigTubesArr[exists3][1], tubes);
                     OrigTubesArr[exists3][1] = TubeOBJ.running;
 
-                    var exists2 = TubesArr.getIndex(data.packagingType);
+                    var exists2 = TubesArr.getIndex( data.packagingType.sku );
                     if (exists2 == -1) {
 
-                        TubesArr.push([data.packagingType, TubeOBJ.used, TubeOBJ.left, tubes])
+                        TubesArr.push([ data.packagingType.sku, TubeOBJ.used, TubeOBJ.left, tubes])
 
                     } else {
                         TubesArr[exists2][1] += TubeOBJ.used;
@@ -527,7 +525,7 @@ function checkStockValues(BATCHES) {
                         var exists3 = OrigLabelsArr.getIndex(data.packlabelsku);
                         if (exists3 == -1) {
 
-                            OrigLabelsArr.push([data.packlabelsku, LabelsCheck.Running]);
+                            OrigLabelsArr.push([data.packlabelsku, LabelsCheck.Running || 0]);
                             exists3 = OrigLabelsArr.getIndex(data.packlabelsku);
                         }
                         var LabelOBJ = checkALL(OrigLabelsArr[exists3][1], tubes);
@@ -559,7 +557,7 @@ function checkStockValues(BATCHES) {
                 var exists3 = OrigInkArr.getIndex('printing ink');
                 if (exists3 == -1) {
 
-                    OrigInkArr.push(['printing ink', InkCheck.Running]);
+                    OrigInkArr.push(['printing ink', InkCheck.Running || 0]);
                     exists3 = OrigInkArr.getIndex('printing ink');
                 }
                 var InkOBJ = checkALL(OrigInkArr[exists3][1], ink);
@@ -586,7 +584,7 @@ function checkStockValues(BATCHES) {
                 var exists3 = OrigLabelsArr.getIndex(label);
                 if (exists3 == -1) {
 
-                    OrigLabelsArr.push([label, LabelsCheck.Running]);
+                    OrigLabelsArr.push([label, LabelsCheck.Running || 0]);
                     exists3 = OrigLabelsArr.getIndex(label);
                 }
                 var LabelOBJ = checkALL(OrigLabelsArr[exists3][1], data.bottles);
@@ -618,7 +616,7 @@ function checkStockValues(BATCHES) {
                       var exists1 = OrigPmixArr.getIndex(premix);
                       if (exists1 == -1) {
                         
-                        OrigPmixArr.push([premix, premixCheck.Running]);
+                        OrigPmixArr.push([premix, premixCheck.Running || 0]);
                         exists1 = OrigPmixArr.getIndex(premix);
                       }
                       
@@ -642,7 +640,7 @@ function checkStockValues(BATCHES) {
                        var exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        if (exists1 == -1) {
                          
-                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running]);
+                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running || 0]);
                          exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        }
                        
@@ -674,7 +672,7 @@ function checkStockValues(BATCHES) {
                     var exists1 = OrigPmixArr.getIndex(premix);
                     if (exists1 == -1) {
 
-                        OrigPmixArr.push([premix, premixCheck.Running]);
+                        OrigPmixArr.push([premix, premixCheck.Running || 0]);
                         exists1 = OrigPmixArr.getIndex(premix);
                     }
 
@@ -699,7 +697,7 @@ function checkStockValues(BATCHES) {
                         var exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                         if (exists1 == -1) {
 
-                            OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running]);
+                            OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running || 0]);
                             exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                         }
 
@@ -741,7 +739,7 @@ function checkStockValues(BATCHES) {
                     var exists3 = OrigLidsArr.getIndex(data.lidSKU);
                     if (exists3 == -1) {
 
-                        OrigLidsArr.push([data.lidSKU, LidCheck.Running]);
+                        OrigLidsArr.push([data.lidSKU, LidCheck.Running || 0]);
                         exists3 = OrigLidsArr.getIndex(data.lidSKU);
                     }
                     var LidOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -767,7 +765,7 @@ function checkStockValues(BATCHES) {
                     var exists3 = OrigBottlesArr.getIndex(data.botSKU);
                     if (exists3 == -1) {
 
-                        OrigBottlesArr.push([data.botSKU, BottleCheck.Running]);
+                        OrigBottlesArr.push([data.botSKU, BottleCheck.Running || 0]);
                         exists3 = OrigBottlesArr.getIndex(data.botSKU);
                     }
                     var BotOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -808,7 +806,7 @@ function checkStockValues(BATCHES) {
                         var exists3 = OrigBoxArr.getIndex(boxname);
                         if (exists3 == -1) {
 
-                            OrigBoxArr.push([boxname, BoxCheck.Running]);
+                            OrigBoxArr.push([boxname, BoxCheck.Running || 0]);
 
                         }
                         exists3 = OrigBoxArr.getIndex(boxname);
@@ -830,14 +828,14 @@ function checkStockValues(BATCHES) {
                     var exists1 = OrigPackedArr.getIndex(brandname);
                     if (exists1 == -1) {
 
-                        OrigPackedArr.push([brandname, brandedstockP.Running]);
+                        OrigPackedArr.push([brandname, brandedstockP.Running || 0]);
                         exists1 = OrigPackedArr.getIndex(brandname);
                     }
 
                     var PBBOBJ = checkALL(OrigPackedArr[exists1][1], tubes);
                     OrigPackedArr[exists1][1] = PBBOBJ.running;
 
-                    var exists2 = PackedArr.getIndex(premix);
+                    var exists2 = PackedArr.getIndex(brandname);
                     if (exists2 == -1) {
 
                         PackedArr.push([brandname, PBBOBJ.used, 0])
@@ -861,7 +859,7 @@ function checkStockValues(BATCHES) {
                       var exists1 = OrigBbottlesArr.getIndex(brandname);
                         if (exists1 == -1) {
 
-                            OrigBbottlesArr.push([brandname, brandedstockB.Running]);
+                            OrigBbottlesArr.push([brandname, brandedstockB.Running || 0]);
                             exists1 = OrigBbottlesArr.getIndex(brandname);
                         }
 
@@ -889,7 +887,7 @@ function checkStockValues(BATCHES) {
                             var exists1 = OrigUbottlesArr.getIndex(unbranded);
                             if (exists1 == -1) {
 
-                                OrigUbottlesArr.push([unbranded, unbrandedCheck.Running]);
+                                OrigUbottlesArr.push([unbranded, unbrandedCheck.Running || 0]);
                                 exists1 = OrigUbottlesArr.getIndex(unbranded);
                             }
 
@@ -922,19 +920,19 @@ function checkStockValues(BATCHES) {
                                         Running: 0
                                     };
                                 }
-                                var exists3 = OrigTubesArr.getIndex(data.packagingType);
+                                var exists3 = OrigTubesArr.getIndex(data.packagingType.sku);
                                 if (exists3 == -1) {
 
-                                    OrigTubesArr.push([data.packagingType, TubesCheck.Running]);
-                                    exists3 = OrigTubesArr.getIndex(data.packagingType);
+                                    OrigTubesArr.push([data.packagingType.sku, TubesCheck.Running || 0]);
+                                    exists3 = OrigTubesArr.getIndex(data.packagingType.sku);
                                 }
                                 var TubeOBJ = checkALL(OrigTubesArr[exists3][1], tubes);
                                 OrigTubesArr[exists3][1] = TubeOBJ.running;
 
-                                var exists2 = TubesArr.getIndex(data.packagingType);
+                                var exists2 = TubesArr.getIndex(data.packagingType.sku);
                                 if (exists2 == -1) {
 
-                                    TubesArr.push([data.packagingType, TubeOBJ.used, TubeOBJ.left, tubes])
+                                    TubesArr.push([data.packagingType.sku, TubeOBJ.used, TubeOBJ.left, tubes])
 
                                 } else {
                                     TubesArr[exists2][1] += TubeOBJ.used;
@@ -954,7 +952,7 @@ function checkStockValues(BATCHES) {
 
                                     if (exists3 == -1) {
 
-                                        OrigLabelsArr.push([data.packlabelsku, LabelsCheck.Running]);
+                                        OrigLabelsArr.push([data.packlabelsku, LabelsCheck.Running || 0]);
                                         exists3 = OrigLabelsArr.getIndex(data.packlabelsku);
                                     }
                                     var LabelOBJ = checkALL(OrigLabelsArr[exists3][1], tubes);
@@ -985,7 +983,7 @@ function checkStockValues(BATCHES) {
                             var exists3 = OrigInkArr.getIndex('printing ink');
                             if (exists3 == -1) {
 
-                                OrigInkArr.push(['printing ink', InkCheck.Running]);
+                                OrigInkArr.push(['printing ink', InkCheck.Running || 0]);
                                 exists3 = OrigInkArr.getIndex('printing ink');
                             }
                             var InkOBJ = checkALL(OrigInkArr[exists3][1], ink);
@@ -1013,7 +1011,7 @@ function checkStockValues(BATCHES) {
                             var exists3 = OrigLabelsArr.getIndex(label);
                             if (exists3 == -1) {
 
-                                OrigLabelsArr.push([label, LabelsCheck.Running]);
+                                OrigLabelsArr.push([label, LabelsCheck.Running || 0]);
                                 exists3 = OrigLabelsArr.getIndex(label);
                             }
                             var LabelOBJ = checkALL(OrigLabelsArr[exists3][1], data.bottles);
@@ -1045,7 +1043,7 @@ function checkStockValues(BATCHES) {
                                 var exists1 = OrigPmixArr.getIndex(premix);
                                 if (exists1 == -1) {
                                   
-                                  OrigPmixArr.push([premix, premixCheck.Running]);
+                                  OrigPmixArr.push([premix, premixCheck.Running || 0]);
                                   exists1 = OrigPmixArr.getIndex(premix);
                                 }
                                 
@@ -1069,7 +1067,7 @@ function checkStockValues(BATCHES) {
                        var exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        if (exists1 == -1) {
                          
-                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running]);
+                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running || 0]);
                          exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        }
                        
@@ -1101,7 +1099,7 @@ function checkStockValues(BATCHES) {
                                 var exists1 = OrigPmixArr.getIndex(premix);
                                 if (exists1 == -1) {
 
-                                    OrigPmixArr.push([premix, premixCheck.Running]);
+                                    OrigPmixArr.push([premix, premixCheck.Running || 0]);
                                     exists1 = OrigPmixArr.getIndex(premix);
                                 }
 
@@ -1126,7 +1124,7 @@ function checkStockValues(BATCHES) {
                                     var exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                                     if (exists1 == -1) {
 
-                                        OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running]);
+                                        OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running || 0]);
                                         exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                                     }
 
@@ -1168,7 +1166,7 @@ function checkStockValues(BATCHES) {
                                 var exists3 = OrigLidsArr.getIndex(data.lidSKU);
                                 if (exists3 == -1) {
 
-                                    OrigLidsArr.push([data.lidSKU, LidCheck.Running]);
+                                    OrigLidsArr.push([data.lidSKU, LidCheck.Running || 0]);
                                     exists3 = OrigLidsArr.getIndex(data.lidSKU);
                                 }
                                 var LidOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -1194,7 +1192,7 @@ function checkStockValues(BATCHES) {
                                 var exists3 = OrigBottlesArr.getIndex(data.botSKU);
                                 if (exists3 == -1) {
 
-                                    OrigBottlesArr.push([data.botSKU, BottleCheck.Running]);
+                                    OrigBottlesArr.push([data.botSKU, BottleCheck.Running || 0]);
                                     exists3 = OrigBottlesArr.getIndex(data.botSKU);
                                 }
                                 var BotOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -1231,7 +1229,7 @@ function checkStockValues(BATCHES) {
                     var exists1 = OrigBbottlesArr.getIndex(brandname);
                     if (exists1 == -1) {
 
-                        OrigBbottlesArr.push([brandname, brandedstockB.Running]);
+                        OrigBbottlesArr.push([brandname, brandedstockB.Running || 0]);
                         exists1 = OrigBbottlesArr.getIndex(brandname);
                     }
 
@@ -1252,12 +1250,14 @@ function checkStockValues(BATCHES) {
                       //  generateForSingleUnbranded(data.recipe, data.flavour.sku, data.bsize);
                         var unbrandedCheck = base.getData("UnbrandedTypes/" + unbranded);
                         if (!unbrandedCheck) {
-                            unbrandedCheck.Running = 0;
+                         unbrandedCheck = {
+                           Running: 0,
+                         } 
                         }
                         var exists1 = OrigUbottlesArr.getIndex(unbranded);
                         if (exists1 == -1) {
 
-                            OrigUbottlesArr.push([unbranded, unbrandedCheck.Running]);
+                            OrigUbottlesArr.push([unbranded, unbrandedCheck.Running || 0]);
                             exists1 = OrigUbottlesArr.getIndex(unbranded);
                         }
 
@@ -1288,7 +1288,7 @@ function checkStockValues(BATCHES) {
                                 var exists1 = OrigPmixArr.getIndex(premix);
                                 if (exists1 == -1) {
                                   
-                                  OrigPmixArr.push([premix, premixCheck.Running]);
+                                  OrigPmixArr.push([premix, premixCheck.Running || 0]);
                                   exists1 = OrigPmixArr.getIndex(premix);
                                 }
                                 
@@ -1312,7 +1312,7 @@ function checkStockValues(BATCHES) {
                        var exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        if (exists1 == -1) {
                          
-                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running]);
+                         OrigColorsArr.push([data.recipe.Color.sku, colorCheck.Running || 0]);
                          exists1 = OrigColorsArr.getIndex(data.recipe.Color.sku);
                        }
                        
@@ -1344,7 +1344,7 @@ function checkStockValues(BATCHES) {
                             var exists1 = OrigPmixArr.getIndex(premix);
                             if (exists1 == -1) {
 
-                                OrigPmixArr.push([premix, premixCheck.Running]);
+                                OrigPmixArr.push([premix, premixCheck.Running || 0]);
                                 exists1 = OrigPmixArr.getIndex(premix);
                             }
 
@@ -1370,7 +1370,7 @@ function checkStockValues(BATCHES) {
                                 var exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                                 if (exists1 == -1) {
 
-                                    OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running]);
+                                    OrigFlavoursArr.push([data.flavour.sku, flavourCheck.Running || 0]);
                                     exists1 = OrigFlavoursArr.getIndex(data.flavour.sku);
                                 }
 
@@ -1411,7 +1411,7 @@ function checkStockValues(BATCHES) {
                             var exists3 = OrigLidsArr.getIndex(data.lidSKU);
                             if (exists3 == -1) {
 
-                                OrigLidsArr.push([data.lidSKU, LidCheck.Running]);
+                                OrigLidsArr.push([data.lidSKU, LidCheck.Running || 0]);
                                 exists3 = OrigLidsArr.getIndex(data.lidSKU);
                             }
                             var LidOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -1437,7 +1437,7 @@ function checkStockValues(BATCHES) {
                             var exists3 = OrigBottlesArr.getIndex(data.botSKU);
                             if (exists3 == -1) {
 
-                                OrigBottlesArr.push([data.botSKU, BottleCheck.Running]);
+                                OrigBottlesArr.push([data.botSKU, BottleCheck.Running || 0]);
                                 exists3 = OrigBottlesArr.getIndex(data.botSKU);
                             }
                             var BotOBJ = checkALL(OrigLidsArr[exists3][1], data.bottles);
@@ -1594,89 +1594,89 @@ function checkStockValues(BATCHES) {
     logDATA.push(['Flavours', '', '', '', '']);
     for (var i = 0; i < flavoursArr.length; i++) {
         var running = base.getData('Flavours/' + flavoursArr[i][0]);
-        FlavMSG += running.name+' '+ flavoursArr[i][0] + ":  -   Will Use: " + flavoursArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + flavoursArr[i][2] + " - Required: " + flavoursArr[i][3] +'<br>';
-        logDATA.push([running.name+' '+flavoursArr[i][0], flavoursArr[i][1], running.Running, flavoursArr[i][2], flavoursArr[i][3]]);
+        FlavMSG += running.name+' '+ flavoursArr[i][0] + ":  -   Will Use: " + flavoursArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + flavoursArr[i][2] + " - Required: " + flavoursArr[i][3] +'<br>';
+        logDATA.push([running.name+' '+flavoursArr[i][0], flavoursArr[i][1],  (running.Running || 0), flavoursArr[i][2], flavoursArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
      logDATA.push(['Colors', '', '', '', '']);
     for (var i = 0; i < colorsArr.length; i++) {
         var running = base.getData('Color/' + colorsArr[i][0]);
-        ColorMSG += running.name+' '+ colorsArr[i][0] + ":  -   Will Use: " + colorsArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + colorsArr[i][2] + " - Required: " + colorsArr[i][3] +'<br>';
-        logDATA.push([running.name+' '+colorsArr[i][0], colorsArr[i][1], running.Running, colorsArr[i][2], colorsArr[i][3]]);
+        ColorMSG += running.name+' '+ colorsArr[i][0] + ":  -   Will Use: " + colorsArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + colorsArr[i][2] + " - Required: " + colorsArr[i][3] +'<br>';
+        logDATA.push([running.name+' '+colorsArr[i][0], colorsArr[i][1],  (running.Running || 0), colorsArr[i][2], colorsArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Bottles', '', '', '', '']);
     for (var i = 0; i < BottlesArr.length; i++) {
         var running = base.getData('BottleTypes/' + BottlesArr[i][0] );
-        BottleMSG += running.name+' '+BottlesArr[i][0] + ":  -   Will Use: " + BottlesArr[i][1] + " - Available: " + running + ' -  Missing: ' + BottlesArr[i][2] + " - Required: " + BottlesArr[i][3] + '<br>';
-        logDATA.push([running.name+' '+BottlesArr[i][0], BottlesArr[i][1], running.Running, BottlesArr[i][2], BottlesArr[i][3]]);
+        BottleMSG += running.name+' '+BottlesArr[i][0] + ":  -   Will Use: " + BottlesArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + BottlesArr[i][2] + " - Required: " + BottlesArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+BottlesArr[i][0], BottlesArr[i][1],  (running.Running || 0), BottlesArr[i][2], BottlesArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 
     logDATA.push(['Lids', '', '', '', '']);
     for (var i = 0; i < LidsArr.length; i++) {
         var running = base.getData('Lids/' + LidsArr[i][0]);
-        LidMSG += running.name+' '+LidsArr[i][0] + ":  -   Will Use: " + LidsArr[i][1] + " - Available: " + running + ' -  Missing: ' + LidsArr[i][2] + " - Required: " + LidsArr[i][3] + '<br>';
-        logDATA.push([running.name+' '+LidsArr[i][0], LidsArr[i][1], running.Running, LidsArr[i][2], LidsArr[i][3]]);
+        LidMSG += running.name+' '+LidsArr[i][0] + ":  -   Will Use: " + LidsArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + LidsArr[i][2] + " - Required: " + LidsArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+LidsArr[i][0], LidsArr[i][1],  (running.Running || 0), LidsArr[i][2], LidsArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 
     logDATA.push(['Premixes', '', '', '', '']);
     for (var i = 0; i < PremixArr.length; i++) {
         var running = base.getData('PremixesTypes/' + PremixArr[i][0] );
-        PremixMSG += PremixArr[i][0] + '  ' + running.name + ":  -   Will Use: " + PremixArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + PremixArr[i][2] + '<br>';
-        logDATA.push([PremixArr[i][0] + '  ' + running.name, PremixArr[i][1], running.Running, PremixArr[i][2],'']);
+        PremixMSG += PremixArr[i][0] + '  ' + running.name + ":  -   Will Use: " + PremixArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + PremixArr[i][2] + '<br>';
+        logDATA.push([PremixArr[i][0] + '  ' + running.name, PremixArr[i][1],  (running.Running || 0), PremixArr[i][2],'']);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Unbranded', '', '', '', '']);
     for (var i = 0; i < UbottlesArr.length; i++) {
         var running = base.getData('UnbrandedTypes/' + UbottlesArr[i][0] );
-        UbottleMSG += UbottlesArr[i][0] + '  ' + running.name + ":  -   Will Use: " + UbottlesArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + UbottlesArr[i][2] + '<br>';
-        logDATA.push([UbottlesArr[i][0] + '  ' + running.name, UbottlesArr[i][1], running.Running, UbottlesArr[i][2],'']);
+        UbottleMSG += UbottlesArr[i][0] + '  ' + running.name + ":  -   Will Use: " + UbottlesArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + UbottlesArr[i][2] + '<br>';
+        logDATA.push([UbottlesArr[i][0] + '  ' + running.name, UbottlesArr[i][1],  (running.Running || 0), UbottlesArr[i][2],'']);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Branded', '', '', '', '']);
     for (var i = 0; i < BbottlesArr.length; i++) {
         var running = base.getData('BrandedTypes/' + BbottlesArr[i][0]);
-        BbottleMSG += BbottlesArr[i][0] + '  ' + running.name + ":  -   Will Use: " + BbottlesArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + BbottlesArr[i][2] + '<br>';
-        logDATA.push([BbottlesArr[i][0] + '  ' + running.name, BbottlesArr[i][1], running.Running, BbottlesArr[i][2],'']);
+        BbottleMSG += BbottlesArr[i][0] + '  ' + running.name + ":  -   Will Use: " + BbottlesArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + BbottlesArr[i][2] + '<br>';
+        logDATA.push([BbottlesArr[i][0] + '  ' + running.name, BbottlesArr[i][1],  (running.Running || 0), BbottlesArr[i][2],'']);
     }
     logDATA.push(['', '', '', '', '']);
 
     for (var i = 0; i < PackedArr.length; i++) {
         var running = base.getData('BrandedTypes/' + PackedArr[i][0]);
-        PBbottleMSG += PackedArr[i][0] + '  ' + running.name + ":  -   Will Use: " + PackedArr[i][1] + " - Available: " + running.Running + ' -  Missing: ' + PackedArr[i][2] + '<br>';
-        logDATA.push([PackedArr[i][0] + '  ' + running.name, PackedArr[i][1], running.Running, PackedArr[i][2],'']);
+        PBbottleMSG += PackedArr[i][0] + '  ' + running.name + ":  -   Will Use: " + PackedArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + PackedArr[i][2] + '<br>';
+        logDATA.push([PackedArr[i][0] + '  ' + running.name, PackedArr[i][1],  (running.Running || 0), PackedArr[i][2],'']);
     }
     logDATA.push(['', '', '', '', '']);
 
     logDATA.push(['Pack Types', '', '', '', '']);
     for (var i = 0; i < TubesArr.length; i++) {
         var running = base.getData('Packages/' + TubesArr[i][0] );
-        tubeMSG += running.name+' '+TubesArr[i][0] + ":  -   Will Use: " + TubesArr[i][1] + " - Available: " + running + ' -  Missing: ' + TubesArr[i][2] + " - Required: " + TubesArr[i][3] + '<br>';
-        logDATA.push([running.name+' '+TubesArr[i][0], TubesArr[i][1], running.Running, TubesArr[i][2], TubesArr[i][3]]);
+        tubeMSG += running.name+' '+TubesArr[i][0] + ":  -   Will Use: " + TubesArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + TubesArr[i][2] + " - Required: " + TubesArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+TubesArr[i][0], TubesArr[i][1],  (running.Running || 0), TubesArr[i][2], TubesArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Boxes', '', '', '', '']);
     for (var i = 0; i < BoxArr.length; i++) {
         var running = base.getData('Boxes/' + BoxArr[i][0] );
-        BoxMSG += BoxArr[i][0] + ":  -   Will Use: " + BoxArr[i][1] + " - Available: " + running + ' -  Missing: ' + BoxArr[i][2] + " - Required: " + BoxArr[i][3] + '<br>';
-        logDATA.push([running.name+' '+BoxArr[i][0], BoxArr[i][1], running.Running, BoxArr[i][2], BoxArr[i][3]]);
+        BoxMSG += BoxArr[i][0] + ":  -   Will Use: " + BoxArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + BoxArr[i][2] + " - Required: " + BoxArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+BoxArr[i][0], BoxArr[i][1],  (running.Running || 0), BoxArr[i][2], BoxArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 
     logDATA.push(['Labels', '', '', '', '']);
     for (var i = 0; i < LabelsArr.length; i++) {
         var running = base.getData('Labels/' + LabelsArr[i][0]);
-        LabelMSG += running.name+' '+LabelsArr[i][0] + ":  -   Will Use: " + LabelsArr[i][1] + " - Available: " + running + ' -  Missing: ' + LabelsArr[i][2] + " - Required: " + LabelsArr[i][3] + '<br>';
-        logDATA.push([running.name+' '+LabelsArr[i][0], LabelsArr[i][1], running.Running, LabelsArr[i][2], LabelsArr[i][3]]);
+        LabelMSG += running.name+' '+LabelsArr[i][0] + ":  -   Will Use: " + LabelsArr[i][1] + " - Available: " + (running.Running || 0) + ' -  Missing: ' + LabelsArr[i][2] + " - Required: " + LabelsArr[i][3] + '<br>';
+        logDATA.push([running.name+' '+LabelsArr[i][0], LabelsArr[i][1],  (running.Running || 0), LabelsArr[i][2], LabelsArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
     logDATA.push(['Ink', '', '', '', '']);
     for (var i = 0; i < InkArr.length; i++) {
         var running = base.getData('Misc/' + InkArr[i][0] + '/Running');
-        InkMSG += InkArr[i][0] + ":  -   Will Use: " + InkArr[i][1] + " - Available: " + running + ' -  Missing: ' + InkArr[i][2] + " - Required: " + InkArr[i][3] + '<br>';
-        logDATA.push([InkArr[i][0], InkArr[i][1], running, InkArr[i][2], InkArr[i][3]]);
+        InkMSG += InkArr[i][0] + ":  -   Will Use: " + InkArr[i][1] + " - Available: " + (running|| 0) + ' -  Missing: ' + InkArr[i][2] + " - Required: " + InkArr[i][3] + '<br>';
+        logDATA.push([InkArr[i][0], InkArr[i][1], (running|| 0), InkArr[i][2], InkArr[i][3]]);
     }
     logDATA.push(['', '', '', '', '']);
 

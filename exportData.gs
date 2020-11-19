@@ -190,7 +190,7 @@ for(var j=0;j<tabs.length;j++){
         var data=getShippingData();
            if(!data){continue;}
             var headerRow=['Order Date','Batch','Order ID','Product Code','ProductDescription','Priority','Customer','Brand','Recipe','Packaging Code','Flavour','Bottles','Bottle Type','Lid Type',
-     'Packaging Tube','Status','Shipping Status','Shipping Code','Date Shipped','Tracking No.','Date Delivered','Location'];
+     'Packaging Tube','Status','Shipping Status','Shipping Code','Date Shipped','Tracking No.','Date Delivered','Location','Partial Production','Partial Packaging'];
 
        var values=[];
       values.push(headerRow);
@@ -200,7 +200,7 @@ for(var j=0;j<tabs.length;j++){
        data[i].boxname?data[i].boxname.name||(data[i].boxname={name:"",sku:""}):data[i].boxname={name:"",sku:""},data[i].packagingType?data[i].packagingType.name||(data[i].packagingType={name:"",sku:""}):data[i].packagingType={name:"",sku:""};
       values.push([formatDateDisplay(data[i].orderdate),data[i].batch,data[i].orderID,data[i].productcode,data[i].productdescription,data[i].priority,data[i].customer,data[i].brand,data[i].recipe.name,data[i].PRINTCODE,data[i].flavour.name,data[i].bottles,
       data[i].btype,data[i].lid,data[i].packagingType.name,data[i].final_status,data[i].shipping_status ,data[i].SHIPPINGCODE,data[i].dateshipped,data[i].trackingNo,
-      data[i].datedelivered,data[i].shippinglocation]);
+      data[i].datedelivered,data[i].shippinglocation,(data[i].partialProduction||''),(data[i].partialPackaging||'')]);
       }
       var sheet=file.insertSheet('Shipping');
       sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
@@ -356,7 +356,7 @@ for(var j=0;j<tabs.length;j++){
      var headerRow=['Product Code','Product Description','Unbranded SKU','Unbranded Description','Premix SKU','Premix Description','Colored Premix SKU','Colored Premix Description','Linked BB SKU','Brand','Brand SKU',
      'Bottle','Bottle SKU','Fill','Cap','Cap SKU','Packaging','Packaging SKU','Box','Box SKU','NIB','Flavour','Flavour SKU','Recipe','Recipe ID',
      'Bottle Label','Bottle Label SKU','Pre Printed Bottle Label','Pre Printed Bottle Label SKU','Pack Label','Pack Label SKU','Pre Printed Pack Label',
-     'Pre Printed Pack Label SKU','Barcode','ECID'];
+     'Pre Printed Pack Label SKU','Barcode','ECID','Price'];
      var values=[];
      for(var i=0;i<data.length;i++)
      {
@@ -365,14 +365,14 @@ for(var j=0;j<tabs.length;j++){
         }
 
      data[i].flavour?data[i].flavour.name||(data[i].flavour={name:"",sku:""}):data[i].flavour={name:"",sku:""},data[i].boxname?data[i].boxname.name||(data[i].boxname={name:"",sku:""}):data[i].boxname={name:"",sku:""},data[i].packagingType?data[i].packagingType.name||(data[i].packagingType={name:"",sku:""}):data[i].packagingType={name:"",sku:""};
-     
+     data[i].price = data[i].price || '';
      
        if(keys[i].length<=30){
          try{
            values.push([data[i].prod,data[i].descr,data[i].unbrandSKU,data[i].unbranddescr,data[i].premixSKU,data[i].premixdescr,data[i].premixSKUColored,data[i].premixdescrColored,data[i].linkedBB,data[i].brand,data[i].brandSKU,data[i].btype,data[i].botSKU,data[i].fill,data[i].lid,data[i].lidSKU,
            data[i].packagingType.name,data[i].packagingType.sku,data[i].boxname.name,data[i].boxname.sku,data[i].NIB,data[i].flavour.name,data[i].flavour.sku,data[i].recipe.name,data[i].recipe.id,
            data[i].botlabel,data[i].botlabelsku,data[i].ppbotlabel,data[i].ppbotlabelsku,data[i].packlabel,data[i].packlabelsku,data[i].pppacklabel,
-           data[i].pppacklabelsku,data[i].barcode,data[i].ecid]);
+           data[i].pppacklabelsku,data[i].barcode,data[i].ecid,data[i].price]);
          }catch(e){Logger.log(data[i]);}
        }
      
@@ -645,7 +645,7 @@ for(var j=0;j<tabs.length;j++){
 
         }else if (tabs[j] == 'FlavourMixes') {
             var data = JSONtoARR(base.getData('FlavourMixes'));
-            var headerRow = ['SKU', 'Name', 'Flavour Names', 'Flavour SKUS', 'Flavour Values'];
+            var headerRow = ['SKU', 'Name', 'Flavour Names', 'Flavour SKUS', 'Flavour Values', 'Flavour Percentages'];
             var keys = ['sku', 'name','flavournames','flavourskus','flavourvalues'];
             var values = [];
             for (var i = 0; i < data.length; i++) {
@@ -668,10 +668,13 @@ for(var j=0;j<tabs.length;j++){
                       row.push(flavarr.join(','));   
                     }else if(keys[k]=='flavourvalues'){
                          var flavarr=[];
+                         var flavarrPercentage = [];
                       for(var m=0;m<flavoursARR.length;m++){
                         flavarr.push(flavoursARR[m].val);
+                        flavarrPercentage.push(handleFloat(flavoursARR[m].val*10));
                       }
-                      row.push(flavarr.join(','));   
+                      row.push(flavarr.join(','));
+                      row.push(flavarrPercentage.join(','));
                     }else{
                         row.push(data[i][keys[k]]);
                     }
@@ -709,7 +712,9 @@ for(var j=0;j<tabs.length;j++){
   
  //  }catch(e){return e.message;}
 }
-
+function handleFloat(num){
+return Math.round(parseFloat((Number(num) * Math.pow(10, 2)).toFixed(2))) / Math.pow(10, 2);
+}
 function removeEmptyColumns(ss) {
 
 var allsheets = ss.getSheets();
@@ -1103,7 +1108,7 @@ function createCompletedExport(H,name){
   var folder=DriveApp.getFolderById(COMPLETED_ITEMS_FOLDER);
   var create=DriveApp.getFileById(COMPLETED_FILE_ID).makeCopy(name,folder);
   var SS=SpreadsheetApp.openById(create.getId());
-  
+ 
   var range = [];
   if(H <= 15){
     range = [1,15];
@@ -1152,10 +1157,9 @@ function createCompletedExport(H,name){
  
 var TOTALS_FINAL = [[],[],[],[],[],[],[]];
 for(var s =0;s<sheets.length;s++){
-     var params = {
-        orderBy: 'final_status',
-        equalTo: "Completed",
-
+     var paramsDate = {
+        orderBy: 'CompletionDate',
+       startAt: new Date().getTime()-(60*60*1000*24),
     }
     var params={};
     switch (sheets[s]){
@@ -1165,6 +1169,7 @@ for(var s =0;s<sheets.length;s++){
           equalTo: "Shipped",
           
         }
+    
         break;
       case 'Production':
         params = {
@@ -1190,7 +1195,8 @@ for(var s =0;s<sheets.length;s++){
         }
         break;
     }
-     var list=searchFor([[sheets[s], params]])[1];
+     var list=JSONtoARR(base.getData(sheets[s], paramsDate)).filter(function(item){
+     return item[params.orderBy]==params.equalTo});
        var data =[];
        for(var i =0;i<list.length;i++){
         
@@ -1613,6 +1619,8 @@ for(var s =0;s<sheets.length;s++){
   if(max>0){
   SS.getSheets()[0].getRange(4, 1, max, 14).setValues(sumArr);
   }
+  
+  Logger.log(SS.getUrl());
  return SS;
   
 }    

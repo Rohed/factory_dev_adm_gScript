@@ -924,7 +924,7 @@ function getSchedulesForDate(date) {
 
 
 function getMachines() {
-    var data = JSONtoARR(base.getData('Machines')).sort(sortSTRINGLH('name'));
+    var data = JSONtoARR(base.getData('Machines')).filter(function(item){ if(item.name){return item}}).sort(sortSTRINGLH('name'));
     return [data, 'Machines'];
 }
 

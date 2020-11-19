@@ -999,8 +999,7 @@ function moveMain(item) {
             };
             base.updateData('Production/' + item.batch, dat3);
             updateAllTabs(item.batch);
-        } else if (sheet_name == 'Printing') {
-            var volume = parseInt(item.btype.replace(/\D/g, ''), 10) * item.bottles / 1000;
+        } else if (sheet_name == 'Printing') { 
             var packData = getPackagingData(item.packagingType, item.bottles + order.branded, order.boxname.sku)
                 //   var packlabel = packData.packlabel;
             var packink = packData.ink;
@@ -1031,8 +1030,7 @@ function moveMain(item) {
             updateAllTabs(item.batch);
         } else if (sheet_name == 'Labelling') {
             var unbrand = getUnbrandName(order);
-            LOGARR.push(['Unbranded SKU:', unbrand]);
-            var volume = parseInt(item.btype.replace(/\D/g, ''), 10) * item.bottles / 1000;
+            LOGARR.push(['Unbranded SKU:', unbrand]); 
             var origbots = order.bottles;
             var tomix = order.mixing;
             var tominusP = order.premixed;
@@ -1093,7 +1091,6 @@ function moveMain(item) {
             base.updateData('Orders/' + item.batch, dat2);
             updateAllTabs(item.batch);
         } else if (sheet_name == 'Packaging') {
-            var volume = parseInt(item.btype.substr(0, 2), 10) * item.bottles / 1000;
             var brandname = getBrandName(order, false);
             LOGARR.push(['Branded SKU:', brandname]);
             var packData = getPackagingData(item.packagingType, item.bottles, order.boxname.sku)
