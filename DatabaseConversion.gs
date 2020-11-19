@@ -1,3 +1,49 @@
+function correctCompletionDate(){
+  var sheets=[ 'Orders'];
+  var sheets=['Production' ];
+  var sheets=[ 'Printing' ];
+  var sheets=[ 'Labelling' ];
+  var sheets=[ 'Packaging' ];
+  var sheets=[ 'Shipping'];
+  sheets.map(function(item){
+  var data =base.getData(item)
+  var keys = Object.keys(data);
+  keys.map(function(batch){
+    if(data[batch].CompletionDate){
+      if(isNaN(data[batch].CompletionDate)){
+      var date = data[batch].CompletionDate.split('-');
+      data[batch].CompletionDate = new Date(date[2],date[1],date[0]).getTime();
+      
+      }
+    }
+  
+  })
+    base.updateData(item,data)
+  });
+  
+  
+}
+
+function updateInvKeys(){
+var inv=base.getData('Inventory');
+var invlist=JSONtoARR(inv);
+var keys=Object.keys(inv);
+ 
+for(var i=0;i<keys.length;i++){
+ 
+if(!inv[keys[i]].key){
+inv[keys[i]].key=keys[i];
+
+}
+ 
+
+}
+
+ 
+base.removeData('Inventory');
+base.updateData('Inventory',inv);
+}
+
 function deleteItems(){
 var id = '1yv7HQDGvNuLwDUgfMHOMuqLJdUoN7s_nz-09LvrF7V0';
 var sheets = SpreadsheetApp.openById(id).getSheets();
@@ -1468,25 +1514,7 @@ for(var i=0;i<plist.length;i++){
 Logger.log(arr);
 }
 
-function updateInvKeys(){
-var inv=base.getData('Inventory');
-var invlist=JSONtoARR(inv);
-var keys=Object.keys(inv);
-var options ='{';
-for(var i=0;i<keys.length;i++){
-var thenum = keys[i].replace( /^\D+/g, '').replace(/ /g,'');
-inv[keys[i]].key=thenum;
- options += '"' + thenum+ '":' + JSON.stringify(inv[keys[i]]) + ',';
 
-}
-
-
-  
-options+='}';  
-      var upload =JSON.parse(options);
-base.removeData('Inventory');
-base.updateData('Inventory',upload);
-}
 
 function updateFillLevels(){
   var PC = base.getData('References/ProductCodes');

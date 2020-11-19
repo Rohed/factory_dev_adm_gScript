@@ -10,6 +10,8 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
 <?!= include('stylesheet'); ?>
+ 
+
 
 
 </head>
@@ -41,6 +43,7 @@
       <li><a href="#tab9">QTY</a></li>
       <li><a href="#tab10">Inventory</a></li>
       <li><a href="#tab11">Functions</a></li>
+      <li><a href="#tab12">Reporting</a></li>
    </ul>
    <ul class="tab-links" id='ordersSubTab'>
       <li id='subTabFlavourMixOrders'><a href="#tab1" sub='subOrder' page='FlavourMixOrders'>Flavour Mix Orders</a></li>
@@ -72,6 +75,9 @@
                   <button type="button" id='getOrderIDs2' class="btn btn-info btn-lg" data-toggle="modal" data-target="#statusModal">Check Order Status</button>
                   <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#priorityModal" id='priorityButton'>Set Order Priorities</button>
                   <button class="btn btn-info btn-lg" type="button" id='scheduleManage'>Manage Schedules</button>
+                  <button class="btn btn-info btn-lg" type="button" id='getpremixReports' onclick='getpremixReports()'>Generate Safety Reports</button>
+                  
+                  <button class="btn btn-info btn-lg" type="button" id='showNotes' onclick="showNotes()">Notes</button>
                   <button type='button' id='savepoint' class="btn btn-info btn-lg"><i class="fa fa-floppy-o fa-3x" aria-hidden="true"></i></button>
                   <button type='button' style='display:none;' id='restorepoint' class="btn btn-info btn-lg"><i class="fa fa-undo fa-3x" aria-hidden="true"></i></button>
                </li>
@@ -88,6 +94,7 @@
                      <button type="button" id='deleteDisplayedOrders' onclick="deleteAll()">Delete Displayed</button>
                      <button type="button" id='deleteandreverseSelected' onclick="deleteandreverseSelected()">Delete and Reverse Stock</button>
                      <button type="button" id='reverseSelected' onclick="reverseSelected()">Reverse Stock</button>
+                    
                   </div>
                </li>
             </ul>
@@ -288,8 +295,18 @@
                <li>
                   <button type="button" id='deleteDisplayedOrders' onclick="deleteAll()">Delete Displayed</button>
                </li>
+                <li class="nav-item">
+                  <div>
+                     <div id='selectionPrinting' style="margin-top:20px;">
+                     </div>
+                         <button type="button" id='selectAllOrders' onclick="selectAll()" style="display:inline-block;margin-right:30px;">Select All</button>
+                     <button type="button" id='checkstock' onclick="runmultiSL()" style="display:inline-block;">Complete Selected</button>
+                 
+
+                  </div>
+               </li>
             </ul>
-            <ul class="nav navbar-nav navbar">
+            <ul class="nav navbar-nav navbar" style="display:block;">
                <li class="nav-item">
                   <div class='searchDates' id='searchDatesPrinting'>
                      <div class='startSearch'>
@@ -558,6 +575,45 @@
                   <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newInventoryFromSheet">Import Inventory List from Sheet</button>
                </li>
             </ul>
+            <ul class="nav navbar-nav navbar" style='display:block;'>
+               <li class="nav-item">
+                  <div class='searchDates' id='searchDatesInventory'>
+                     <div class='startSearch'>
+                        From:
+                        <input type="date" onchange='datesearch();' class="form-control" id="startSearch" />
+                     </div>
+                     <div class='startSearch'>
+                        To:
+                        <input type="date" onchange='datesearch();' class="form-control" id="endSearch" />
+                     </div>
+                     <select class="form-control" id='filterdates'>
+                        <option value='orderdate' selected>Order Date</option>
+                        <option value='delivdate'>Delivery Date</option>
+                        <option value='paiddate'>Paid Date</option>
+                     </select>
+                  </div>
+                  <div id="searchBox" class='searchBoxInventory'>
+                  </div>
+               </li>
+               <li>Split Pages By: </li>
+               <li>
+                  <select class="form-control" style='margin:20px 0; width:100px;' id='splitcountselect' onchange="changeSplit()">
+                     <option>50</option>
+                     <option>100</option>
+                     <option>150</option>
+                     <option>200</option>
+                     <option>250</option>
+                     <option>300</option>
+                     <option>400</option>
+                     <option>500</option>
+                     <option value='all'>All</option>
+                  </select>
+               </li>
+               <li>
+               <div class='content' id='Pagination2'></div>
+              
+               </li>
+            </ul>
          </nav>
          <div id='invbody'></div>
       </div>
@@ -627,6 +683,7 @@
                      <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newCapsFromSheet">Import Caps from Sheet</button>
                      <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newBrandsFromSheet">Import Brands from Sheet</button>
                      <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newFlavoursFromSheet">Import Flavours from Sheet</button>
+                      <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newFlavourMixesFromSheet">Import Flavour Mixes from Sheet</button>
                      <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newLabelsFromSheet">Import Labels from Sheet</button>
                      <button class="btn btn-info btn-lg" type="button" data-toggle="modal" data-target="#newColorsFromSheet">Import Colors from Sheet</button>
                      
@@ -635,6 +692,7 @@
                 <tr>
                   <td>
                     <button class="btn btn-info btn-lg" type="button"  id="#roundups" onclick="getRoundups()" >Edit Rount Up Values</button>
+                      <button class="btn btn-info btn-lg" type="button" onclick="getglobalFilter()" >Edit Global Date Filter</button>
                   <button class="btn btn-info btn-lg" type="button"  id="#backupAndRestore" onclick="backupAndRestore()">Backup And Restore</button>
                    <button class="btn btn-info btn-lg" type="button"   onclick="refreshOrders()">Refresh Orders</button>
                   </td>
@@ -668,7 +726,64 @@
             </table>
          </div>
       </div>
-     
+      <div id="tab12" class="tab">
+         <nav class="navbar navbar-default" role="navigation">
+            <ul class="nav navbar-nav navbar">
+               <li class="nav-item">
+                  <h2>Reporting - V1.0</h2>
+               </li>
+            </ul>
+         </nav>
+         <div id='Reporting'>
+             <div class='container'>
+               <div>
+                <p>Select Order IDs</p>
+                <div class="form-group">
+                    <select id="OrderIds1" class="form-control" multiple="multiple">
+
+                    </select>
+                </div>
+                <br />
+                <button type="button" class="leftSwitch" id="leftSwitch" type1='#OrderIds1' type2='#OrderIds2'><i class="fa fa-caret-up" aria-hidden="true"></i></button>
+                <button type="button" class="rightSwitch" id="rightSwitch" type1='#OrderIds1' type2='#OrderIds2'><i class="fa fa-caret-down" aria-hidden="true"></i></button>
+                <button type="button" class="leftallSwitch" id="leftallSwitch" type1='#OrderIds1' type2='#OrderIds2'><i class="fa fa-caret-square-o-up" aria-hidden="true"></i></button>
+                <button type="button" class="rightallSwitch" id="rightallSwitch" type1='#OrderIds1' type2='#OrderIds2'><i class="fa fa-caret-square-o-down" aria-hidden="true"></i></button>
+                <br />
+                <label for="OrderIds2">Selected</label>
+                <div class="form-group">
+                    <select id="OrderIds2" class="form-control" multiple="multiple">
+
+                    </select>
+                </div>
+
+            </div>
+             </div>
+        
+             <div class='container'>
+                  <p>Delivery Date (Used for Shipping Report/Summary)</p>
+                  <div class='searchDates' id='searchDatesReporting'>
+                     <div class='startSearch'>
+                        From:
+                        <input type="date" class="form-control" id="startSearchReporting" placeholder='All' value='All' />
+                     </div>
+                     <div class='startSearch'>
+                        To:
+                        <input type="date" class="form-control" id="endSearchReporting" placeholder='All' value='All'  />
+                     </div>
+             
+             </div>
+             </div>
+             <div class='container flex'>
+               <button class="btn btn-info btn-lg" type="button"  name='Orders Report' reportType='orders' onclick="generateReport(this)">Orders Report</button>
+               <button class="btn btn-info btn-lg" type="button"  name='Shipping Report' reportType='shipping' onclick="generateReport(this)">Shipping Report</button>
+               <button class="btn btn-info btn-lg" type="button"  name='Shipping Summary' reportType='shippingsummary' onclick="generateReport(this)">Shipping Summary</button>
+             </div>
+               <div class='container flex'>
+              <h4 id='reportLink'></h4>
+             </div>
+         </div>
+          
+      </div>
    </div>
 </div>
 

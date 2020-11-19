@@ -1,5 +1,75 @@
 
     <style>
+     .highlight{
+    background-color:#1a73e8;
+    width: 30px;
+    height: 30px;
+    margin:auto;
+    }
+ .add-note-inner__notes {
+  -ms-flex: 0 0 85%;
+  flex: 0 0 85%;
+  overflow-y: scroll;
+    height: 300px;
+  overflow: auto;
+  
+}
+.add-note-inner__notes textarea {
+  border: none;
+  background: none;
+  width: 100%;
+  
+  
+  padding: 10px;
+  font-size: 18px;
+
+}
+.add-note-inner__notes textarea:focus {
+  outline: 0;
+}  
+
+.note-line-textarea {
+  /* padding: 10px 0px 10px 0px; */
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(202, 202, 202);
+}
+.note-line-fixed {
+min-height:100px;
+  padding-top: 10px; 
+   display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(202, 202, 202);
+}
+.note-text {
+  width: 75%;
+  font-size: 1.6rem;
+ display:inline-block;
+  padding: 10px;
+}
+
+.note-timestamp { 
+  width: 20%;
+  padding: 0 0 0 20px;
+  font-size: 1.2rem;
+  color: #777;
+  margin: 0;
+   display:inline-block;
+}
+.note-timestamp2 { 
+
+  font-size: 1rem;
+  color: #777;
+  margin: 0;
+   display:inline-block;
+}
+
+ .flex{
+ padding:60px 0 60px 0;
+ display:flex;
+ justify-content:space-between;
+ 
+ }
         /* hidding input files */
  .modal-content {
   position: relative;
@@ -55,6 +125,7 @@
             background: #b2b7ba;
             display: none;
             position: fixed;
+            z-index:20;
             top: 0;
             right: 0;
             bottom: 0;
@@ -359,8 +430,22 @@ font-family: Gill Sans, Verdana;
  letter-spacing: 2px;
  font-weight: bold;
  margin-bottom:10px;
+ 
 }
 
+.renderType{
+    font-size: 22px;
+    font-weight: 500;
+    padding-bottom:20px;
+}
+#renderDisplay{
+   font-size: 30px;
+   cursor:pointer;
+}
+.valtotal span{
+display:inline-block;
+padding-bottom:20px;
+}
 #flavourDropdowns{
 margin-top:40px;
 }
@@ -472,4 +557,9 @@ overflow-y:scroll;
 heigth:500px;
 
 }
+
+#renderDisplaySwitch{
+padding:10px;
+}
+ 
     </style>

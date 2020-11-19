@@ -8,7 +8,80 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js" integrity="sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1" crossorigin="anonymous"></script>
     <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
     <style>
-    .modal-content {
+    .highlight{
+    background-color:#1a73e8;
+    width: 30px;
+    height: 30px;
+    margin:auto;
+    }
+.sarButton {
+    margin: 20px;
+}
+     .add-note-inner__notes {
+  -ms-flex: 0 0 85%;
+  flex: 0 0 85%;
+  overflow-y: scroll;
+    height: 300px;
+  overflow: auto;
+  
+}
+.add-note-inner__notes textarea {
+  border: none;
+  background: none;
+  width: 100%;
+  
+  
+  padding: 10px;
+  font-size: 18px;
+
+}
+.add-note-inner__notes textarea:focus {
+  outline: 0;
+}  
+
+.note-line-textarea {
+  /* padding: 10px 0px 10px 0px; */
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(202, 202, 202);
+}
+.note-line-fixed {
+min-height:100px;
+  padding-top: 10px; 
+   display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid rgb(202, 202, 202);
+}
+.note-text {
+  width: 75%;
+  font-size: 1.6rem;
+ display:inline-block;
+  padding: 10px;
+}
+
+.note-timestamp { 
+  width: 20%;
+  padding: 0 0 0 20px;
+  font-size: 1.2rem;
+  color: #777;
+  margin: 0;
+   display:inline-block;
+}
+.note-timestamp2 { 
+
+  font-size: 1rem;
+  color: #777;
+  margin: 0;
+   display:inline-block;
+}
+
+ .flex{
+ padding:60px 0 60px 0;
+ display:flex;
+ justify-content:space-between;
+ 
+ }
+ .modal-content {
   position: relative;
   background-color: #fff;
   -webkit-background-clip: padding-box;
@@ -17,8 +90,10 @@
   border: 0;
   border-radius: 0;
   outline: 0;
-  max-height: 500px;
+  max-height: 800px;
   overflow: scroll;
+  overflow-x: auto;
+  min-width:900px;
 }
         
     .bold td{
@@ -225,6 +300,7 @@ display: inline-block;
             background: #b2b7ba;
             display: none;
             position: fixed;
+             z-index:20;
             top: 0;
             right: 0;
             bottom: 0;
@@ -232,6 +308,23 @@ display: inline-block;
             opacity: 0.5;
             height: 100%;
             width: 100;
+        }
+        
+         .modal{
+        
+        overflow:scroll;
+        }
+        .modallarge {
+            width: 1500px;
+            right: 500px;
+        }
+        .modal-header{
+          margin:20px;
+          border:none;
+        }
+        .modal-footer{
+          margin:20px;
+          border:none;
         }
 /*
 .modal.show .modal-dialog {
@@ -291,16 +384,12 @@ width: 100%;
             </div>
         </div>-->
         
- <div id="updating">
+   <div id="updating">
         <div class="loader"></div>
     </div>
     <button onclick="topFunction()" id="myBtn" title="Go to top">Back To Top</button>        
         
-        
-        
-    <div class='container-fluid'>
-    
-          <div id="checkBatches" class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" role="dialog">
+         <div id="checkBatches" class="modal fade bd-example-modal-lg" aria-labelledby="myLargeModalLabel" role="dialog">
             <div class="modal-dialog modal-lg">
 
                 <!-- Modal content-->
@@ -625,7 +714,11 @@ width: 100%;
             </div>
 
         </div>
-  </div>
+  </div>    
+        
+    <div class='container-fluid'>
+    
+     
         <div class='logo'> <img src="https://drive.google.com/uc?export=view&id=<?= LOGOIMG?>">
          <h1><?= TITLE?></h1>
         </div>
@@ -638,22 +731,37 @@ width: 100%;
                     </li>
                     <li style="margin-top:50px;" class="nav-item">
                     <div  class='searchDates' id='searchDates'> 
-                    <div class='startSearch'>
-                    From:
-                    <input type="date" onchange='datesearch();' class="form-control" id="startSearch"/>
-                    </div>
-                    <div class='startSearch'>   
-                    To:
-                    <input type="date" onchange='datesearch();' class="form-control" id="endSearch"/>
-                    </div>
-                    <select class="form-control"  id='filterdates'> 
-                    <option value='orderdate' selected>Order Date</option>
-                    <option value='starttime'>Start Date</option>
-                    <option value='CompletionDate'>Completion Date</option>
-                    </select>
+                      <div class='startSearch'>
+                      From:
+                      <input type="date" onchange='datesearch();' class="form-control" id="startSearch"/>
+                      </div>
+                      <div class='startSearch'>   
+                      To:
+                      <input type="date" onchange='datesearch();' class="form-control" id="endSearch"/>
+                      </div>
+                      <select class="form-control"  id='filterdates'> 
+                      <option value='orderdate' selected>Order Date</option>
+                      <option value='starttime'>Start Date</option>
+                      <option value='CompletionDate'>Completion Date</option>
+                      </select>
+                    </div> 
+                    <div  class='searchDates' id='searchDatesInventory' style='margin-bottom:30px;display:none;'> 
+                      <div class='startSearch'>
+                      From:
+                      <input type="date" onchange='datesearch();' class="form-control" id="startSearch"/>
+                      </div>
+                      <div class='startSearch'>   
+                      To:
+                      <input type="date" onchange='datesearch();' class="form-control" id="endSearch"/>
+                      </div>
+                      <select class="form-control"  id='filterdates'> 
+                      <option value='orderdate' selected>Order Date</option>
+                        <option value='delivdate'>Delivery Date</option>
+                        <option value='paiddate'>Paid Date</option>
+                      </select>
                     </div> 
                     <div class='nav-item2'>
-                      <div id="searchBox" class='searchBox<?= sheetName?>'>                        
+                      <div style='margin-bottom:30px;' id="searchBox" class='searchBox<?= sheetName?>'>                        
                       </div>
         
                       </div>
@@ -759,6 +867,7 @@ width: 100%;
       
 </body>
   <script>
+   getNotesGlobal();
   function formatDateDisplay(datems){
      try{
      if(datems&&datems!=""){
@@ -921,14 +1030,17 @@ var SEARCHNUM=0;
     }else{
     getSearchBoxData(sheet);
     }
-  RUNFIRST();
+
   function RUNFIRST(){
   if(selPage!='QTY'&&selPage!='Shipping'&&selPage!='Inventory'&&selPage!='Locations'){
   if(sheet!='MixingTeam'){
 
   $('#mixingTabs').hide();
   }
-    if(selPage=='Production' || selPage=='Packaging'){
+  
+  console.log('selPage RUNFIRST',selPage);
+    if(selPage=='Production' || selPage=='Packaging' || selPage=='Printing'){
+        $('#selButton').css('display','block');
     $('#selectAll').show();
       $('#runMulti').show();
     }else{
@@ -943,7 +1055,7 @@ var SEARCHNUM=0;
   }
   
   }
-  
+    RUNFIRST();
  
  // populateSlSheetTable();
   function populateSlSheetTable(){
@@ -969,6 +1081,7 @@ var SEARCHNUM=0;
      // populateSLProductionTab();
     }else if(sheet=='Printing'){
        filterpage('xx',true);
+             $('#selButton').css('display','block');
       //populateSLPrintingTab();
     }else if(sheet=='Labelling'){
       filterpage('xx',true);
@@ -992,11 +1105,12 @@ var SEARCHNUM=0;
        $('#searchBox').css('display','none');
           $('#searchDates').css('display','none');
     }else if(sheet=='Inventory'){
-    
+     $('#paginationSelect').show();
       $('#newitem').css('display','block');
       populateInventoryTab(); 
-      $('#searchBox').css('display','none');
+      $('#searchBox').css('display','block');
           $('#searchDates').css('display','none');
+          $('#searchDatesInventory').css('display','block');
     }else if(sheet=='QTY'){
     
     $('#searchBox').css('display','none');
@@ -1057,6 +1171,8 @@ buildShippingTable(data);
    $('#selButton').css('display','block');
    $('#ordersNav').css('display','block'); 
 buildOrders(data);
+}else if (page == 'Inventory') {
+buildInventory(data);
 }
 }
 
@@ -1179,6 +1295,8 @@ addToSelected(href.substr(7, href.length));
 removeFromInventory(href.substr(10, href.length), page);
 }  else if (href.substr(0, 9) == '#editItem') {
 editItem(href.substr(9, href.length), page);
+}else if(href.substr(0,8) == '#orderID'){
+selectNotesForBatch(href.substr(8, href.length));
 }
 
 return false;
@@ -1200,12 +1318,12 @@ return false;
         thisData=data;
         thisPage='Orders';
         var html = '';
-        html += '<table class="table"><thead><tr><th>Row</th><th>Menu</th><th>Move</th><th>Order Date</th><th>Started</th><th>Production Machine</th><th>Labelling Machine</th><th>Batch</th><th>Order ID</th><th>Code</th><th>Description</th><th>Priority</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th><th>Bottles</th><th>Stocking Amount (litre)</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th>';
+        html += '<table class="table"><thead><tr><th>Row</th><th>Menu</th><th>Notes</th><th>Move</th><th>Order Date</th><th>Started</th><th>Production Machine</th><th>Labelling Machine</th><th>Batch</th><th>Order ID</th><th>Code</th><th>Description</th><th>Priority</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th><th>Bottles</th><th>Stocking Amount (litre)</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th>';
         html += '<th>QTY</th><th>Flavour Value</th><th>VG Value</th><th>AG Value</th><th>PG Value</th><th>Nicotine Value</th><th>Nicotine Salts Value</th><th>CBD Value</th><th>MCT Value</th><th>Backed by Mixing</th>';
         html+='<th>Backed by Premixed</th><th>Backed by Unbranded</th><th>Backed by Branded</th><th>Backed By Branded Packaged</th><th>Mixing Status</th><th>Production Status</th><th>Printing Status</th><th>Labelling Status</th>';
         html += '<th>Packaging Status</th><th>FINAL STATUS</th><th>Partial Production</th><th>Partial Packaging</th></tr>';
         
-        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal'+thisPage+'"></div></th><th><div>STOCKING TOTAL</div><div id="stockingTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th><div>QTY TOTAL</div><div id="qtyTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th>';
+        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal'+thisPage+'"></div></th><th><div>STOCKING TOTAL</div><div id="stockingTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th><div>QTY TOTAL</div><div id="qtyTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th>';
         html += '<th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal'+thisPage+'"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal'+thisPage+'"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal'+thisPage+'"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal'+thisPage+'"></div></th><th><div>TUBES TOTAL</div><div id="tubesTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><tr>';
       if(data){
         var keys=['orderdate','runtime','machineP','machineL','batch','orderID','productcode','productdescription','priority','customer','brand','recipe.name','flavour.name','bottles','stocking','btype','lid','packagingType.name','QTY','flavvalue','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','mixing','premixed',
@@ -1267,11 +1385,18 @@ return false;
 
                 html += '<a class="dropdown-item" onclick="return menuClick(this);" id="select'+data[i].batch+'" href="#select' + data[i].batch + '">Select</a>';
                 html += '<a class="dropdown-item" onclick="return menuClick(this);" style="display:none;" id="deselect'+data[i].batch+'" href="#select' + data[i].batch + '">Deselect</a>';
-
+   
+        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+     
 
          //   }
 
             html += ' </div></div></td>';  
+            if(notesGlobalObj[data[i].orderID]){
+            html += '<td><div class="highlight"></div></td>';
+            }else{
+            html += '<td><div></div></td>';
+            }
             html += '<td></td>';
              data[i].runtime=data[i].runtime ? data[i].runtime: ' ';
             html += '<td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + formatDateDisplay2(data[i].runtime) + '</td>';
@@ -1552,8 +1677,8 @@ $('#rowsTotal').html(rowsTotal);
         thisPage='PremixColoring';
         console.log(data);
         var html = '';
-     var heads=['Row','Menu','Batch','Order Date','Started','QTY','Color','Color SKU','Color %','Mix Batch Code','Uncolored Premix Description','Uncolored Premix SKU','Colored Premix Description','Colored Premix SKU','Status','Completion Date','Notes','Location'];
-        var keys=['row','menu','batch','orderdate','starttime','QTY','Color.name','Color.sku','Color.val','mix_batch_code','premixdescr','premixSKU','premixdescrColored','premixSKUColored','final_status','CompletionDate','Notes','Location']
+     var heads=['Row','Menu','Notes','Batch','Order Date','Started','QTY','Color','Color SKU','Color %','Mix Batch Code','Uncolored Premix Description','Uncolored Premix SKU','Colored Premix Description','Colored Premix SKU','Status','Completion Date','Notes','Location'];
+        var keys=['row','menu','notes','batch','orderdate','starttime','QTY','Color.name','Color.sku','Color.val','mix_batch_code','premixdescr','premixSKU','premixdescrColored','premixSKUColored','final_status','CompletionDate','Notes','Location']
         html += '<table class="table"><thead><tr>';
         for(var i=0;i<heads.length;i++){
           html+= '<th>'+heads[i]+'</th>';
@@ -1561,7 +1686,7 @@ $('#rowsTotal').html(rowsTotal);
         html += '</tr>';
         
         var drpdowns='';
-        html += '<tr><th></th><th></th>';
+        html += '<tr><th></th><th></th><th></th>';
         console.log(keys);
         for(var l=2;l<keys.length;l++){
         drpdowns+='<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>';
@@ -1587,9 +1712,18 @@ $('#rowsTotal').html(rowsTotal);
                 
                 html+='<a class="dropdown-item" onclick="return menuClick(this);" page="PremixColoring" href="#setBusy'+data[i].batch+'">Mark Busy</a>';
                 }  
+          
+        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+      
                 html += '</div></div></td>';  
                 }else if(keys[j]=='row'){
                 html+= '<td>'+i+'</td>';
+                }else if(keys[j]=='notes'){
+                if(notesGlobalObj[data[i].orderID]){
+                html += '<td><div class="highlight"></div></td>';
+                }else{
+                html += '<td><div></div></td>';
+                }
                 }else if(keys[j]=='Color.name'){
                 html+= '<td>'+data[i].Color.name+'</td>';
                 }else if(keys[j]=='Color.sku'){
@@ -1629,17 +1763,17 @@ var rowsTotal=0;
         var unbrandedTotal=0;
         var brandedTotal=0;
 var tubesTotal=0;
-html+='<table class="table"><thead><tr><th>Menu</th><th>Move</th><th>Mixing Completed</th><th>Order Date</th><th>Batch</th><th>Machine</th><th>Order ID</th><th>Priority</th><th>Description</th><th>Mix Batch Code</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
+html+='<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Mixing Completed</th><th>Order Date</th><th>Batch</th><th>Machine</th><th>Order ID</th><th>Priority</th><th>Description</th><th>Mix Batch Code</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
 html+='<th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Location</th>';
 html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th><th>Backed By Branded Packaged</th>';
 html += '</tr>';
-html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th>';
+html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th>';
 html += '</th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
 
  if(data){
          var keys=['mixing_status','orderdate','batch','machineP','orderID','priority','productdescription','mixbatch','brand','recipe.name','flavour.name','bottles','btype','lid','Location','mixing','premixed','unbranded','branded','backtubed'];
          var drpdowns='';
-         html += '<tr><th></th><th></th>';
+         html += '<tr><th></th><th></th><th></th>';
          console.log(keys);
          for(var l=0;l<keys.length;l++){
          drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
@@ -1686,8 +1820,15 @@ html+='<a class="dropdown-item" onclick="return menuClick(this);" data-toggle="m
 
    html += '<a class="dropdown-item" onclick="return menuClick(this);" id="select'+data[i].batch+'" href="#select' + data[i].batch + '">Select</a>';
             html += '<a class="dropdown-item" onclick="return menuClick(this);" style="display:none;" id="deselect'+data[i].batch+'" href="#select' + data[i].batch + '">Deselect</a>';
-            
+   
+        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+                 
 html+=' </div></div></td>';
+   if(notesGlobalObj[data[i].orderID]){
+                html += '<td><div class="highlight"></div></td>';
+                }else{
+                html += '<td><div></div></td>';
+                }
    html += '<td></td>';
 
      
@@ -1761,15 +1902,15 @@ var html='';
       var botlabels=0;
     var tubelabels=0;
 
-        html += '<table class="table"><thead><tr><th>Menu</th><th>Move</th><th>Production Status</th><th>Order Date</th><th>Batch</th><th>Priority</th><th>Bottle Labels QTY</th><th>Cylinder Labels QTY</th><th>Exp. Date</th><th>Label</th><th>Order ID</th><th>Description</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
+        html += '<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Production Status</th><th>Order Date</th><th>Batch</th><th>Priority</th><th>Bottle Labels QTY</th><th>Cylinder Labels QTY</th><th>Exp. Date</th><th>Label</th><th>Order ID</th><th>Description</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
 html+='<th>Bottles</th><th>Bottle Type</th><th>Pack Type</th><th>Location</th>';
 html += '</tr>';
-html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLE LABELS TOTAL</div><div id="numLabelsBottlesTotal"></div></th><th><div>PACK LABELS TOTAL</div><div id="numLabelsTubesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal">';
+html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLE LABELS TOTAL</div><div id="numLabelsBottlesTotal"></div></th><th><div>PACK LABELS TOTAL</div><div id="numLabelsTubesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal">';
 html += '</div></th><th></th><th></th></th></th></tr>';
        if(data){
          var keys=['production_status','orderdate','batch','priority','numLabelsBottles','numLabelsTubes','expDate','botlabel','orderID','productdescription','customer','brand','recipe.name','flavour.name','bottles','btype','packagingType.name','Location'];
          var drpdowns='';
-         html += '<tr><th></th><th></th>';
+         html += '<tr><th></th><th></th><th></th>';
          console.log(keys);
          for(var l=0;l<keys.length;l++){
          drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
@@ -1805,6 +1946,8 @@ html += '</div></th><th></th><th></th></th></th></tr>';
          };
          }
          html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+         html += '<a class="dropdown-item" onclick="return menuClick(this);" id="select'+data[i].batch+'" href="#select' + data[i].batch + '">Select</a>';
+
          if (data[i].movedtoNext == 0||data[i].movedtoNext == 'Busy'){    
          html+='<a class="dropdown-item" onclick="return menuClick(this);" data-toggle="modal" data-target="#myModal" href="#EditItemPrinting'+data[i].batch+'">Edit/Mark Complete</a>';
          if(data[i].movedtoNext != 'Busy'){
@@ -1812,10 +1955,16 @@ html += '</div></th><th></th><th></th></th></th></tr>';
          }
          }
          
-         
+           
+        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+       
          
          html+=' </div></div></td>';
-         
+            if(notesGlobalObj[data[i].orderID]){
+                html += '<td><div class="highlight"></div></td>';
+                }else{
+                html += '<td><div></div></td>';
+                }
          html += '<td><button page="Printing" batch="'+data[i].batch+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button>';
          html += '<button onclick="moveDown(this)" page="Printing" batch="'+data[i].batch+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
  data[i].priority=data[i].priority ? data[i].priority: ' ';
@@ -1858,17 +2007,17 @@ var html='';
         var rowsTotal=0;
 
 
-html+='<table class="table"><thead><tr><th>Menu</th><th>Move</th><th>Production Status</th><th>Order Date</th><th>Batch</th><th>Order ID</th<th>Priority</th>><th>Code</th><th>Description</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
+html+='<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Production Status</th><th>Order Date</th><th>Batch</th><th>Order ID</th<th>Priority</th>><th>Code</th><th>Description</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
 html+='<th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th><th>Start Date</th><th>Completion Date</th><th>Production Completed</th><th>Location</th><th>Machine</th>';
 html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th>';
         html += '</tr>';
-        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
+        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
         
                
          if(data){
          var keys=['production_status','orderdate','batch','orderID','priority','productcode','productdescription','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineL','mixing','premixed','unbranded','branded','backtubed'];
          var drpdowns='';
-         html += '<tr><th></th><th></th>';
+         html += '<tr><th></th><th></th><th></th>';
          console.log(keys);
          for(var l=0;l<keys.length;l++){
          drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
@@ -1910,8 +2059,15 @@ if(data[i].movedtoNext != 'Busy'){
 html+='<a class="dropdown-item" onclick="return menuClick(this);" page="Labelling" href="#setBusy'+data[i].batch+'">Mark Busy</a>';
 }
 }
-
+    
+        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+        
 html+=' </div></div></td>';
+   if(notesGlobalObj[data[i].orderID]){
+                html += '<td><div class="highlight"></div></td>';
+                }else{
+                html += '<td><div></div></td>';
+                }
    html += '<td></td>';
 
  data[i].priority=data[i].priority ? data[i].priority: ' ';
@@ -1964,16 +2120,16 @@ var html='';
         var bottlesTotal=0;
         var rowsTotal=0;
 
-html+='<table class="table"><thead><tr><th>Menu</th><th>Move</th><th>Production Status</th><th>Printing Status</th><th>Order Date</th><th>Batch</th><th>Order ID</th><th>Priority</th><th>Code</th><th>Description</th><th>Packaging Code</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
+html+='<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Production Status</th><th>Printing Status</th><th>Order Date</th><th>Batch</th><th>Order ID</th><th>Priority</th><th>Code</th><th>Description</th><th>Packaging Code</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
 html+='<th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th><th>Start Date</th><th>Completion Date</th><th>Packaging Completed</th><th>Location</th>';
 html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th>';
         html += '</tr>';
         
-        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
+        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
                  if(data){
          var keys=['production_status','printing_status','orderdate','batch','orderID','priority','productcode','productdescription','PRINTCODE','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','mixing','premixed','unbranded','branded','backtubed'];
          var drpdowns='';
-         html += '<tr><th></th><th></th>';
+         html += '<tr><th></th><th></th><th></th>';
          console.log(keys);
          for(var l=0;l<keys.length;l++){
          drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
@@ -2019,8 +2175,15 @@ html+='<a class="dropdown-item" onclick="return menuClick(this);" data-toggle="m
 
    html += '<a class="dropdown-item" onclick="return menuClick(this);" id="select'+data[i].batch+'" href="#select' + data[i].batch + '">Select</a>';
             html += '<a class="dropdown-item" onclick="return menuClick(this);" style="display:none;" id="deselect'+data[i].batch+'" href="#select' + data[i].batch + '">Deselect</a>';
-            
+      
+        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+                  
 html+=' </div></div></td>';
+   if(notesGlobalObj[data[i].orderID]){
+                html += '<td><div class="highlight"></div></td>';
+                }else{
+                html += '<td><div></div></td>';
+                }
    html += '<td></td>';
 
  data[i].priority=data[i].priority ? data[i].priority: ' ';
@@ -2414,13 +2577,13 @@ google.script.run.withSuccessHandler(newItemSuccess).runBusy(batch,page);
     thisPage='Shipping';
  var bottlesTotal=0;
  var rowsTotal=0;
-       html += '<table class="table table-striped"><thead><tr><th>Menu</th><th>Order Date</th><th>Batch</th><th>Order ID</th><th>Code</th><th>Description</th><th>Priority</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Packaging Code</th><th>Flavour</th><th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th>';
+       html += '<table class="table table-striped"><thead><tr><th>Menu</th><th>Notes</th><th>Order Date</th><th>Batch</th><th>Order ID</th><th>Code</th><th>Description</th><th>Priority</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Packaging Code</th><th>Flavour</th><th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th>';
         html += '<th>Status</th><th>Shipping Status</th><th>Shipping Code</th><th>Date Shipped</th><th>Tracking No.</th><th>Date Delivered</th><th>Location</th></tr>';
-       html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
+       html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
        if(data){
         var keys=['orderdate','batch','orderID','productcode','productdescription','priority','PRINTCODE','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','final_status','shipping_status','SHIPPINGCODE','dateshipped','trackingNo','datedelivered', 'Location'];
         var drpdowns='';
-        html += '<tr><th></th>';
+        html += '<tr><th></th><th></th>';
         console.log(keys);
         for(var l=0;l<keys.length;l++){
         drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
@@ -2453,9 +2616,15 @@ google.script.run.withSuccessHandler(newItemSuccess).runBusy(batch,page);
 
             html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteShipping' + data[i].batch + '">Delete Batch</a>';
             html += '<a class="dropdown-item" onclick="return menuClick(this);" data-toggle="modal" data-target="#myModal3" href="#editShipping' + data[i].batch + '">Edit</a>';
-
+     
+                html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+           
             html += ' </div></div></td>';
-            
+               if(notesGlobalObj[data[i].orderID]){
+                html += '<td><div class="highlight"></div></td>';
+                }else{
+                html += '<td><div></div></td>';
+                }
              data[i].priority=data[i].priority ? data[i].priority: ' ';
             html += '<td>' + formatDateDisplay(data[i].orderdate) + '</td><td>' + data[i].batch + '</td><td>' + data[i].orderID + '</td><td>' + data[i].productcode + '</td><td>' + data[i].productdescription + '</td><td>' + data[i].priority + '</td><td>' + data[i].customer + '</td><td>' + data[i].brand + '</td>';
             html += '<td>' + data[i].recipe.name + '</td><td>' + data[i].PRINTCODE + '</td><td>' + data[i].flavour.name + '</td><td>' + data[i].bottles + '</td><td>' + data[i].btype + '</td><td>' + data[i].lid + '</td>';
@@ -2623,7 +2792,8 @@ function populateLocationsTab() {
 
 
     function populateInventoryTab() {
-        google.script.run.withSuccessHandler(buildInventory).getInventoryData();
+       // google.script.run.withSuccessHandler(buildInventory).getInventoryData();
+        filterpage('xx',true);
     }
 
       function buildInventory(data) {
@@ -2643,8 +2813,8 @@ function populateLocationsTab() {
     
             html += '<a class="dropdown-item" onclick="return menuClick(this);" page="' + data[i].page + '" href="#deleteInv' + data[i].key + '">Delete Item</a>';
             html += ' </div></div></td>';
-            html += '<td>'+data[i].row+'</td>';
-            html += '<td>' + data[i].desc + '</td><td>' + data[i].orderdate + '</td><td>' + data[i].delivdate + '</td><td>' + data[i].paiddate + '</td><td>' + data[i].eta + '</td><td>' + quant + '</td><td>' + data[i].note + '</td></tr>';
+             html += '<td>'+data[i].row+'</td>';
+            html += '<td>' + data[i].desc + '</td><td>' +formatDateDisplay( data[i].orderdate) + '</td><td>' + formatDateDisplay(data[i].delivdate) + '</td><td>' + formatDateDisplay(data[i].paiddate) + '</td><td>' + data[i].eta + '</td><td>' + quant + '</td><td>' + data[i].note + '</td></tr>';
 
         }}
         html += '</tbody></table>';
@@ -2857,7 +3027,6 @@ $('#description2').val(selectedVal.options[selectedVal.selectedIndex].getAttribu
     function populateInventoryTab() {
         google.script.run.withSuccessHandler(buildInventory).getInventoryData();
     }
-
 
 //QTY///////////
     var qtySheet="#Misc";
@@ -3073,7 +3242,7 @@ for(var i=0;i<thisData.length;i++){
     }    
     function multRun(msg){
     
-    alert(msg);
+    htmlModalMSG(msg);
     filterpage('xx',true);
     //buildOrders(SelAllOrders);
     $("#updating").css("display", "none");
@@ -3198,13 +3367,19 @@ equalTo: val
 
 };
 console.log(searchItems);
+if(key){
 searchItems.push([page,params]);
-
+}
 }
 }
 console.log('selPage,BASEPARAM');
 console.log(selPage,BASEPARAM);
-searchItems.push([selPage,BASEPARAM]);
+  if(selPage == 'Inventory'&& searchItems.length == 0 ){
+  
+  searchItems.push([selPage,{equalTo:'all'}]);
+  }else if(selPage != 'Inventory'){
+  searchItems.push([selPage,BASEPARAM]);
+  }
 LASTSEARCH=searchItems;
 console.log(searchItems);
  google.script.run.withSuccessHandler(filterResult).searchFor(searchItems);
@@ -3677,6 +3852,12 @@ switch (type){
     case 'PackagePrint':
     built= buildPackagePrint(data);
     break;
+    case 'notesModal':
+    built= buildNotesModal(data);
+    break;
+    case 'htmlMSG':
+    built= buildHtmlMsg(data);
+    break;
   default:
 
   break;
@@ -3685,7 +3866,15 @@ $('.htmlMSGmodalbody').html(built);
 $('#htmlMSGmodal').modal('show');
 $("#updating").css("display", "none");
 }
+function htmlModalMSG(msg){
+buildhtmlmodal([msg,'htmlMSG'])
+  
+}
+function buildHtmlMsg(msg){
+var html='<div  class="container">'+msg+'</div>';
 
+return html;
+}
 var DELandREVData=[];
 function buildDeleteAndReverse(list){
 DELandREVData=list;
@@ -3787,6 +3976,222 @@ var html='<div>\
 
 html+='</div>';
 return html;
+}
+
+function htmlModalMSG(msg){
+buildhtmlmodal([msg,'htmlMSG'])
+  
+}
+function buildHtmlMsg(msg){
+var html='<div  class="container">'+msg+'</div>';
+
+return html;
+}
+
+
+//NOTES
+
+var notesGlobal=[];
+var notesGlobalObj=[];
+var selectedNote = false;
+function showNotes(){
+google.script.run.withSuccessHandler(buildhtmlmodal).getNotesList();
+
+}
+
+function getNotesGlobal(){
+
+google.script.run.withSuccessHandler(setNotesGlobal).getNotesObj();
+}
+
+function setNotesGlobal(data){
+notesGlobalObj = data;
+console.log(notesGlobalObj)
+}
+function buildOrderIDsList(list){
+
+//console.log(list);
+var html='';
+for(var i=0;i<list.length;i++){
+html+='<div value="'+list[i][0]+'" onClick="selectNotesForOrder(this)" >'+list[i][0]+' - Last Change: '+formatDateDisplay2(list[i][1])+'</div>';
+}
+return html;
+}
+function buildNotesModal(list){
+notesGlobal = list;
+var html = '';
+html+='<div class="container">\
+<div>\
+<p>Select an Order ID</p>\
+<div>\
+<select class="form-control" id="notesOrderIDSelect" onchange="setListSorted(this)" ><option value="All" selected>All</option><option value="dont">Don\'t Have Notes</option><option value="have">Have Notes</option></select>\
+</div>\
+<div class="form-group">\
+<div  style="height:200px; overflow:auto;" id="orderIDList"  >\
+'+buildOrderIDsList(list)+'\
+</div>\
+</div>\
+<br />\
+<br />\
+<div class="form-group"  id="noteTextHolder"  style="height:340px; display:none;">\
+<p>Selected: <span id="selectedOrderID"></span><button type="button" class="btn btn-success sarButton" onclick="saveNote()">Save</button></p>\
+<div  >\
+<div class="add-note-inner__notes">\
+<div class="note-line-textarea">\
+<textarea id="noteTextBox" rows="3"  ></textarea>\
+</div>\
+<div class="notes-container" id="notesContainer"></div>\
+</div>\
+</div>\
+</div>\
+</div>';
+
+return html;
+}
+
+function setListSorted(event){
+var exists = $(event).val();
+console.log(exists);
+var arr = [];
+if(exists == 'All'){
+arr = notesGlobal;
+}
+
+if(exists == 'have'){
+
+arr=notesGlobal.filter(function(item){
+
+return item[1] != ''
+});
+
+
+}else if(exists == "dont"){
+
+arr=notesGlobal.filter(function(item){
+return item[1] == ''
+});
+
+}
+var builtList = buildOrderIDsList(arr);
+
+$("#orderIDList").html(builtList);
+}
+function buildNotesList(list){
+$("#updating").css("display", "block");
+//console.log(list);
+var html='';
+list = list.sort(function(a,b){
+return b.timestamp - a.timestamp
+});
+for(var i=0;i<list.length;i++){
+html+="<div class='note-line-fixed'>\
+              <div class='note-text'>";
+              if(list[i].text){ 
+              var textarr = list[i].text.split('\n');
+              for(var j = 0; j<textarr.length; j++){
+               html+= "<span>"+textarr[j]+"<br /></span>"
+              
+              }
+           
+                }
+                
+                html+="<div class='note-timestamp2'><span>";
+                html+=(list[i].selPage || '') + ' - ' +(list[i].user || '');
+                html+="</span></div>";  
+              html+="</div>\
+              <div class='note-timestamp'>\
+                <span>";
+               html+=formatDateDisplay2(list[i].timestamp);
+              html+="</span>\
+              </div>\
+            </div>";
+}
+
+$("#notesContainer").html(html);
+        
+$("#noteTextHolder").css("display", "block");
+$("#updating").css("display", "none");
+}
+
+
+function selectNotesForOrder(event){
+
+var orderID = $(event).attr('value');
+selectedNote = orderID;
+var notes = notesGlobal.filter(function(item){
+return item[0] == orderID
+})[0];
+var list = JSONtoARR(notes[2]);
+buildNotesList(list)
+
+$("#selectedOrderID").html(orderID);
+}
+
+function selectNotesForBatch(orderID){
+$("#updating").css("display", "block");
+showNotes();
+setTimeout(function() { 
+
+selectedNote = orderID;
+var notes = notesGlobal.filter(function(item){
+return item[0] == orderID
+})[0];
+var list = JSONtoARR(notes[2]);
+buildNotesList(list)
+
+$("#selectedOrderID").html(orderID);
+$("#updating").css("display", "none");
+ return false;
+}, 10000);
+
+}
+function saveNote(){
+var text =$("#noteTextBox").val();
+
+
+google.script.run.withSuccessHandler(refreshNotes).saveNote(selectedNote,text,selPage);
+}
+ 
+function refreshNotes(data){
+var newNote =data[0];
+var msg= data[1];
+var err = data[2];
+alert(msg);
+if(!err){
+var newNotes = notesGlobal.map(function(item){
+if(item[0] == selectedNote){
+item[2] = newNote.notes;
+return item;
+}else{
+return item;
+}
+
+});
+notesGlobal = newNotes;
+
+console.log('notes',list)
+var list = JSONtoARR(newNote.notes).sort(function(a,b){
+return b.timestamp - a.timestamp
+});
+buildNotesList(list)
+$("#noteTextBox").html('')
+$("#noteTextBox").val('')
+$("#selectedOrderID").html(selectedNote);
+getNotesGlobal();
+}
+}
+
+function JSONtoARR(data) {
+    if (data) {
+    var result = Object.keys(data).map(function(key) {
+      return data[key];
+    });
+    
+    return result;
+  } else {
+        return [];
+    }
+
 }
 </script>
 

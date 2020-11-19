@@ -25,6 +25,18 @@ function saveOrder(data, edit) {
                 var exists = base.getData("Orders/" + data.batch);
                 if (exists) {
                     return 'BATCH ' + data.batch + ' is already in the system.';
+                }else{
+                 var largestBatch=base.getData('highestBatch'); 
+                  if(largestBatch){
+                    if(largestBatch<parseInt(data.batch,10)){
+                      base.updateData('',{'highestBatch':parseInt(data.batch,10)});
+                    } 
+                    
+                  }else{
+                     base.updateData('',{'highestBatch':parseInt(data.batch,10)});
+                  }
+                  
+                
                 }
             }
         }
@@ -272,7 +284,7 @@ function bulkrun(arr, page) {
 
 
 function testrun() {
-    runItem('915535', false);
+    runItem('918836', false);
 
 }
 
@@ -719,7 +731,7 @@ function getNewOrderID() {
         orderBy: ['orderID']
     }
     var ordersByOrderID = JSONtoARR(base.getData('Orders', params));
-    ordersByOrderID = ordersByOrderID.sort(sortOrderIDsHL)
+    ordersByOrderID = ordersByOrderID.filter(function(item){ return item.orderID}).sort(sortOrderIDsHL)
     if (ordersByOrderID.length >= 1) {
         var LastorderID = ordersByOrderID[0].orderID;
         if (LastorderID) {
@@ -752,7 +764,7 @@ function getNewOrderID() {
 
 function getNewOrderID2(ordersByOrderID) {
 
-    ordersByOrderID = ordersByOrderID.sort(sortOrderIDsHL)
+    ordersByOrderID = ordersByOrderID.filter(function(item){ return item.orderID}).sort(sortOrderIDsHL)
     if (ordersByOrderID.length >= 1) {
         var LastorderID = ordersByOrderID[0].orderID;
         if (LastorderID) {

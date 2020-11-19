@@ -211,7 +211,7 @@
 <div class="modal fade" id="newflavourmix" role="dialog">
     <div class="modal-dialog">
         <!-- Modal content-->
-        <div class="modal-content" style='overflow:hidden; min-height:1100px;'>
+        <div class="modal-content" style='overflow:hidden; overflow-y: scroll;  min-height:1100px;'>
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
                 <h4 class="modal-title">Flavour Maker</h4>
@@ -249,9 +249,10 @@
                     <button class='btn btn-default' style="margin: 5px auto; " id='flavourmixMinusButton'><i class="fa fa-minus-square-o" aria-hidden="true"></i></button>
                 </div>
 
-                <div class="container" style='width:1100px'>
+                <div class="container" style='width:1100px;'>
                     <div class="row">
                         <div class="col-xs-6" id='bottleDiv'>
+                            <div class = "renderType">Display: <span id="renderDisplay" onclick="renderType()">ml</span><span id="renderDisplaySwitch" ></span></div>
                             <div id='totalsDiv' class='valtotal'></div>
                             <div class="bottleBlockGroup">
                                 <div class="bottleBlock" id="bottleBlock10"></div>
@@ -334,7 +335,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button id='subflavourmixForm' type="button" class="btn btn-primary" data-dismiss="modal">Submit</button>
+                <button id='subflavourmixForm' type="button" class="btn btn-primary" >Submit</button>
             </div>
         </div>
     </div>
@@ -1540,6 +1541,31 @@
     </div>
 </div>
 
+
+<div class="modal fade" id="newFlavourMixesFromSheet" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Import Flavour Mixes from Sheet</h4>
+            </div>
+            <div class="modal-body7">
+                <p>Before Upload Please check that your spreadsheet follows the desired format.</p>
+
+                <div class="input-group">
+                    <input class="form-control" type="text" id="flavourMixSheetId" aria-describedby="sizing-addon2" />
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="save_sheet_flavour_mix">Upload Sheet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="newBottlesFromSheet" role="dialog">
     <div class="modal-dialog modal-lg">
         <!-- Modal content-->
@@ -1697,7 +1723,7 @@
                         <td>Linked Code</td>
                         <td>Recipe</td>
                         <td>Brand</td>
-                        <td></td>
+                        <td>Price</td>
                     </tr>
                     <tr>
                         <td>
@@ -1721,7 +1747,9 @@
                         <td>
                             <select class="form-control" id='newPCDbrand'></select>
                         </td>
-                        <td></td>
+                        <td><div class="input-group">
+                                <input class="form-control" type="text" id="newprice" placeholder="Price" aria-describedby="sizing-addon2" />
+                            </div></td>
                     </tr>
                     <tr>
                         <td>Flavour</td>
@@ -1849,7 +1877,7 @@
                         <td>Linked Code</td>
                         <td>Recipe</td>
                         <td>Brand</td>
-                        <td></td>
+                        <td>Price</td>
                     </tr>
                     <tr>
                         <td>
@@ -1879,7 +1907,11 @@
                         <td>
                             <select class="form-control" id='editPCDbrand'></select>
                         </td>
-                        <td></td>
+                        <td>
+                            <div class="input-group">
+                                <input class="form-control" type="text" id="editprice" placeholder="Price" aria-describedby="sizing-addon2" />
+                            </div>
+                        </td>
                     </tr>
                     <tr>
                         <td>Flavour</td>
