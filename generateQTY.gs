@@ -7,6 +7,9 @@ function generatePremixBrandUnbrand(){
   var toCreateBranded=[];
   for(var j=0;j<sheets.length;j++){
     var raw=base.getData(sheets[j]);
+    if(!raw){
+      raw = {};
+    }
     for(var i=0;i<PCList.length;i++){
       if(sheets[j]=='PremixesTypes'){
         if(!raw[PCList[i].premixSKU]){

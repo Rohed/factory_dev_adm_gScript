@@ -1,5 +1,5 @@
 function export(tabs) {
-//var tabs=['MixingTeam'];
+ //var tabs=['PC/PD'];
  var LOGDATA={
     status:true,
     msg:'',
@@ -352,32 +352,39 @@ for(var j=0;j<tabs.length;j++){
      var baseData=base.getData('References/ProductCodes');
      var keys=Object.keys(baseData);
             var data=JSONtoARR(baseData);
-
-     var headerRow=['Product Code','Product Description','Unbranded SKU','Unbranded Description','Premix SKU','Premix Description','Colored Premix SKU','Colored Premix Description','Linked BB SKU','Brand','Brand SKU',
-     'Bottle','Bottle SKU','Fill','Cap','Cap SKU','Packaging','Packaging SKU','Box','Box SKU','NIB','Flavour','Flavour SKU','Recipe','Recipe ID',
+       var headerRow = ['Product Code','Product Description','Unbranded SKU','Unbranded Description','Premix SKU','Premix Description','Colored Premix SKU','Colored Premix Description','Linked BB SKU','Brand','Brand SKU',
+     'Bottle','Bottle SKU','Fill','Fill Time','Cap','Cap SKU','Packaging','Packaging SKU','Bottles Per Package','Box','Box SKU','Tubes Per Box','NIB','Flavour','Flavour SKU','Recipe','Recipe ID',
+     'VG','AG','PG','Nicotine','Nicotine Salts','CBD','MCT','Recipe Flavour','VG Ratio','PG Ratio','Strength','Color','Color SKU','Color %',
      'Bottle Label','Bottle Label SKU','Pre Printed Bottle Label','Pre Printed Bottle Label SKU','Pack Label','Pack Label SKU','Pre Printed Pack Label',
-     'Pre Printed Pack Label SKU','Barcode','ECID','Price'];
-     var values=[];
-     for(var i=0;i<data.length;i++)
-     {
-        if(data[i].linkedBB){}else{
-        data[i].linkedBB='';
-        }
+     'Pre Printed Pack Label SKU','Barcode','ECID','Price'
+                       ];
+       var keyRow = ['prod', 'descr', 'unbrandSKU', 'unbranddescr', 'premixSKU', 'premixdescr','premixSKUColored','premixdescrColored','linkedBB','brand', 'brandSKU', 'btype', 'botSKU','fill','','lid','lidSKU', 
+                     'packagingType.name', 'packagingType.sku','', 'boxname.name', 'boxname.sku','','NIB','flavour.name', 'flavour.sku','recipe.name', 'recipe.id',
+                     '','','','','','','','','','','','','','',
+                      'botlabel', 'botlabelsku', 'ppbotlabel', 'ppbotlabelsku', 'packlabel', 'packlabelsku', 'pppacklabel', 'pppacklabelsku', 'barcode', 'ecid', 'price'
+                    ];
+ 
+            var values = [];
+            for (var i = 0; i < data.length; i++) {
+                var row = [];
+                for (var k = 0; k < keyRow.length; k++) {
+                    var value = '';
+                  if(keyRow){
+                    if (keyRow[k].indexOf('.') > -1) {
+                        var item = keyRow[k].split('.');
+                        value = data[i][item[0]] ? data[i][item[0]][item[1]] ? data[i][item[0]][item[1]] : null : null;
+                    } else {
+                        value = data[i][keyRow[k]] ? data[i][keyRow[k]] : null;
 
-     data[i].flavour?data[i].flavour.name||(data[i].flavour={name:"",sku:""}):data[i].flavour={name:"",sku:""},data[i].boxname?data[i].boxname.name||(data[i].boxname={name:"",sku:""}):data[i].boxname={name:"",sku:""},data[i].packagingType?data[i].packagingType.name||(data[i].packagingType={name:"",sku:""}):data[i].packagingType={name:"",sku:""};
-     data[i].price = data[i].price || '';
-     
-       if(keys[i].length<=30){
-         try{
-           values.push([data[i].prod,data[i].descr,data[i].unbrandSKU,data[i].unbranddescr,data[i].premixSKU,data[i].premixdescr,data[i].premixSKUColored,data[i].premixdescrColored,data[i].linkedBB,data[i].brand,data[i].brandSKU,data[i].btype,data[i].botSKU,data[i].fill,data[i].lid,data[i].lidSKU,
-           data[i].packagingType.name,data[i].packagingType.sku,data[i].boxname.name,data[i].boxname.sku,data[i].NIB,data[i].flavour.name,data[i].flavour.sku,data[i].recipe.name,data[i].recipe.id,
-           data[i].botlabel,data[i].botlabelsku,data[i].ppbotlabel,data[i].ppbotlabelsku,data[i].packlabel,data[i].packlabelsku,data[i].pppacklabel,
-           data[i].pppacklabelsku,data[i].barcode,data[i].ecid,data[i].price]);
-         }catch(e){Logger.log(data[i]);}
-       }
-     
-     }
-     values.unshift(headerRow);
+                    }
+                  }
+                    row.push(value);
+                }
+
+                values.push(row);
+
+            }
+            values.unshift(headerRow);
       var sheet=file.insertSheet('PC/PD');
       sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
   
