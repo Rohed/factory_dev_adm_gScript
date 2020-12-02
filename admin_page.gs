@@ -1905,7 +1905,16 @@ base.updateData('globalFilter/1',obj);
 return 'Saved';
 }
 
-
+function testAddItem(){
+  var data ={
+    sku:'VG',
+    tab:'Misc',
+    value:200,
+    batch:1
+  
+  }
+addMissingStockItem(data);
+}
 function addMissingStockItem(data){
   var LOGDATA={
     status:true,
@@ -1927,15 +1936,29 @@ function addMissingStockItem(data){
     LOGDATA.data.push(['Stock Value:', data.value]);
     LOGDATA.data.push(['Stock Batch:', data.batch]);
     LOGDATA.data.push(['Stock QTY Tab:', data.tab]);
-    toRunning(data.tab+'/'+data.sku,parseFloat(data.value));
+    //toRunning(data.tab+'/'+data.sku,parseFloat(data.value));
+    var now =new Date().getTime()
+     var invObj = {
+            paiddate:now,
+            orderdate: now,
+            delivdate: now,
+            eta: 0,
+            desc:data.sku, 
+           
+            quantity: parseFloat(data.value),
+            note: "Added Via Order",
+            page: data.tab,
+            sku:data.sku
+        };
+    saveItem(invObj) 
     resp.msg = "Success";
   }catch (e) {
     LOGDATA.status=false;
     LOGDATA.data.push(['Failed:', e.message]);
-    logItem(LOGDATA);
+   
     resp.msg=e.message;
   }
-  
+  logItem(LOGDATA);
   return resp;
 }
 
