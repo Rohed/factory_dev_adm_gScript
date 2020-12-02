@@ -25,18 +25,22 @@ function saveOrder(data, edit) {
                 var exists = base.getData("Orders/" + data.batch);
                 if (exists) {
                     return 'BATCH ' + data.batch + ' is already in the system.';
-                }else{
-                 var largestBatch=base.getData('highestBatch'); 
-                  if(largestBatch){
-                    if(largestBatch<parseInt(data.batch,10)){
-                      base.updateData('',{'highestBatch':parseInt(data.batch,10)});
-                    } 
-                    
-                  }else{
-                     base.updateData('',{'highestBatch':parseInt(data.batch,10)});
-                  }
-                  
-                
+                } else {
+                    var largestBatch = base.getData('highestBatch');
+                    if (largestBatch) {
+                        if (largestBatch < parseInt(data.batch, 10)) {
+                            base.updateData('', {
+                                'highestBatch': parseInt(data.batch, 10)
+                            });
+                        }
+
+                    } else {
+                        base.updateData('', {
+                            'highestBatch': parseInt(data.batch, 10)
+                        });
+                    }
+
+
                 }
             }
         }
@@ -213,13 +217,18 @@ function saveOrder(data, edit) {
 
 }
 
-function TESTBULKRUN(){
+function TESTBULKRUN() {
 
-bulkrun(['912902','913933'],'Orders');
+    bulkrun(['940000', '940001'], 'Orders');
 }
 
 function bulkrun(arr, page) {
     //  arr = ['912126'];
+  var RETOBJ = {
+    NEGATIVELOG:[],
+    SUCCESS:[],
+    msg:''
+  };
     var USAGE = [];
     Logger.log(arr);
     var l = arr.length;
@@ -237,24 +246,34 @@ function bulkrun(arr, page) {
             for (var i = 0; i < arr.length; i++) {
 
                 var exec = runItem(arr[i], true);
-                var resp = exec[0];
-              
-//                var usageArr =  convertUsageToArr(data,rett.USAGE);
-//                LogTransaction([usageArr]);
-                if (resp[0] == 'BREAK') {
+               
+
+                //                var usageArr =  convertUsageToArr(data,rett.USAGE);
+                //                LogTransaction([usageArr]);
+                if (exec.error) {
                     var dat1 = {
                         final_status: 0,
                         runtime: 0,
                         started: 0,
                         wentNegative: true,
                     };
-                 
-                    base.updateData('Orders/' + arr[i], dat1);
 
-                }else{
-                 USAGE.push(exec[1]);
-                 }
-                msg += arr[i] + " - " + resp[1] + "\n";
+                    base.updateData('Orders/' + arr[i], dat1);
+                  if(exec.RUNITEM){
+                    if(exec.RUNITEM.hasNegative){
+                      RETOBJ.hasNegative = exec.RUNITEM.hasNegative; 
+                      RETOBJ.NEGATIVELOG.push({batch:arr[i],arr:exec.RUNITEM.NEGATIVELOG})
+                    }
+                  }
+                } else {
+                    USAGE.push(exec.RUNITEM.retUSAGE);
+                    RETOBJ.SUCCESS.push(arr[i])
+                }
+                msg += arr[i] + " - " +exec.msg+ "<br>";
+               if (exec.error) {
+                 RETOBJ.msg = msg;
+                 return RETOBJ;
+               }
             }
         } else {
 
@@ -267,220 +286,263 @@ function bulkrun(arr, page) {
                     started: 0,
                     wentNegative: true,
                 };
-                msg += arr[i] + " - " + resp[1] + " \n";
+                msg += arr[i] + " - " + resp[1] + "<br>";
                 base.updateData('FlavourMixOrders/' + arr[i], dat1);
 
             }
-            msg += arr[i] + " - " + resp[1] + "\n";
-          
+            msg += arr[i] + " - " + resp[1] + "<br>";
+
         }
     }
-  if(USAGE.length>0 &&  page == 'Orders'){
-    LogTransaction(USAGE);
-  }
-    return msg;
+    if (USAGE.length > 0 && page == 'Orders') {
+        LogTransaction(USAGE);
+    }
+  
+    RETOBJ.msg = msg;
+    return RETOBJ;
 
 }
 
 
 function testrun() {
-    runItem('918836', false);
+    runItem('940000', false);
 
 }
 
 
 function runItem(batch, frombulk) {
-try{
-    var LOGDATA = {
-        status: true,
-        msg: '',
-        action: 'Run',
-        batch: batch,
-        page: 'Orders',
-        user: Session.getActiveUser().getEmail(),
-        data: new Array()
-    };
-    var USAGE = {};
-    LOGDATA.type = 'Order';
-    var missingmsg = '';
-    var data = base.getData('Orders/' + batch);
-    //data = JSON.parse(JSON.stringify(data).replace(/\#N\/A/,"0"));
-    data.wentNegative = false;
-    base.updateData('Orders/' + batch, data);
-    if (data.botSKU != "") {
-        var bottleexist = base.getData('BottleTypes/' + data.botSKU);
-        if (!bottleexist) {
-            missingmsg += 'Missing Bottle: ' + data.botSKU + '\n';
+    try {
+        var LOGDATA = {
+            status: true,
+            msg: '',
+            action: 'Run',
+            batch: batch,
+            page: 'Orders',
+            user: Session.getActiveUser().getEmail(),
+            data: new Array()
+        };
+        var USAGE = {};
+        LOGDATA.type = 'Order';
+        var missingmsg = '';
+        var data = base.getData('Orders/' + batch);
+        //data = JSON.parse(JSON.stringify(data).replace(/\#N\/A/,"0"));
+        data.wentNegative = false;
+        base.updateData('Orders/' + batch, data);
+        if (data.botSKU != "") {
+            var bottleexist = base.getData('BottleTypes/' + data.botSKU);
+            if (!bottleexist) {
+                missingmsg += 'Missing Bottle: ' + data.botSKU + '\n';
+            }
+        } else {
+            var bottleexist = 1
         }
-    } else {
-        var bottleexist = 1
-    }
-    if (data.flavour.sku != "") {
-        var flavourexists = base.getData('Flavours/' + data.flavour.sku);
-        if (!flavourexists) {
-            missingmsg += 'Missing Flavour: ' + data.flavour.sku + '\n';
+        if (data.flavour.sku != "") {
+            var flavourexists = base.getData('Flavours/' + data.flavour.sku);
+            if (!flavourexists) {
+                missingmsg += 'Missing Flavour: ' + data.flavour.sku + '\n';
+            }
+        } else {
+            var flavourexists = 1
         }
-    } else {
-        var flavourexists = 1
-    }
-    if (data.brand != "") {
-        var brandexists = base.getData('Brands/' + data.brandSKU);
-        if (!brandexists) {
-            missingmsg += 'Missing Brand: ' + data.brand + '\n';
+        if (data.brand != "") {
+            var brandexists = base.getData('Brands/' + data.brandSKU);
+            if (!brandexists) {
+                missingmsg += 'Missing Brand: ' + data.brand + '\n';
+            }
+        } else {
+            var brandexists = 1
         }
-    } else {
-        var brandexists = 1
-    }
-    if (data.customer != "") {
-        var customerexists = base.getData('Customers/' + data.customerSKU);
-        if (!customerexists) {
-            missingmsg += 'Missing Customer: ' + data.customer + '\n';
+        if (data.customer != "") {
+            var customerexists = base.getData('Customers/' + data.customerSKU);
+            if (!customerexists) {
+                missingmsg += 'Missing Customer: ' + data.customer + '\n';
+            }
+        } else {
+            var customerexists = 1
         }
-    } else {
-        var customerexists = 1
-    }
-    if (data.lidSKU != "") {
-        var lidexists = base.getData('Lids/' + data.lidSKU);
-        if (!lidexists) {
-            missingmsg += 'Missing Cap: ' + data.lidSKU + '\n';
+        if (data.lidSKU != "") {
+            var lidexists = base.getData('Lids/' + data.lidSKU);
+            if (!lidexists) {
+                missingmsg += 'Missing Cap: ' + data.lidSKU + '\n';
+            }
+        } else {
+            var lidexists = 1
         }
-    } else {
-        var lidexists = 1
-    }
 
-    if (data.botlabelsku != "") {
-        var labelexists = base.getData('Labels/' + data.botlabelsku);
-        if (!labelexists) {
-            missingmsg += 'Missing Label: ' + data.botlabelsku + '\n';
+        if (data.botlabelsku != "") {
+            var labelexists = base.getData('Labels/' + data.botlabelsku);
+            if (!labelexists) {
+                missingmsg += 'Missing Label: ' + data.botlabelsku + '\n';
+            }
+        } else {
+            var labelexists = 1
         }
-    } else {
-        var labelexists = 1
-    }
-     
-    var packagingTypeexists = 1;
-    if (data.packagingType) {
-        if (data.packagingType.sku != '') {
-          
-        
-            packagingTypeexists = null;
-            if (data.packagingType.sku != undefined) {
-                packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
-                if (!packagingTypeexists) {
-                    missingmsg += 'Missing Package: ' +data.packagingType.sku + '\n';
-                } else if (!packagingTypeexists.botperPack) {
-                    missingmsg += 'Missing Package Bottles Per Pack: ' + data.packagingType.sku + '\n';
-                    packagingTypeexists = false;
-                } else {
-                    var div = data.bottles / packagingTypeexists.botperPack;
-                    if (parseInt(div, 10) != div) {
-                        missingmsg += 'WARNING! Running ' + data.bottles + ' Bottles with a package that uses ' + packagingTypeexists.botperPack + ' Bottles per Package. \n Order quantities must be in raw bottles format. Ex: 1 of 3x10ml = 3 raw 10ml bottles ';
+
+        var packagingTypeexists = 1;
+        if (data.packagingType) {
+            if (data.packagingType.sku != '') {
+
+
+                packagingTypeexists = null;
+                if (data.packagingType.sku != undefined) {
+                    packagingTypeexists = base.getData('Packages/' + data.packagingType.sku);
+                    if (!packagingTypeexists) {
+                        missingmsg += 'Missing Package: ' + data.packagingType.sku + '\n';
+                    } else if (!packagingTypeexists.botperPack) {
+                        missingmsg += 'Missing Package Bottles Per Pack: ' + data.packagingType.sku + '\n';
                         packagingTypeexists = false;
+                    } else {
+                        var div = data.bottles / packagingTypeexists.botperPack;
+                        if (parseInt(div, 10) != div) {
+                            missingmsg += 'WARNING! Running ' + data.bottles + ' Bottles with a package that uses ' + packagingTypeexists.botperPack + ' Bottles per Package. \n Order quantities must be in raw bottles format. Ex: 1 of 3x10ml = 3 raw 10ml bottles ';
+                            packagingTypeexists = false;
+                        }
+
                     }
 
+                } else {
+                    missingmsg += 'Missing Package SKU: ' + data.batch + '\n';
                 }
-
             } else {
-                missingmsg += 'Missing Package SKU: ' + data.batch + '\n';
+                packagingTypeexists = 1
             }
         } else {
             packagingTypeexists = 1
         }
-    } else {
-        packagingTypeexists = 1
-    }
-    if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists ) {
+        if (bottleexist && flavourexists && brandexists && customerexists && lidexists && labelexists && packagingTypeexists) {
 
-        var RUNITEM = assignMixture2(data);
-        LOGDATA.data = RUNITEM.LogData;
-        USAGE = RUNITEM.USAGE;
-        if (LOGDATA.data[LOGDATA.data.length - 1][0] == 'WENT NEGATIVE') {
+            var RUNITEM = assignMixture2(data);
+            LOGDATA.data = RUNITEM.LOGARR;
+            USAGE = RUNITEM.USAGE;
+            if (RUNITEM.hasNegative || RUNITEM.hasFailed) {
+                LOGDATA.data = LOGDATA.data.concat(returnData(RUNITEM, data));
+                if (frombulk) {
 
-            if (frombulk) {
 
-                var msg = 'MISSING: ' + LOGDATA.data[LOGDATA.data.length - 1][1];
-                logItem(LOGDATA);
-              return [
-                ['BREAK', msg],
-                USAGE];
+                    logItem(LOGDATA);
+                    return {
+                        error: true,
+                        RUNITEM: RUNITEM,
+                        msg: RUNITEM.hasFailed ? findFailed(JSON.parse(JSON.stringify(RUNITEM.LOGARR))) : 'Missing QTY Items'
+                    }
 
+
+                } else {
+
+                    var dat1 = {
+                        final_status: 0,
+                        runtime: 0,
+                        started: 0,
+                        wentNegative: RUNITEM.hasNegative,
+                    };
+
+                    base.updateData('Orders/' + batch, dat1);
+                    
+                    logItem(LOGDATA);
+
+                    return {
+                        error: true,
+                        RUNITEM: RUNITEM,
+                        msg: RUNITEM.hasFailed ? findFailed(JSON.parse(JSON.stringify(RUNITEM.LOGARR))) : 'Missing QTY Items'
+                    };
+                }
 
             } else {
 
-                var dat1 = {
-                    final_status: 0,
-                    runtime: 0,
-                    started: 0,
-                    wentNegative: true,
+                logItem(LOGDATA);
+                var rett = {
+                    LogData: 'Success'
+                };
+                if (frombulk) {
+
+
+                    var retUSAGE = convertUsageToArr(data, USAGE);
+                    RUNITEM.hasSuccess = true;
+                    RUNITEM.retUSAGE = retUSAGE;
+                    return {
+                        error: false,
+                        RUNITEM: RUNITEM,
+                        msg:'Success'
+                    }
+                } else {
+
+                    var usageArr = convertUsageToArr(data, USAGE);
+                    LogTransaction([usageArr]);
+                    RUNITEM.hasSuccess = true;
+                    return {
+                        error: false,
+                        RUNITEM: RUNITEM,
+                        msg:'Success'
+                    }
+                }
+
+
+            }
+        } else {
+            LOGDATA.status = false;
+            LOGDATA.msg += 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg;
+            LOGDATA.data.push(['FAILED:', 'Can not run Order. Contains parts that are not indexed in the database \n' + missingmsg]);
+            logItem(LOGDATA);
+
+            var msg = 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg;
+            if (frombulk) {
+                return {
+                    error: true,
+                    msg: msg
                 };
 
-                base.updateData('Orders/' + batch, dat1);
-                var msg = 'MISSING: ' + LOGDATA.data[LOGDATA.data.length - 1][1];
-                logItem(LOGDATA);
-              
-                return msg;
-            }
 
-        } else {
 
-            logItem(LOGDATA);
-            var rett = { LogData: 'Success'};
-            if (frombulk) {
-              
-              
-              var retUSAGE= convertUsageToArr(data,USAGE);
-              return [['','Success'],retUSAGE];
-              
-            }else{
-              
-              var usageArr =  convertUsageToArr(data,USAGE);
-              LogTransaction([usageArr]);
-              return 'Success';
+            } else {
+                return {
+                    error: true,
+                    msg: msg
+                };
+
             }
-         
-        
+            //return 'Can not run Order. Contains parts that are not indexed in the database. \n'+missingmsg;
         }
-    } else {
-        LOGDATA.status = false;
-        LOGDATA.msg += 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg;
-        LOGDATA.data.push(['FAILED:', 'Can not run Order. Contains parts that are not indexed in the database \n' + missingmsg]);
-        logItem(LOGDATA);
- 
-            var msg = 'Can not run Order. Contains parts that are not indexed in the database. \n' + missingmsg;
-          if (frombulk) {
-           return [['BREAK',msg],USAGE];    
-       
-        
-        }else{
-         return msg;
-        
-        }
-        //return 'Can not run Order. Contains parts that are not indexed in the database. \n'+missingmsg;
-    }
-    }catch(e){
+    } catch (e) {
         LOGDATA.status = false;
         LOGDATA.msg += 'Can not run Order.';
-      var dat1 = {
-        final_status: 0,
-        runtime: "",
-        unbranded : 0,
-        branded : 0,
-        premixed : 0,
-        coloredpremix : 0,
-        mixing : 0,
-        backtubed : 0,
-      }
- 
+        var dat1 = {
+            final_status: 0,
+            runtime: "",
+            unbranded: 0,
+            branded: 0,
+            premixed: 0,
+            coloredpremix: 0,
+            mixing: 0,
+            backtubed: 0,
+        }
+
         base.updateData('Orders/' + data.batch, dat1);
         logItem(LOGDATA);
+        return {
+            error: true,
+            msg: e.message
         }
-    
-   
+    }
+
+
+}
+
+function findFailed(LOGARR) {
+    return LOGARR.filter(function(item) {
+        return item[0] === 'FAILED'
+    })[0][1];
+
 }
 
 function assignMixture2(data) {
     try {
-        var USAGE = {};
-        var LOGARR = new Array();
+        var ORDER_FLOW = {
+            hasNegative: false,
+            LOGARR: [],
+            USAGE: {},
+            LOG: [],
+            NEGATIVELOG: [],
+        }
         var runtime = new Date().getTime();
         var dat1 = {
             final_status: 'started',
@@ -502,24 +564,41 @@ function assignMixture2(data) {
 
             if (data.checkUncolored) {
                 var PMIXRUN = CheckPremixed(data);
-                LOGARR = LOGARR.concat(PMIXRUN.LogData);
-                USAGE = PMIXRUN.USAGE;
+                ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(PMIXRUN.LOGARR)
+                ORDER_FLOW.LOG = ORDER_FLOW.LOG.concat(PMIXRUN.LOG)
+                ORDER_FLOW.NEGATIVELOG = ORDER_FLOW.NEGATIVELOG.concat(PMIXRUN.NEGATIVELOG)
+                ORDER_FLOW.USAGE = jsonConcat(ORDER_FLOW.USAGE, PMIXRUN.USAGE);
+                ORDER_FLOW.hasNegative = PMIXRUN.hasNegative;
+                ORDER_FLOW.hasFailed = PMIXRUN.hasFailed;
             } else {
                 if (data.recipe.Color) {
-                    USAGE.Color = {
+                    ORDER_FLOW.USAGE.Color = {
                         sku: data.recipe.Color.sku,
                         name: data.recipe.Color.name,
                         qty: data.colorval,
                     };
-                    LOGARR.push(['Color - ' + data.recipe.Color.sku, data.colorval]);
-                    fromRunningtoReserved("Color/" + data.recipe.Color.sku, data.colorval);
-
+                    var obj = {
+                        displayGroup: 'Colors',
+                        tab: 'Color',
+                        sku: data.recipe.Color.sku,
+                        name: data.recipe.Color.name,
+                        value: data.colorval
+                    }
+                    ORDER_FLOW.LOG.push(obj);
+                    ORDER_FLOW.LOGARR.push(['Color - ' + data.recipe.Color.sku, data.colorval]);
+                    var neg = fromRunningtoReserved("Color/" + data.recipe.Color.sku, data.colorval);
+                    if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
                     toPremixColoring(data);
                 }
-                LOGARR.push(['Order Type:', 'Premix Stock']);
+                ORDER_FLOW.LOGARR.push(['Order Type:', 'Premix Stock']);
 
-                LOGARR = LOGARR.concat(createMixOrder(data));
-                USAGE.Mixing = {
+                ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
+                ORDER_FLOW.USAGE.Mixing = {
                     vg: data.VGrecipe,
                     pg: data.PGrecipe,
                     mct: data.MCTrecipe,
@@ -527,38 +606,153 @@ function assignMixture2(data) {
                     nicsalt: data.Nicotrecipesalts,
                     cbd: data.CBDrecipe,
                 };
-                USAGE.Flavour = {
+                ORDER_FLOW.USAGE.Flavour = {
                     sku: data.flavour.sku,
                     name: data.flavour.name,
                     qty: data.flavrecipe,
                 };
-                fromRunningtoReserved('Flavours/' + data.flavour.sku, data.flavrecipe);
+                var obj = {
+                    displayGroup: 'Flavours',
+                    tab: 'Flavours',
+                    sku: data.flavour.sku,
+                    name: data.flavour.name,
+                    value: data.flavrecipe
+                }
+                ORDER_FLOW.LOG.push(obj);
+                var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, data.flavrecipe);
+                if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
+                ORDER_FLOW.LOGARR.push(['Flavour ' + data.flavour.sku, data.flavrecipe]);
+                if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
 
-                LOGARR.push(['Flavour ' + data.flavour.sku, data.flavrecipe]);
+                var obj = {
+                    displayGroup: 'Misc',
+                    tab: 'Misc',
+                    sku: 'VG',
+                    name: 'VG',
+                    value: data.VGrecipe
+                }
+                ORDER_FLOW.LOG.push(obj);
+                var neg = fromRunningtoReserved("Misc/VG", data.VGrecipe);
+                if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
+                ORDER_FLOW.LOGARR.push(['VG:', data.VGrecipe]);
+                var obj = {
+                    displayGroup: 'Misc',
+                    tab: 'Misc',
+                    sku: 'PG',
+                    name: 'PG',
+                    value: data.PGrecipe
+                }
+                ORDER_FLOW.LOG.push(obj);
+                var neg = fromRunningtoReserved("Misc/PG", data.PGrecipe);
+                if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
+                ORDER_FLOW.LOGARR.push(['PG:', data.PGrecipe]);
 
-                fromRunningtoReserved("Misc/VG", data.VGrecipe);
-                LOGARR.push(['VG:', data.VGrecipe]);
-                fromRunningtoReserved("Misc/PG", data.PGrecipe);
-                LOGARR.push(['PG:', data.PGrecipe]);
-
-
-                fromRunningtoReserved("Misc/MCT", data.MCTrecipe);
-                LOGARR.push(['MCT:', data.MCTrecipe]);
-
-                fromRunningtoReserved("Misc/AG", data.AGrecipe);
-                LOGARR.push(['AG:', data.AGrecipe]);
+                var obj = {
+                    displayGroup: 'Misc',
+                    tab: 'Misc',
+                    sku: 'MCT',
+                    name: 'MCT',
+                    value: data.MCTrecipe
+                }
+                ORDER_FLOW.LOG.push(obj);
+                var neg = fromRunningtoReserved("Misc/MCT", data.MCTrecipe);
+                if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
+                ORDER_FLOW.LOGARR.push(['MCT:', data.MCTrecipe]);
+                var obj = {
+                    displayGroup: 'Misc',
+                    tab: 'Misc',
+                    sku: 'AG',
+                    name: 'AG',
+                    value: data.AGrecipe
+                }
+                ORDER_FLOW.LOG.push(obj);
+                var neg = fromRunningtoReserved("Misc/AG", data.AGrecipe);
+                if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
+                ORDER_FLOW.LOGARR.push(['AG:', data.AGrecipe]);
                 if (data.Nicotrecipe) {
-                    LOGARR.push(['Nicotine:', data.Nicotrecipe]);
-                    fromRunningtoReserved("Misc/Nicotine", data.Nicotrecipe);
+                    ORDER_FLOW.LOGARR.push(['Nicotine:', data.Nicotrecipe]);
+                    var obj = {
+                        displayGroup: 'Misc',
+                        tab: 'Misc',
+                        sku: 'Nicotine',
+                        name: 'Nicotine',
+                        value: data.Nicotrecipe
+                    }
+                    ORDER_FLOW.LOG.push(obj);
+                    var neg = fromRunningtoReserved("Misc/Nicotine", data.Nicotrecipe);
+                    if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
                 }
 
                 if (data.Nicotrecipesalts) {
-                    LOGARR.push(['Nicotine Salts:', data.Nicotrecipesalts]);
-                    fromRunningtoReserved("Misc/Nicotine Salts", data.Nicotrecipesalts);
+                    ORDER_FLOW.LOGARR.push(['Nicotine Salts:', data.Nicotrecipesalts]);
+                    var obj = {
+                        displayGroup: 'Misc',
+                        tab: 'Misc',
+                        sku: 'Nicotine Salts',
+                        name: 'Nicotine Salts',
+                        value: data.Nicotrecipesalts
+                    }
+                    ORDER_FLOW.LOG.push(obj);
+                    var neg = fromRunningtoReserved("Misc/Nicotine Salts", data.Nicotrecipesalts);
+                    if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
                 }
                 if (data.CBDrecipe) {
-                    LOGARR.push(['CBD:', data.CBDrecipe]);
-                    fromRunningtoReserved("Misc/CBD", data.CBDrecipe);
+                    ORDER_FLOW.LOGARR.push(['CBD:', data.CBDrecipe]);
+                    var obj = {
+                        displayGroup: 'Misc',
+                        tab: 'Misc',
+                        sku: 'CBD',
+                        name: 'CBD',
+                        value: data.CBDrecipe
+                    }
+                    ORDER_FLOW.LOG.push(obj);
+                    var neg = fromRunningtoReserved("Misc/CBD", data.CBDrecipe);
+                    if (neg < 0) {
+                    ORDER_FLOW.hasNegative = true;
+                    var newObj = JSON.parse(JSON.stringify(obj))
+                    newObj.value = neg;
+                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                }
                 }
 
 
@@ -567,7 +761,7 @@ function assignMixture2(data) {
 
 
         } else if (for_unbranded_stock) {
-            LOGARR.push(['Order Type:', 'Unbranded Stock']);
+            ORDER_FLOW.LOGARR.push(['Order Type:', 'Unbranded Stock']);
 
             //Check premix
             //If premix == curent, move to production
@@ -576,52 +770,58 @@ function assignMixture2(data) {
             //checkpremix(current_row,recipe,flavour,order_date,required,original_required,order_batch,priority,bottles,order_bottle_type,order_cap_type,packaging,customer,order_brand,last_unbranded_bottlestock_row,last_branded_bottlestock_row,flavvalue,vg,pg,nicot);
 
             var PMIXRUN = CheckPremixed(data);
-            LOGARR = LOGARR.concat(PMIXRUN.LogData);
-            USAGE = PMIXRUN.USAGE;
+            ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(PMIXRUN.LOGARR)
+            ORDER_FLOW.LOG = ORDER_FLOW.LOG.concat(PMIXRUN.LOG)
+            ORDER_FLOW.NEGATIVELOG = ORDER_FLOW.NEGATIVELOG.concat(PMIXRUN.NEGATIVELOG)
+            ORDER_FLOW.USAGE = jsonConcat(ORDER_FLOW.USAGE, PMIXRUN.USAGE);
+            ORDER_FLOW.hasNegative = PMIXRUN.hasNegative;
+            ORDER_FLOW.hasFailed = PMIXRUN.hasFailed;
             //  LOGARR = LOGARR.concat(CheckPremixed(data));
 
         } else if (for_branded_stock) {
-            LOGARR.push(['Order Type:', 'Branded Stock']);
+            ORDER_FLOW.LOGARR.push(['Order Type:', 'Branded Stock']);
 
-            Logger.log("Checking Branded")
+
 
             //checkunbranded(current_row,recipe,flavour,order_date,required,original_required,order_batch,priority,bottles,order_bottle_type,order_cap_type,packaging,customer,order_brand,last_unbranded_bottlestock_row,last_branded_bottlestock_row,flavvalue,vg,pg,nicot);
-            LOGARR = LOGARR.concat(generateForSingleBrand2(data.productcode, data.productdescription));
+            ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(generateForSingleBrand2(data.productcode, data.productdescription));
             var UNBRRUN = CheckUnbranded(data);
-            LOGARR = LOGARR.concat(UNBRRUN.LogData);
-            USAGE = UNBRRUN.USAGE;
+            ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(UNBRRUN.LOGARR)
+            ORDER_FLOW.LOG = ORDER_FLOW.LOG.concat(UNBRRUN.LOG)
+            ORDER_FLOW.NEGATIVELOG = ORDER_FLOW.NEGATIVELOG.concat(UNBRRUN.NEGATIVELOG)
+            ORDER_FLOW.USAGE = jsonConcat(ORDER_FLOW.USAGE, UNBRRUN.USAGE);
+            ORDER_FLOW.hasNegative = UNBRRUN.hasNegative;
+            ORDER_FLOW.hasFailed = UNBRRUN.hasFailed;
             //LOGARR = LOGARR.concat(CheckUnbranded(data));
 
         } //end for branded stock
         else {
-            LOGARR.push(['Order Type:', 'Customer Order']);
+            ORDER_FLOW.LOGARR.push(['Order Type:', 'Customer Order']);
 
 
-            LOGARR = LOGARR.concat(generateForSingleBrand2(data.productcode, data.productdescription));
+            ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(generateForSingleBrand2(data.productcode, data.productdescription));
             var BRRUN = CheckBranded(data);
-            LOGARR = LOGARR.concat(BRRUN.LogData);
-            USAGE = BRRUN.USAGE;
+            ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(BRRUN.LOGARR)
+            ORDER_FLOW.LOG = ORDER_FLOW.LOG.concat(BRRUN.LOG)
+            ORDER_FLOW.NEGATIVELOG = ORDER_FLOW.NEGATIVELOG.concat(BRRUN.NEGATIVELOG)
+            ORDER_FLOW.USAGE = jsonConcat(ORDER_FLOW.USAGE, BRRUN.USAGE);
+            ORDER_FLOW.hasNegative = BRRUN.hasNegative;
+            ORDER_FLOW.hasFailed = BRRUN.hasFailed;
             //            LOGARR = LOGARR.concat(CheckBranded(data));
             updateShippingInformation2(data.batch);
 
         } //end custom
         updateAllTabs(data.batch);
         //return 'success';
-        return {
-            LogData: LOGARR,
-            USAGE: USAGE
-        };
+        return ORDER_FLOW;
     } catch (e) {
-        LOGARR.push(['Failed:', e.message]);
+        ORDER_FLOW.LOGARR.push(['FAILED', e.message]);
         var dat1 = {
-          final_status: 0,
-          runtime: "",
+            final_status: 0,
+            runtime: "",
         };
         base.updateData('Orders/' + data.batch, dat1);
-        return {
-            LogData: LOGARR,
-            USAGE: USAGE
-        };
+        return ORDER_FLOW;
 
     }
 }
@@ -731,7 +931,9 @@ function getNewOrderID() {
         orderBy: ['orderID']
     }
     var ordersByOrderID = JSONtoARR(base.getData('Orders', params));
-    ordersByOrderID = ordersByOrderID.filter(function(item){ return item.orderID}).sort(sortOrderIDsHL)
+    ordersByOrderID = ordersByOrderID.filter(function(item) {
+        return item.orderID
+    }).sort(sortOrderIDsHL)
     if (ordersByOrderID.length >= 1) {
         var LastorderID = ordersByOrderID[0].orderID;
         if (LastorderID) {
@@ -764,7 +966,9 @@ function getNewOrderID() {
 
 function getNewOrderID2(ordersByOrderID) {
 
-    ordersByOrderID = ordersByOrderID.filter(function(item){ return item.orderID}).sort(sortOrderIDsHL)
+    ordersByOrderID = ordersByOrderID.filter(function(item) {
+        return item.orderID
+    }).sort(sortOrderIDsHL)
     if (ordersByOrderID.length >= 1) {
         var LastorderID = ordersByOrderID[0].orderID;
         if (LastorderID) {
@@ -1192,9 +1396,51 @@ function runflavourmixItem(batch, frombulk) {
     data.final_status = 0;
     base.updateData('FlavourMixMixingTeam/' + data.batch, data);
 
-    return ["","Success"];
+    return ["", "Success"];
 
 
 }
 
 
+
+function returnData(RUNITEM, data) {
+    var LOG = RUNITEM.LOG;
+    var NEGATIVELOG = RUNITEM.NEGATIVELOG;
+    var LOGARR = [];
+    for (var i = 0; i < RUNITEM.LOG.length; i++) {
+        try {
+            fromReservedToRunning(LOG[i].tab + '/' + LOG[i].sku, LOG[i].value);
+            LOGARR.push(['To Running: ' + LOG[i].tab + '/' + LOG[i].sku, LOG[i].value]);
+        } catch (e) {
+
+            LOGARR.push(['To Running Failed: ' + LOG[i].tab + '/' + LOG[i].sku, LOG[i].value]);
+        }
+    }
+    var dat = {
+        wentNegative: true,
+        unbranded: 0,
+        branded: 0,
+        premixed: 0,
+        coloredpremix: 0,
+        mixing: 0,
+        backtubed: 0,
+    }
+
+    base.updateData('Orders/' + data.batch, dat);
+    var sheets2 = ['PremixColoring', 'Production', 'Printing', 'Labelling', 'Packaging', 'Shipping'];
+
+    for (var i = 0; i < sheets2.length; i++) {
+        try {
+            base.removeData(sheets2[i] + '/' + data.batch);
+        } catch (e) {
+
+            LOGARR.push(['Removing From Tab Failed: ', sheets2[i] + '/' + data.batch]);
+        }
+    }
+    for (var i = 0; i < NEGATIVELOG.length; i++) {
+        LOGARR.push(['WENT NEGATIVE', Math.abs(NEGATIVELOG[i].value) + ' - ' + NEGATIVELOG[i].tab + '/' + NEGATIVELOG[i].sku + ' - ' + NEGATIVELOG[i].name])
+    }
+
+
+    return LOGARR;
+}

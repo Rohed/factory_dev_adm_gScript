@@ -1904,3 +1904,57 @@ obj.id= '1';
 base.updateData('globalFilter/1',obj);
 return 'Saved';
 }
+
+
+function addMissingStockItem(data){
+  var LOGDATA={
+    status:true,
+    msg:'',
+    action:'Add Missing Stock',
+    batch:data.batch,
+    page:'Orders',
+    user:Session.getActiveUser().getEmail(),
+    data:new Array()
+  };
+  var resp = {
+    error:false,
+    msg:'',
+    batch:data.batch,
+    sku:data.sku
+  }
+  try {
+    LOGDATA.data.push(['Stock SKU:', data.sku]);
+    LOGDATA.data.push(['Stock Value:', data.value]);
+    LOGDATA.data.push(['Stock Batch:', data.batch]);
+    LOGDATA.data.push(['Stock QTY Tab:', data.tab]);
+    toRunning(data.tab+'/'+data.sku,parseFloat(data.value));
+    resp.msg = "Success";
+  }catch (e) {
+    LOGDATA.status=false;
+    LOGDATA.data.push(['Failed:', e.message]);
+    logItem(LOGDATA);
+    resp.msg=e.message;
+  }
+  
+  return resp;
+}
+
+function addMissingStockItemList(dataArr){
+
+   var resp = {
+    error:false,
+    msg:'',
+  }
+   
+   dataArr.map(function(item){
+     
+     var result = addMissingStockItem(item);
+     if(result.error){
+       resp.msg += result.msg+'\n';
+       resp.error = true;
+     }
+   });
+   
+   
+  return resp;
+}

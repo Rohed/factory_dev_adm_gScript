@@ -1301,7 +1301,7 @@ edit_flavour_mix_order=true;
     }
     function runmulti(){
           $("#updating").css("display", "block");
-     google.script.run.withSuccessHandler(multRun).bulkrun(SELECTED,selPage);
+     google.script.run.withSuccessHandler(handleMultiOrderRun).bulkrun(SELECTED,selPage);
     
     }
        function runmultiSL(){
@@ -1316,6 +1316,106 @@ edit_flavour_mix_order=true;
    //buildOrders(SelAllOrders);
      $("#updating").css("display", "none");
     }
+    
+    var MULTI_ORDER_LOG = null;
+    function handleMultiOrderRun(resp){
+    console.log('handleMultiOrderRun',resp);
+    MULTI_ORDER_LOG=resp;
+    var html = '<div class ="section" ><h2>Bulk order run finished</h2></div>';
+    html+='<div class ="section" ><h2>Response Messages:</h2><p>'+resp.msg+'</p></div>';
+    if(resp.hasNegative){
+    var negativeHtml = '';
+    for(var i = 0; i < resp.NEGATIVELOG.length;i++){
+    var negItems = '';
+    var arr = resp.NEGATIVELOG[i].arr;
+    arr.map(function(item){
+    negItems+='<div class="section sr" ><span>'+item.displayGroup+': '+item.name+'</span><div class="row"><input type="number" value="'+Math.abs(item.value)+'" id="'+item.sku +'_'+resp.NEGATIVELOG[i].batch+'" style="margin-right:10px;" />\
+    <button class="btn btn-primary" onClick="addMissingStockItem(this)" sku="'+item.sku+'" '+(item.disabled === true ? 'disabled' : '')+'  tab="'+item.tab+'" batch="'+resp.NEGATIVELOG[i].batch+'">Add To Stock</button></div></div>';
+    })
+    negativeHtml+='<div class ="section" ><h3>'+resp.NEGATIVELOG[i].batch+':</h3><p>'+negItems+'</p></div>';
+    }
+    html+='<div class ="section" ><h2>Missing Items</h2><p>'+negativeHtml+'</p></div>';
+     html+='<div class ="section sr" ><span></span><button class="btn btn-primary" onClick="addAllMissingStockItems()" >Add All Missing Items</button></div>';
+    }
+    if(resp.SUCCESS.length){
+    resp.SUCCESS.map(function(batch){
+    addToSelected(batch);
+    });
+    
+    }
+    closemainmodal();
+     htmlModalMSG(html);
+     filterpage('xx',true);
+     $("#updating").css("display", "none");
+    }
+    
+    function addMissingStockItem(event){
+    var batch = $(event).attr("batch");
+    var sku = $(event).attr("sku");
+     var tab = $(event).attr("tab");
+    var value = $("#"+sku+"_"+batch).val();
+    $("#updating").css("display", "block");
+    var data = {
+    sku:sku,
+    batch:batch,
+    tab:tab,
+    value:value
+    };
+     google.script.run.withSuccessHandler(handleAddSingleStock).addMissingStockItem(data);
+    }
+    
+    
+    function handleAddSingleStock(resp){
+    
+    if(resp.error){
+    alert(resp.msg);
+    }
+    for(var i = 0; i < MULTI_ORDER_LOG.NEGATIVELOG.length;i++){
+       var arr = MULTI_ORDER_LOG.NEGATIVELOG[i].arr;
+       for(var j = 0 ; j < arr.length ;j++){
+        if(arr[j].sku == resp.sku && MULTI_ORDER_LOG.NEGATIVELOG[i].batch == resp.batch){
+         MULTI_ORDER_LOG.NEGATIVELOG[i].arr[j].disabled = true;
+        }
+       }
+     }
+     
+     handleMultiOrderRun(MULTI_ORDER_LOG);
+      $("#updating").css("display", "none");
+    }
+    
+    function addAllMissingStockItems(){
+       $("#updating").css("display", "block");
+       var dataArr = [];
+       for(var i = 0; i < MULTI_ORDER_LOG.NEGATIVELOG.length;i++){
+       var arr = MULTI_ORDER_LOG.NEGATIVELOG[i].arr;
+       for(var j = 0 ; j < arr.length ;j++){
+       if(!arr[j].disabled){
+       var value =  $("#"+arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch).val();
+       var obj = {
+       sku:arr[j].sku,
+       batch:MULTI_ORDER_LOG.NEGATIVELOG[i].batch,
+       tab:arr[j].tab,
+       value:value
+       }
+       dataArr.push(obj);
+       }
+       }
+       }
+     
+       google.script.run.withSuccessHandler(handleAddAllStock).addMissingStockItemList(dataArr);
+    }
+    
+    
+    function handleAddAllStock(resp){
+    if(resp.error){
+    alert(resp.msg);
+    }
+     closemainmodal();
+      $("#updating").css("display", "none");
+     alert('All Stock Items have been added.');
+    }
+    
+    
     function checkstock(){
       $("#updating").css("display", "block");
      google.script.run.withSuccessHandler(stockCheck).checkStockValues(SELECTED);
@@ -1348,7 +1448,8 @@ edit_flavour_mix_order=true;
     function runItem(batch) {
         console.log(batch +" " + selPage);
         if(selPage=='Orders'){
-        google.script.run.withSuccessHandler(OrderItemSuccess).runItem(batch,false);
+        google.script.run.withSuccessHandler(handleMultiOrderRun).bulkrun([batch],selPage);
+       // google.script.run.withSuccessHandler(OrderItemSuccess).runItem(batch,false);
         }else{
          google.script.run.withSuccessHandler(OrderItemSuccess).runflavourmixItem(batch);
         }
@@ -6570,6 +6671,11 @@ $('#'+name).show();
 function closemainmodal(){
 console.log('here');
 modalclosed = true;
+var body = $('body');
+
+if ( body.is('.modal-open') ){
+body.removeClass('modal-open');
+}
 $('#htmlMSGmodal').hide();
 $('.modal-backdrop').hide();
 }

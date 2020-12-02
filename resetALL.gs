@@ -20,15 +20,21 @@ var data = base.getData(sheet + '/');
 
 }
 function absoluteeveryting(){
-var sheets=['PremixesTypes','UnbrandedTypes','BrandedTypes','BottleTypes','Lids','Packages','Flavours','Boxes','Labels']
+var sheets=['PremixesTypes','UnbrandedTypes','BrandedTypes','BottleTypes','Lids','Packages','Flavours','Boxes','Labels','Misc']
 for(var i=0;i<sheets.length;i++){
 var raw=base.getData(sheets[i]);
 var list=JSONtoARR(raw);
   for(var j=0;j<list.length;j++){
-  
-    if(list[j].Running == undefined){
-    raw[list[j].sku].Running=0
+    if(sheets[i] == 'Misc'){
+      raw[list[j].name].Running=0
+      raw[list[j].name].Reserved=0
+      raw[list[j].name].Completed=0
+    }else{
+      raw[list[j].sku].Running=0
+      raw[list[j].sku].Reserved=0
+      raw[list[j].sku].Completed=0
     }
+
 //    if(list[j].Reserved<0){
 //    raw[list[j].sku].Reserved=Math.abs(list[j].Reserved)
 //    }
