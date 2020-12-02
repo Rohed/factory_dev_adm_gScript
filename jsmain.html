@@ -1333,10 +1333,10 @@ edit_flavour_mix_order=true;
     <button class="btn btn-primary" onClick="addMissingStockItem(this)" sku="'+item.sku+'" '+(item.disabled === true ? 'disabled' : '')+'  tab="'+item.tab+'" batch="'+resp.NEGATIVELOG[i].batch+'">Add To Stock</button></div></div>';
     }) 
     negativeHtml+='<div class ="section" ><h3>'+resp.NEGATIVELOG[i].batch+':</h3><p>'+negItems+'</p></div>';
-    negativeHtml+='<div class ="section sr" ><span></span><button class="btn btn-primary" batch="'+resp.NEGATIVELOG[i].batch+'"  id="batch_add_'+resp.NEGATIVELOG[i].batch+'" onClick="addBatchMissingStockItems(this)" >Add Batch Missing Items</button></div>';
+    negativeHtml+='<div class ="section sr" ><span></span><button class="btn btn-primary" '+(resp.NEGATIVELOG[i].disabled === true ? 'disabled' : '')+' batch="'+resp.NEGATIVELOG[i].batch+'"  id="batch_add_'+resp.NEGATIVELOG[i].batch+'" onClick="addBatchMissingStockItems(this)" >Add Batch Missing Items</button></div>';
     }
     html+='<div class ="section" ><h2>Missing Items</h2><p>'+negativeHtml+'</p></div>';
-     html+='<div class ="section sr" ><span></span><button class="btn btn-primary" onClick="addAllMissingStockItems()" '+(item.disabled === true ? 'disabled' : '')+' >Add All Missing Items</button></div>';
+     html+='<div class ="section sr" ><span></span><button class="btn btn-primary" onClick="addAllMissingStockItems()"   >Add All Missing Items</button></div>';
     }
     if(resp.SUCCESS.length){
     resp.SUCCESS.map(function(batch){
