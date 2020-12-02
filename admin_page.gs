@@ -1981,3 +1981,9 @@ function addMissingStockItemList(dataArr){
    
   return resp;
 }
+
+function addMissingStockItemListBatch(dataArr,batch){
+var resp = addMissingStockItemList(dataArr);
+ resp.batch = batch;
+return resp;
+}

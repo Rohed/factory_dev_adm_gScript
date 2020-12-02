@@ -2,17 +2,32 @@ function fromRunningtoReserved(item, value) {
     if (isNaN(value)) {
         value = 0;
     }
+    var neg = 0;
     var orig1 = base.getData(item);
     if (orig1) {
+  
+      if(orig1.Running < 0){ 
         orig1.Running = orig1.Running - value;
         orig1.Reserved = orig1.Reserved + value;
+        neg = -value; 
+        
+      }else{
+        orig1.Running = orig1.Running - value;
+        orig1.Reserved = orig1.Reserved + value;
+        if( orig1.Running<0){
+         neg = orig1.Running;
+        }
+      
+      }
+      base.updateData(item, orig1);
+       
 
-        base.updateData(item, orig1);
+        
 
-        if (orig1.Running >= 0) {
-            return 1;
+        if (neg < 0) {
+            return neg;
         } else {
-            return orig1.Running;
+            return 1;
         }
     } else {
         return -404

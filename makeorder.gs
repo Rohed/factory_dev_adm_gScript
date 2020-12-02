@@ -226,9 +226,10 @@ function bulkrun(arr, page) {
     //  arr = ['912126'];
   var RETOBJ = {
     NEGATIVELOG:[],
-    SUCCESS:[],
+    SUCCESS:[], 
     msg:''
   };
+  var RUNITEMS = [];
     var USAGE = [];
     Logger.log(arr);
     var l = arr.length;
@@ -264,16 +265,14 @@ function bulkrun(arr, page) {
                       RETOBJ.hasNegative = exec.RUNITEM.hasNegative; 
                       RETOBJ.NEGATIVELOG.push({batch:arr[i],arr:exec.RUNITEM.NEGATIVELOG})
                     }
+                     RUNITEMS.push(exec.RUNITEM)
                   }
                 } else {
                     USAGE.push(exec.RUNITEM.retUSAGE);
                     RETOBJ.SUCCESS.push(arr[i])
                 }
                 msg += arr[i] + " - " +exec.msg+ "<br>";
-               if (exec.error) {
-                 RETOBJ.msg = msg;
-                 return RETOBJ;
-               }
+              
             }
         } else {
 
@@ -297,7 +296,13 @@ function bulkrun(arr, page) {
     if (USAGE.length > 0 && page == 'Orders') {
         LogTransaction(USAGE);
     }
+  if(RUNITEMS.length){
+    RUNITEMS.map(function(item){
+    returnData(item, item.data)
+    
+    })
   
+  }
     RETOBJ.msg = msg;
     return RETOBJ;
 
@@ -414,14 +419,15 @@ function runItem(batch, frombulk) {
             var RUNITEM = assignMixture2(data);
             LOGDATA.data = RUNITEM.LOGARR;
             USAGE = RUNITEM.USAGE;
+            RUNITEM.data = data;
             if (RUNITEM.hasNegative || RUNITEM.hasFailed) {
-                LOGDATA.data = LOGDATA.data.concat(returnData(RUNITEM, data));
+                //LOGDATA.data = LOGDATA.data.concat(returnData(RUNITEM, data));
                 if (frombulk) {
 
 
                     logItem(LOGDATA);
                     return {
-                        error: true,
+                        error: true, 
                         RUNITEM: RUNITEM,
                         msg: RUNITEM.hasFailed ? findFailed(JSON.parse(JSON.stringify(RUNITEM.LOGARR))) : 'Missing QTY Items'
                     }
