@@ -2122,10 +2122,10 @@ var html='';
 
 html+='<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Production Status</th><th>Printing Status</th><th>Order Date</th><th>Batch</th><th>Order ID</th><th>Priority</th><th>Code</th><th>Description</th><th>Packaging Code</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
 html+='<th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th><th>Start Date</th><th>Completion Date</th><th>Packaging Completed</th><th>Location</th>';
-html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th>';
+html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th><th>Backed By Branded Packaged</th>';
         html += '</tr>';
         
-        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
+        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>MIXING TOTAL</div><div id="mixingTotal"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal"></div></th></th></th><th><div>TUBES TOTAL</div><div id="tubesTotal"></div></th></tr>';
                  if(data){
          var keys=['production_status','printing_status','orderdate','batch','orderID','priority','productcode','productdescription','PRINTCODE','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','mixing','premixed','unbranded','branded','backtubed'];
          var drpdowns='';
@@ -2259,9 +2259,9 @@ console.log(data);
  if(thisPage=='MixingTeam'){
  var html='';
  html+='<table class="form_table">';
- html+='<tr><td><h4>Completed</h4></td><td><h4>Production Date</h4></td><td><h4>Notes</h4></td><td><h4>Location</h4></td><td><h4>VG supplier batch</h4></td><td><h4>PG supplier batch</h4></td><td><h4>Nicotine supplier batch</h4></td><td><h4>Flavour supplier batch</h4></td><tr>';
+ html+='<tr><td><h4>Completed</h4></td><td><h4>Production Date</h4></td><td><h4>Notes</h4></td><td><h4>Location</h4></td><tr>';
  
- var opt='';
+  var opt='';
  opt+='<option batch="'+data.MIXNAME+'" value="Not Completed" selected id="Completed">Not Completed<option>';
  opt+='<option batch="'+data.MIXNAME+'" value="Completed" id="Completed">Completed<option>';
 
@@ -2270,6 +2270,9 @@ console.log(data);
  html+='<tr><td><select  batch="'+data.MIXNAME+'"  class="form-control" id="completed">'+opt+'</select></td><td><div class="input-group"><input type="date" id="prodDate" disabled class="form-control" placeholder="Production Date" aria-describedby="sizing-addon2"></div></td>';
  html+='<td><div class="input-group"><input type="text" id="Notes" class="form-control" placeholder="Notes" aria-describedby="sizing-addon2"></div></td>';
  html+='<td><div class="input-group"><input type="text" id="Location" class="form-control" placeholder="Location" aria-describedby="sizing-addon2"></div></td>';
+ html+='</tr>'; 
+ html+='<tr><td><h4>VG supplier batch</h4></td><td><h4>PG supplier batch</h4></td><td><h4>Nicotine supplier batch</h4></td><td><h4>Flavour supplier batch</h4></td><tr>';
+
  
  html+='<td><div class="input-group"><input type="text" id="vgSupplier" class="form-control" placeholder="" aria-describedby="sizing-addon2"></div></td>';
  html+='<td><div class="input-group"><input type="text" id="pgSupplier" class="form-control" placeholder="" aria-describedby="sizing-addon2"></div></td>';

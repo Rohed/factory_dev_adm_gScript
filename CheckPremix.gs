@@ -1,6 +1,6 @@
 function CheckPremixed(data) {
     var ORDER_FLOW = {
-        hasNegative: false,
+        hasNegative: data.hasNegative,
         LOGARR: [],
         USAGE: {},
         LOG: [],
@@ -425,9 +425,9 @@ function CheckPremixed(data) {
 
             }
 
-
+          if(!ORDER_FLOW.hasNegative){
             ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
-
+          }
 
             //DUD Premix ORDER
             if (forpremix > 0) {
@@ -616,7 +616,7 @@ function checkColoredPremix(data) {
             var newmixvol = data.QTY - dat3.premixed;
             base.updateData('Orders/' + data.batch, dat3)
             data.QTY = newmixvol;
-
+            data.hasNegative = ORDER_FLOW.hasNegative;
             var PMIXRUN = CheckPremixed(data);
             ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(PMIXRUN.LOGARR)
             ORDER_FLOW.LOG = ORDER_FLOW.LOG.concat(PMIXRUN.LOG)

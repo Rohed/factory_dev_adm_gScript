@@ -1430,6 +1430,13 @@ function returnData(RUNITEM, data) {
         coloredpremix: 0,
         mixing: 0,
         backtubed: 0,
+      
+      mixing_status:0,
+      production_status:0,
+      printing_status:0,
+      labeling_status:0,
+      packaging_status:0,
+      final_status:0, 
     }
 
     base.updateData('Orders/' + data.batch, dat);

@@ -906,7 +906,7 @@ function moveMain(item) {
                           };
                           base.updateData('Mixing/' + batches[i].batch, dat3);
                         }
-                      }
+                        } 
                  
                     }
                     
@@ -918,6 +918,10 @@ function moveMain(item) {
                     if(item.POMARKED){
                         PtoRunning(premix, item.POvolume);
                     }
+                     var dat1 = {
+                      mixing_status: 'Completed', 
+                    };
+                    base.updateData('Orders/' + batches[i].batch, dat1);
                   }
                 }
                 

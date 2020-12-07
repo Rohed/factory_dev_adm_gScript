@@ -1280,6 +1280,20 @@ edit_flavour_mix_order=true;
       displaySelected(SELECTED);
       }
     }
+    
+    function removeFromSelected(batch){
+        var check=SELECTED.indexOf(batch);
+    if(check !== -1){
+        $('#deselect'+batch).css('display','none');
+        $('#select'+batch).css('display','block');
+      SELECTED.splice(check, 1);
+      displaySelected(SELECTED);
+      }
+      
+    }
+    
+    
+    
     function displaySelected(SELECTED){
     var html='<p>Selected:</p>';
     html+='<p>';
@@ -1340,7 +1354,7 @@ edit_flavour_mix_order=true;
     }
     if(resp.SUCCESS.length){
     resp.SUCCESS.map(function(batch){
-    addToSelected(batch);
+    removeFromSelected(batch);
     });
     
     }
