@@ -45,13 +45,13 @@
       <li><a href="#tab11">Functions</a></li>
       <li><a href="#tab12">Reporting</a></li>
    </ul>
-   <ul class="tab-links" id='ordersSubTab'>
+   <!--<ul class="tab-links" id='ordersSubTab'>
       <li id='subTabFlavourMixOrders'><a href="#tab1" sub='subOrder' page='FlavourMixOrders'>Flavour Mix Orders</a></li>
-   </ul>
+   </ul>-->
    <ul class="tab-links" id='baseFilters'>
       <li class="active"><a href="#tab1" sub='sub' param='Not Run' id="defaultAnchor">Not Run</a></li>
       <li><a sub='sub' id='wentNegative' param='wentNegative' href="#tab2">Missing</a></li>
-      <li><a sub='sub' param='Busy' href="#tab2">Busy</a></li>
+      <li><a sub='sub' param='In Progress' href="#tab2">In Progress</a></li>
       <li><a sub='sub' param='Completed' href="#tab3">Completed</a></li>
       <li><a sub='sub' id='allsearch' param='all' href="#tab4">All</a></li>
        <li><a  sub='sub'  id='scheduled' param='schedule' href="#tab5">Scheduled</a></li>
@@ -78,6 +78,8 @@
                   <button class="btn btn-info btn-lg" type="button" id='getpremixReports' onclick='getpremixReports()'>Generate Safety Reports</button>
                   
                   <button class="btn btn-info btn-lg" type="button" id='showNotes' onclick="showNotes()">Notes</button>
+                  <button class="btn btn-info btn-lg" type="button" id='runAllocationScreen' onclick="runAllocationScreen()">Batch Allocation</button>
+                  
                   <button type='button' id='savepoint' class="btn btn-info btn-lg"><i class="fa fa-floppy-o fa-3x" aria-hidden="true"></i></button>
                   <button type='button' style='display:none;' id='restorepoint' class="btn btn-info btn-lg"><i class="fa fa-undo fa-3x" aria-hidden="true"></i></button>
                </li>
@@ -153,7 +155,7 @@
                         <button type="button" id='deleteDisplayedOrders' onclick="deleteAll()">Delete Displayed</button>
                         <li class="active"><a href="#Mixing" id="defaultAnchor">Mixing - V1.0</a></li>
                         <li><a href="#MixingTeam">Mixing Team - V1.0</a></li>
-                        <li><a href="#FlavourMixMixingTeam">Flavour Mix Mixing Team - V1.0</a></li>
+                         <!--<li><a href="#FlavourMixMixingTeam">Flavour Mix Mixing Team - V1.0</a></li>-->
                         <li><a href="#PremixColoring">Premix Coloring - V1.0</a></li>
                      </ul>
                   </div>

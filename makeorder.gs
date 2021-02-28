@@ -219,16 +219,20 @@ function saveOrder(data, edit) {
 
 function TESTBULKRUN() {
 
-    bulkrun(['940000', '940001'], 'Orders');
+    bulkrun(['940015'], 'Orders');
 }
 
 function bulkrun(arr, page) {
     //  arr = ['912126'];
+
   var RETOBJ = {
     NEGATIVELOG:[],
     SUCCESS:[], 
-    msg:''
+    msg:'',
+    pickListUrl:mapPickList(arr)
+          
   };
+  
   var RUNITEMS = [];
     var USAGE = [];
     Logger.log(arr);
@@ -248,7 +252,7 @@ function bulkrun(arr, page) {
 
                 var exec = runItem(arr[i], true);
                
-
+             
                 //                var usageArr =  convertUsageToArr(data,rett.USAGE);
                 //                LogTransaction([usageArr]);
                 if (exec.error) {
@@ -262,8 +266,10 @@ function bulkrun(arr, page) {
                     base.updateData('Orders/' + arr[i], dat1);
                   if(exec.RUNITEM){
                     if(exec.RUNITEM.hasNegative){
-                      RETOBJ.hasNegative = exec.RUNITEM.hasNegative; 
-                      RETOBJ.NEGATIVELOG.push({batch:arr[i],arr:exec.RUNITEM.NEGATIVELOG})
+                 
+                        RETOBJ.hasNegative = exec.RUNITEM.hasNegative; 
+                        RETOBJ.NEGATIVELOG.push({batch:arr[i],arr:exec.RUNITEM.NEGATIVELOG}) 
+                    
                     }
                      RUNITEMS.push(exec.RUNITEM)
                   }
@@ -274,6 +280,8 @@ function bulkrun(arr, page) {
                 msg += arr[i] + " - " +exec.msg+ "<br>";
               
             }
+          
+           
         } else {
 
             var resp = runflavourmixItem(arr[i], true);
@@ -308,7 +316,24 @@ function bulkrun(arr, page) {
 
 }
 
-
+function mapPickList(BATCHES){
+  var folder =DriveApp.getFolderById(PICK_LIST_FOLDER);
+  var create=DriveApp.getFileById(PICK_LIST_SHEET).makeCopy("Pick List "+formatDateDisplay(new Date())+' '+BATCHES.join(','),folder);
+  
+ 
+  var dataArr = [];
+  var stockCheck =checkStockNew(BATCHES,true) 
+  var sheet = SpreadsheetApp.openById(create.getId()).getSheetByName('Sheet1');
+  var lastRow = sheet.getLastRow() + 4;
+  var newDataArr = [];
+      stockCheck.dataList.map(function(item){
+    return newDataArr.push([item[0],item[1],item[3]]);
+  })
+  
+  sheet.getRange(sheet.getLastRow() + 4, 1, 1, 3).setBackground('#D9A744');
+  sheet.getRange(sheet.getLastRow() + 4, 1, newDataArr.length, 3).setValues(newDataArr);
+  return create.getUrl();
+}
 function testrun() {
     runItem('940000', false);
 
@@ -420,8 +445,19 @@ function runItem(batch, frombulk) {
             LOGDATA.data = RUNITEM.LOGARR;
             USAGE = RUNITEM.USAGE;
             RUNITEM.data = data;
+            var negativeItems = RUNITEM.NEGATIVELOG.filter(function(obj){
+                return obj.tab !== 'Flavours';
+              });
+          if (RUNITEM.hasNegative || RUNITEM.hasFailed){
+            if(RUNITEM.data.isFlavourMix && RUNITEM.data.isFlavourMix && RUNITEM.data.flavourMixPartsMissing == false){ 
+              if(negativeItems.length === 0){
+                RUNITEM.hasNegative = false;
+              }
+            }
+          }
             if (RUNITEM.hasNegative || RUNITEM.hasFailed) {
                 //LOGDATA.data = LOGDATA.data.concat(returnData(RUNITEM, data));
+            
                 if (frombulk) {
 
 
@@ -634,10 +670,59 @@ function assignMixture2(data) {
                 }
                 ORDER_FLOW.LOGARR.push(['Flavour ' + data.flavour.sku, data.flavrecipe]);
                 if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                   var baseFlavour = base.getData('Flavours/' + data.flavour.sku);
+                  if(baseFlavour){
+                    if(baseFlavour.type === 'mix'){
+                      obj.displayGroup = 'Flavour Mix'
+                      ORDER_FLOW.hasNegative = true;
+                      var newObj = JSON.parse(JSON.stringify(obj))
+                      newObj.value = neg;
+                      ORDER_FLOW.NEGATIVELOG.push(newObj);
+                      
+                       var flavourMix = base.getData('FlavourMixes/' + data.flavour.sku);
+                      if(flavourMix){
+                        var flavourValue = Math.abs(neg);
+                        var flavourList = JSONtoARR(flavourMix.flavours);
+                        for(var f = 0; f < flavourList.length ;f++){
+                          var rawValue = (flavourValue * ( flavourList[f].val/10))
+                          var listItemValue =  parseFloat(parseFloat(rawValue).toFixed(2));
+                          ORDER_FLOW.USAGE.Flavour = {
+                            sku: flavourList[f].sku,
+                            name: flavourList[f].name,
+                            qty: listItemValue,
+                          };
+                          data.used.push(['Flavours/',flavourList[f].sku,listItemValue]);
+                          var obj = {
+                            displayGroup: 'Flavours',
+                            tab: 'Flavours',
+                            sku: flavourList[f].sku,
+                            name: flavourList[f].name,
+                            value: listItemValue
+                          }
+                          ORDER_FLOW.LOG.push(obj);
+                          ORDER_FLOW.LOGARR.push(['Flavour:', listItemValue]);
+                          var neg = fromRunningtoReserved('Flavours/' + flavourList[f].sku, listItemValue);
+                          
+                          if (neg < 0) {
+                            ORDER_FLOW.hasNegative = true;
+                            var newObj = JSON.parse(JSON.stringify(obj))
+                            newObj.value = neg;
+                            ORDER_FLOW.NEGATIVELOG.push(newObj);
+                          }
+                        }
+                        
+                      }
+                        
+                      
+                    }else{
+                       ORDER_FLOW.hasNegative = true;
+                      var newObj = JSON.parse(JSON.stringify(obj))
+                      newObj.value = neg;
+                      ORDER_FLOW.NEGATIVELOG.push(newObj);
+               
+                    }
+                    
+                  }
                 }
 
                 var obj = {
@@ -1353,7 +1438,7 @@ function saveflavourmixOrder(data, edit) {
 
 function testRUNFLAVOURMIX() {
 
-    var resp = runflavourmixItem('1', false);
+    var resp = runflavourmixItem('23331', false);
 }
 
 function runflavourmixItem(batch, frombulk) {
@@ -1366,6 +1451,7 @@ function runflavourmixItem(batch, frombulk) {
         user: Session.getActiveUser().getEmail(),
         data: new Array()
     };
+ 
     LOGDATA.type = 'Flavour Mix Orders';
     var missingmsg = '';
     var data = base.getData('FlavourMixOrders/' + batch);
@@ -1384,26 +1470,28 @@ function runflavourmixItem(batch, frombulk) {
         var neg = fromRunningtoReserved('Flavours/' + flavours[i].sku, flavours[i].val * data.stocking / 10);
 
         if (neg < 0) {
-            LOGDATA.data = LOGDATA.data.concat(returnData2(used, neg))
+            LOGDATA.data = LOGDATA.data.concat(returnData2(used, neg));
+            var msg = LOGDATA.data[LOGDATA.data.length - 1][1];
             logItem(LOGDATA);
             if (frombulk) {
-                return ['BREAK', 'MISSING: ' + LOGDATA.data[LOGDATA.data.length - 1][1]];
+                return ['BREAK', 'MISSING: ' +msg];
             } else {
                 data.wentNegative = true;
                 data.started = 0;
                 data.final_status = 0;
                 base.updateData('FlavourMixOrders/' + batch, data);
-                return 'MISSING: ' + LOGDATA.data[LOGDATA.data.length - 1][1];
+                return 'MISSING: ' + msg;
             }
         }
 
     }
     LOGDATA.data.push(['Sent to Mixing Team:', data.stocking]);
     data.final_status = 0;
+    data.movedtoNext = 0; 
     base.updateData('FlavourMixMixingTeam/' + data.batch, data);
-
+     logItem(LOGDATA);
     return ["", "Success"];
-
+  
 
 }
 

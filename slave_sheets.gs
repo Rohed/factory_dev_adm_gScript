@@ -107,7 +107,7 @@ function runBusy(batch, page) {
     var LOGDATA = {
         status: true,
         msg: '',
-        action: 'Marked Busy',
+        action: 'Marked In Progress',
         batch: batch,
         page: page,
         user: Session.getActiveUser().getEmail(),
@@ -118,7 +118,7 @@ function runBusy(batch, page) {
         var order = base.getData('Orders/' + batch);
 
         var dat = {
-            movedtoNext: "Busy",
+            movedtoNext: "In Progress",
             starttime: (new Date()).getTime(),
         };
         base.updateData(page + '/' + batch, dat);
@@ -129,11 +129,11 @@ function runBusy(batch, page) {
             for (var i = 0; i < batches.length; i++) {
                 var dat1 = {
                     starttime: (new Date()).getTime(),
-                    movedtoNext: "Busy"
+                    movedtoNext: "In Progress"
 
                 };
                 var dat2 = {
-                    mixing_status: "Busy"
+                    mixing_status: "In Progress"
                 };
                 base.updateData('Mixing/' + batches[i].batch, dat1);
                 base.updateData('Orders/' + batches[i].batch, dat2);
@@ -143,8 +143,8 @@ function runBusy(batch, page) {
 
             if (page == 'Production') {
 
-                data.production_status = "Busy"
-                order.production_status = "Busy"
+                data.production_status = "In Progress"
+                order.production_status = "In Progress"
 
             } else if (page == 'Printing') {
                 var d = new Date();
@@ -153,26 +153,26 @@ function runBusy(batch, page) {
                 var day = d.getDate() + 1;
                 data.expDate = Utilities.formatDate(new Date(year + 2, month, day), "GMT", "dd-MM-yyyy");
 
-                data.printing_status = "Busy"
-                order.printing_status = "Busy"
+                data.printing_status = "In Progress"
+                order.printing_status = "In Progress"
             } else if (page == 'Labelling') {
 
 
-                data.labelling_status = "Busy"
-                order.labelling_status = "Busy"
+                data.labelling_status = "In Progress"
+                order.labelling_status = "In Progress"
 
             } else if (page == 'Packaging') {
 
 
-                data.packaging_status = "Busy"
-                order.packaging_status = "Busy"
+                data.packaging_status = "In Progress"
+                order.packaging_status = "In Progress"
 
             } else if(page=='FlavourMixMixingTeam'){
-              data.final_status='Busy';
+              data.final_status='In Progress';
               data.starttime= (new Date()).getTime();
               
             } else if(page=='PremixColoring'){
-              data.final_status='Busy';
+              data.final_status='In Progress';
               data.starttime= (new Date()).getTime();
               
             }
@@ -181,7 +181,7 @@ function runBusy(batch, page) {
             base.updateData('Orders/' + batch, order);
           }
         }
-        LOGDATA.data.push(['Marked Busy:', batch]);
+        LOGDATA.data.push(['Marked In Progress:', batch]);
         logItem(LOGDATA);
         return 'Success';
     } catch (e) {
@@ -245,7 +245,7 @@ function overProd(batch, newBottles, sheet) {
 
         PtoReserved(premix, volume)
         LOGDATA.data.push(['To Reserved:' + premix, volume]);
-        object.final_status = "Busy"
+        object.final_status = "In Progress"
         toProduction(object);
         data.hasoverprod = true;
         data.overprod = newBottles - data.bottles;

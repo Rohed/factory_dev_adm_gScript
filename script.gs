@@ -296,7 +296,18 @@ function testMixMake() {
     };
     createMixOrder(data);
 }
+function getFlavourMixCodes(){
+var flavmixArr = [];
+   for(var i = 1; i <= 10;i++){
+    flavmixArr.push({
+    val:'flavMixVal_'+i,
+    name:'flavMixName_'+i,
+    sku:'flavMixSKU_'+i, 
+    });
 
+   }
+  return flavmixArr;
+}
 function getBatchesInMIXBATCH(mixbatch) {
     var mixARR = [];
     if (mixbatch.Batches) {
@@ -313,6 +324,8 @@ function getBatchesInMIXBATCH(mixbatch) {
 function createMixOrder(data) {
     var LOGARR = [];
     try {
+     
+      var flavourMixCodes = getFlavourMixCodes();
         var orig = {
             'recipe': data.recipe,
             'batch': data.batch,
@@ -341,8 +354,20 @@ function createMixOrder(data) {
             'priority': data.priority,
             'Location': 0,
             'productcode': data.productcode,
-            'productdescription': data.productdescription
+            'productdescription': data.productdescription,
+            'isFlavourMix':data.isFlavourMix,
+            'mixAmountNeeded':data.mixAmountNeeded
         };
+      if(orig.isFlavourMix){
+        flavourMixCodes.map(function(item){
+          var keys = Object.keys(item);
+          keys.map(function(key){
+          orig[item[key]] = data[item[key]];
+          })
+          
+        });
+      
+      }
         if (data.haspremix) {
             orig.haspremix = true;
             var dudcode = data.dudpremixCode
@@ -353,14 +378,13 @@ function createMixOrder(data) {
             orig.haspremix = false;
         }
        
-            orig.Nico = data.Nico;
-            orig.Nicotrecipe = data.Nicotrecipe;
-           orig.Nicosalts = data.Nicosalts;
-            orig.Nicotrecipesalts = data.Nicotrecipesalts;
-       
-            orig.CBDvalue = data.CBDvalue;
-            orig.CBDrecipe = data.CBDrecipe;
-       
+      orig.Nico = data.Nico;
+      orig.Nicotrecipe = data.Nicotrecipe;
+      orig.Nicosalts = data.Nicosalts;
+      orig.Nicotrecipesalts = data.Nicotrecipesalts; 
+      orig.CBDvalue = data.CBDvalue;
+      orig.CBDrecipe = data.CBDrecipe;
+      
         var mixingData = base.getData('MixingTeam');
         var mixARR = [];
         if (mixingData) {
@@ -407,7 +431,9 @@ function createMixOrder(data) {
                     'priority': data.priority,
                     'Location': 0,
                     'productcode': data.productcode,
-                    'productdescription': data.productdescription
+                    'productdescription': data.productdescription,
+                    'isFlavourMix': data.isFlavourMix,
+                    'mixAmountNeeded':data.mixAmountNeeded
                 };
               
                     newData.Nico = data.Nico;
@@ -417,7 +443,16 @@ function createMixOrder(data) {
                     
                     newData.CBDvalue = data.CBDvalue;
                     newData.CBDrecipe = data.CBDrecipe;
-             
+              if(orig.isFlavourMix){
+                flavourMixCodes.map(function(item){
+                  var keys = Object.keys(item);
+                  keys.map(function(key){
+                    newData[item[key]] = orig[item[key]];
+                  })
+                  
+                });
+                
+              }
                 LOGARR.push(['Sent to Mixing Team:', newData.QTY]);
                 toMixingTeam(newData, true, '');
             }
@@ -500,6 +535,7 @@ function createMixOrder(data) {
 }
 
 function toMixingTeam(data, createNew, old) {
+    var flavourMixCodes = getFlavourMixCodes();
     if (createNew) {
         var mixingData = base.getData('MixingTeam');
         var mixARR = [];
@@ -543,8 +579,11 @@ function toMixingTeam(data, createNew, old) {
             'Completed': 0,
             'Notes': '',
             'priority': data.priority,
-            'Location': 0
+            'Location': 0,
+           'isFlavourMix': data.isFlavourMix,
+          'mixAmountNeeded':data.mixAmountNeeded
         };
+      
         if (data.haspremix) {
             mixingData.haspremix = true;
             var dudcode = data.dudpremixCode
@@ -563,7 +602,16 @@ function toMixingTeam(data, createNew, old) {
       
             mixingData.CBDvalue = data.CBDvalue;
             mixingData.CBDrecipe = data.CBDrecipe;
-        
+           if(data.isFlavourMix){
+                flavourMixCodes.map(function(item){
+                  var keys = Object.keys(item);
+                  keys.map(function(key){
+                    mixingData[item[key]] = data[item[key]];
+                  })
+                  
+                });
+                
+              }
         var MIXBATCH = {
             orderdate: Utilities.formatDate(new Date(), "GMT", "dd-MM-yyyy"),
             QTYTOTAL: data.QTY,
@@ -585,6 +633,8 @@ function toMixingTeam(data, createNew, old) {
             'CompletionDate': 0,
             'customer': data.customer,
             'orderID': data.orderID,
+            'isFlavourMix': data.isFlavourMix,
+           'mixAmountNeeded':data.mixAmountNeeded
         };
       
             MIXBATCH.Nico = data.Nico;
@@ -594,12 +644,37 @@ function toMixingTeam(data, createNew, old) {
         
             MIXBATCH.CBDvalue = data.CBDvalue;
             MIXBATCH.cbd = data.recipe.cbd;
-       
+      if(data.isFlavourMix){
+        flavourMixCodes.map(function(item){
+          var keys = Object.keys(item);
+          keys.map(function(key){
+            MIXBATCH[item[key]] = data[item[key]];
+          })
+          
+        });
+        
+      }
         base.updateData('MixingTeam/' + mixingData.mix_batch_code + '/Batches/' + data.batch, mixingData);
         base.updateData('MixingTeam/' + mixingData.mix_batch_code, MIXBATCH);
     } else {
         var MIXBATCH = base.getData('MixingTeam/' + old.MIXNAME);
         MIXBATCH.QTYTOTAL = MIXBATCH.QTYTOTAL + data.QTY;
+      MIXBATCH.mixAmountNeeded = MIXBATCH.mixAmountNeeded + data.mixAmountNeeded;
+       if(data.isFlavourMix){
+        flavourMixCodes.map(function(item){
+          var keys = Object.keys(item);
+          keys.map(function(key){
+            if(!MIXBATCH[item[key]]){
+            MIXBATCH[item[key]] = data[item[key]];
+            }else if(key == 'val'){
+              MIXBATCH[item[key]] += data[item[key]];
+            }
+          
+          })
+          
+        });
+        
+      }
         base.updateData('MixingTeam/' + old.MIXNAME, MIXBATCH);
         var mixingData = {
             'recipe': data.recipe,
@@ -628,7 +703,9 @@ function toMixingTeam(data, createNew, old) {
             'Completed': 0,
             'Notes': '',
             'priority': data.priority,
-            'Location': 0
+            'Location': 0,
+            'isFlavourMix':data.isFlavourMix, 
+            'mixAmountNeeded':data.mixAmountNeeded, 
         };
         if (data.haspremix) {
             mixingData.haspremix = true;
@@ -647,7 +724,16 @@ function toMixingTeam(data, createNew, old) {
        
             mixingData.CBDvalue = data.CBDvalue;
             mixingData.CBDrecipe = data.CBDrecipe;
-       
+      if(data.isFlavourMix){
+        flavourMixCodes.map(function(item){
+          var keys = Object.keys(item);
+          keys.map(function(key){
+            mixingData[item[key]] = data[item[key]];
+          })
+          
+        });
+        
+      }
         base.updateData('MixingTeam/' + old.MIXNAME + '/Batches/' + data.batch, mixingData);
     }
     
@@ -669,6 +755,8 @@ function toMixingTeam(data, createNew, old) {
 }
 
 function toMixing(data) {
+    var flavourMixCodes = getFlavourMixCodes();
+
     var mixingData = base.getData('Mixing');
     var mixARR = [];
     if (mixingData) {
@@ -711,6 +799,8 @@ function toMixing(data) {
         'movedtoNext': 0,
         'productcode': data.productcode,
         'productdescription': data.productdescription,
+      'isFlavourMix':data.isFlavourMix, 
+      'mixAmountNeeded':data.mixAmountNeeded, 
     };
     if (data.haspremix) {
         mixingData.haspremix = true;
@@ -734,7 +824,16 @@ function toMixing(data) {
         mixingData.CBDvalue = data.CBDvalue;
         mixingData.CBDrecipe = data.CBDrecipe;
         mixingData.cbd = data.CBDrecipe;
- 
+  if(data.isFlavourMix){
+        flavourMixCodes.map(function(item){
+          var keys = Object.keys(item);
+          keys.map(function(key){
+            mixingData[item[key]] = data[item[key]];
+          })
+          
+        });
+        
+      }
     if(data.recipe.Color){
      mixingData.Color = data.recipe.Color;
     }
@@ -788,10 +887,26 @@ function moveMain(item) {
         var sheet_name = item.current;
         var next_sheet = sheets[sheets.indexOf(sheet_name) + 1];
         if (sheet_name == 'MixingTeam') {
+           var flavourMixCodes = getFlavourMixCodes();
             var batches = getBatchesInMIXBATCH(item);
             for (var i = 0; i < batches.length; i++) {
+              if(batches[i].isFlavourMix){
+                var valueFromFlavour = fixValue(batches[i].flavvalue - batches[i].mixAmountNeeded)
+                if(valueFromFlavour){
+                fromReservedtoCompleted("Flavours/" + batches[i].flavour.sku, valueFromFlavour * batches[i].QTY / 1000);
+                LOGARR.push(['Flavour:',valueFromFlavour * batches[i].QTY / 1000]);
+                }
+                for(var f = 0; f < flavourMixCodes.length; f++){
+                  if(batches[i][flavourMixCodes[f].val]){
+                        fromReservedtoCompleted("Flavours/" + batches[i][flavourMixCodes[f].sku], batches[i][flavourMixCodes[f].val] * batches[i].QTY / 1000);
+                        LOGARR.push(['Flavour Mix Item '+batches[i][flavourMixCodes[f].sku]+':',valueFromFlavour * batches[i].QTY / 1000]);
+                  }
+                }
+              }else{
                 fromReservedtoCompleted("Flavours/" + batches[i].flavour.sku, batches[i].flavvalue * batches[i].QTY / 1000);
                 LOGARR.push(['Flavour:', batches[i].flavvalue * batches[i].QTY / 1000]);
+              }
+                
                 fromReservedtoCompleted("Misc/VG", batches[i].VGval * batches[i].QTY);
                 LOGARR.push(['VG:', batches[i].VGval * batches[i].QTY]);
                 if (isNaN(batches[i].AGval)) {

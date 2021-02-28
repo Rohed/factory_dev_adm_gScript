@@ -44,6 +44,9 @@ var list=JSONtoARR(raw);
   }
   base.updateData(sheets[i],raw);
 }
+  
+  base.removeData('Mixing');
+  base.removeData('MixingTeam');
 }
 function you_spin_me_right_round_baby_right_round() {
 var premixes=getSheetData2('PremixesTypes');

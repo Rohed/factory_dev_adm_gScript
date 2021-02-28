@@ -247,8 +247,7 @@ function createRefferenceDB(id) {
 function updatebotlid() {
     var bottles = JSONtoARR(base.getData('BottleTypes'));
     var Caps = JSONtoARR(base.getData('Lids'));
-    var pc = JSONtoARR(base.getData('References/ProductCodes'));
-    var pd = JSONtoARR(base.getData('References/Descriptions'));
+    var pc = JSONtoARR(base.getData('References/ProductCodes')); 
     for (var j = 0; j < pc.length; j++) {
         for (var i = 0; i < Caps.length; i++) {
             if (Caps[i].name == pc[j].lid) {
@@ -265,37 +264,19 @@ function updatebotlid() {
             }
         }
     }
-    for (var j = 0; j < pd.length; j++) {
-        for (var i = 0; i < bottles.length; i++) {
-            if (bottles[i].name == pd[j].btype) {
-                pd[j].botSKU = bottles[i].sku;
-                break;
-            }
-        }
-    }
-    for (var j = 0; j < pd.length; j++) {
-        for (var i = 0; i < Caps.length; i++) {
-            if (Caps[i].name == pd[j].lid) {
-                pd[j].lidSKU = Caps[i].sku;
-                break;
-            }
-        }
-    }
+ 
     var options1 = '{';
     var options2 = '{';
     for (var i = 0; i < pc.length; i++) {
         options1 += '"' + pc[i].prod + '":' + JSON.stringify(pc[i]) + ',';
     }
-    for (var i = 0; i < pd.length; i++) {
-        options1 += '"' + pc[i].descr + '":' + JSON.stringify(pd[i]) + ',';
-    }
+    
     options1 += '}';
     options2 += '}';
     var ob1 = JSON.parse(options1);
     var ob2 = JSON.parse(options2);
     // base.removeData('References');
-    base.updateData('References/ProductCodes', ob1);
-    base.updateData('References/Descriptions', ob2);
+    base.updateData('References/ProductCodes', ob1); 
 }
 
 function importRecipesFromSheet(id) {
@@ -1147,8 +1128,7 @@ function intersect(a, b) {
 function updatebotlid() {
     var bottles = JSONtoARR(base.getData('BottleTypes'));
     var Caps = JSONtoARR(base.getData('Lids'));
-    var pc = JSONtoARR(base.getData('References/ProductCodes'));
-    var pd = JSONtoARR(base.getData('References/Descriptions'));
+    var pc = JSONtoARR(base.getData('References/ProductCodes')); 
     for (var j = 0; j < pc.length; j++) {
         for (var i = 0; i < Caps.length; i++) {
             if (Caps[i].name == pc[j].lid) {
@@ -1165,37 +1145,19 @@ function updatebotlid() {
             }
         }
     }
-    for (var j = 0; j < pd.length; j++) {
-        for (var i = 0; i < bottles.length; i++) {
-            if (bottles[i].name == pd[j].btype) {
-                pd[j].botSKU = bottles[i].sku;
-                break;
-            }
-        }
-    }
-    for (var j = 0; j < pd.length; j++) {
-        for (var i = 0; i < Caps.length; i++) {
-            if (Caps[i].name == pd[j].lid) {
-                pd[j].lidSKU = Caps[i].sku;
-                break;
-            }
-        }
-    }
+   
     var options1 = '{';
     var options2 = '{';
     for (var i = 0; i < pc.length; i++) {
         options1 += '"' + pc[i].prod + '":' + JSON.stringify(pc[i]) + ',';
     }
-    for (var i = 0; i < pd.length; i++) {
-        options1 += '"' + pc[i].descr + '":' + JSON.stringify(pd[i]) + ',';
-    }
+    
     options1 += '}';
     options2 += '}';
     var ob1 = JSON.parse(options1);
     var ob2 = JSON.parse(options2);
     // base.removeData('References');
-    base.updateData('References/ProductCodes', ob1);
-    base.updateData('References/Descriptions', ob2);
+    base.updateData('References/ProductCodes', ob1); 
 }
 
 function importFlavourMixesFromSheet(id){

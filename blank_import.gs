@@ -463,12 +463,10 @@ function createRefferenceDB2(id,data) {
   var msg = LOGDATA.msg;
   logItem(LOGDATA);
   //      base.updateData('References/ProductCodes', ob3);
-  
-  //     base.updateData('References/Descriptions', ob4);
+   
   
   base.updateData('References/ProductCodes', ob1);
-  
-  base.updateData('References/Descriptions', ob2);
+   
   
   return msg + ' \n Updated.';
 }

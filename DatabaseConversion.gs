@@ -1,3 +1,17 @@
+function changeBusyToInProgress(){
+  var sheets=['Orders','FlavourMixOrders','Mixing','MixingTeam','FlavourMixMixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
+ 
+  for(var i=0;i<sheets.length;i++){
+  
+    var data=base.getData(sheets[i]);
+    var string = JSON.stringify(data);
+    string = string.replace(/Busy/gm,'In Progress');
+    var newData = JSON.parse(string);
+    base.updateData(sheets[i],newData);
+    
+  }
+}
+
 function correctCompletionDate(){
   var sheets=[ 'Orders'];
   var sheets=['Production' ];

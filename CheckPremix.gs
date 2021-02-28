@@ -258,14 +258,82 @@ function CheckPremixed(data) {
             }
             ORDER_FLOW.LOG.push(obj);
             ORDER_FLOW.LOGARR.push(['Flavour:', data.flavvalue * data.QTY / 1000]);
-            var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, data.flavvalue * data.QTY / 1000);
-
+            var flavourNeeded = +(data.flavvalue * data.QTY / 1000).toFixed(12)
+            var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, flavourNeeded);
+            var flavourValue = Math.abs(+(neg).toFixed(12));
+          var flavourToReturn =+(flavourNeeded > flavourValue? flavourNeeded - flavourValue :flavourValue-  flavourNeeded).toFixed(12) ;
             if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
+                   
+                  var baseFlavour = base.getData('Flavours/' + data.flavour.sku);
+                  if(baseFlavour){
+                    if(baseFlavour.type === 'mix'){
+                      data.flavourMixPartsMissing =false;
+                      data.isFlavourMix = true;
+                       
+                      data.mixAmountNeeded =parseFloat((parseFloat(flavourValue)*1000).toFixed(2)); 
+                      obj.displayGroup = 'Flavour Mix'
+                   
+                      ORDER_FLOW.hasNegative = true;
+                      var newObj = JSON.parse(JSON.stringify(obj))
+                      newObj.value = neg;
+                      ORDER_FLOW.NEGATIVELOG.push(newObj);
+                      
+                       var flavourMix = base.getData('FlavourMixes/' + data.flavour.sku);
+                      if(flavourMix){
+                       
+                        var flavourList = JSONtoARR(flavourMix.flavours);
+                           var flavourMixCodes = getFlavourMixCodes();
+                        for(var f = 0; f < flavourList.length ;f++){
+                          var rawValue = (flavourValue * ( flavourList[f].val/10))
+                          var listItemValue =  parseFloat(parseFloat(rawValue).toFixed(2));
+                          ORDER_FLOW.USAGE['Flavour_Mix_Item_'+(f+1)] = {
+                            sku: flavourList[f].sku,
+                            name: flavourList[f].name,
+                            qty: listItemValue,
+                          };
+                          data.used.push(['Flavours/',flavourList[f].sku,listItemValue]);
+                          var obj = {
+                            displayGroup: 'Flavours',
+                            tab: 'Flavours',
+                            sku: flavourList[f].sku,
+                            name: flavourList[f].name,
+                            value: listItemValue
+                          }
+                          ORDER_FLOW.LOG.push(obj);
+                          ORDER_FLOW.LOGARR.push(['Flavour:', listItemValue]);
+                          var neg = fromRunningtoReserved('Flavours/' + flavourList[f].sku, listItemValue);
+                          
+                          if (neg < 0) {
+                            data.flavourMixPartsMissing = true;
+                            ORDER_FLOW.hasNegative = true;
+                            var newObj = JSON.parse(JSON.stringify(obj))
+                            newObj.value = neg;
+                            ORDER_FLOW.NEGATIVELOG.push(newObj);
+                          }else{
+                            //TODO FIX DISPLAYED VALUE TO MATCH MG
+                            // CHECK IF Showing missing flav mix, flavour
+                            data[flavourMixCodes[f].name] = flavourList[f].name;
+                            data[flavourMixCodes[f].sku] = flavourList[f].sku;
+                            data[flavourMixCodes[f].val] =  parseFloat((parseFloat(rawValue)*1000).toFixed(2));
+                          }
+                        }
+                        
+                      }else{
+                      
+                      throw new Error('Flavour Mix '+data.flavour.sku+' not in database!'); 
+                      }
+                        
+                      
+                    }else{
+                       ORDER_FLOW.hasNegative = true;
+                      var newObj = JSON.parse(JSON.stringify(obj))
+                      newObj.value = neg;
+                      ORDER_FLOW.NEGATIVELOG.push(newObj);
+               
+                    }
+                    
+                  }
+            }
 
 
             ORDER_FLOW.USAGE.Mixing = {
@@ -427,10 +495,20 @@ function CheckPremixed(data) {
 
           if(!ORDER_FLOW.hasNegative){
             ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
+          }else if(ORDER_FLOW.hasNegative && data.isFlavourMix && data.isFlavourMix && data.flavourMixPartsMissing == false){
+            var negativeItems = ORDER_FLOW.NEGATIVELOG.filter(function(obj){
+              return obj.tab !== 'Flavours';
+            });
+            if(negativeItems.length === 0){
+              
+                 fromReservedToRunning('Flavours/' + data.flavour.sku, flavourNeeded);
+              fromRunningtoReserved('Flavours/' + data.flavour.sku, flavourToReturn);
+             ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
+            }
           }
 
             //DUD Premix ORDER
-            if (forpremix > 0) {
+            if (forpremix > 0 && !ORDER_FLOW.hasNegative) {
                 var object = {
                     batch: data.batch + "RU",
 
@@ -660,9 +738,9 @@ function returnData2(data, neg) {
         fromReservedToRunning(data[i][0] + data[i][1], data[i][2]);
         LOGARR.push(['To Running: ' + data[i][0] + data[i][1], data[i][2]]);
     }
-    var name = base.getData(data.used[data.used.length - 1][0] + data.used[data.used.length - 1][1] + '/name');
+    var name = base.getData(data[data.length - 1][0] + data[data.length - 1][1] + '/name');
 
-    LOGARR.push(['WENT NEGATIVE', Math.abs(neg) + ' - ' + data.used[data.used.length - 1][0] + data.used[data.used.length - 1][1] + ' - ' + name])
+    LOGARR.push(['WENT NEGATIVE', Math.abs(neg) + ' - ' + data[data.length - 1][0] + data[data.length - 1][1] + ' - ' + name])
 
     return LOGARR;
 }

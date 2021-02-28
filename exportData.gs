@@ -1,5 +1,5 @@
 function export(tabs) {
- //var tabs=['PC/PD'];
+// var tabs=['Recipes'];
  var LOGDATA={
     status:true,
     msg:'',
@@ -45,60 +45,118 @@ for(var j=0;j<tabs.length;j++){
       sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
   }else if(tabs[j]== 'Mixing'){
        
-       
+        var flavourMixCodes = getFlavourMixCodes();
           var data=getSheetData('Mixing');
         if(!data){continue;}
-     var headerRow=['Completed','Priority','Batch','OrderID',"Brand",'Product Code','Product Description','Recipe','Flavour','Order Date','QTY(Litres)','VG (MG)','AG (MG)',
-     'PG (MG)','Nicotine (MG)','Nicotine Salts (MG)','CBD (MG)','MCT (MG)','Flavour (MG)'];
-       var values=[];
-      values.push(headerRow);
-      for(var i=0;i<data.length;i++){
-       if(!data[i].recipe){continue;}
-       data[i].brand =   data[i].brand ?   data[i].brand : "";
-      values.push([data[i].final_status,data.priority,data[i].batch,data[i].orderID,data[i].brand,data[i].productcode,data[i].productdescription,data[i].recipe.name,data[i].flavour.name,formatDateDisplay(data[i].orderdate),
-      data[i].QTY,data[i].VGval,data[i].AGval,data[i].PGval,data[i].Nico,data[i].Nicosalts,data[i].CBDvalue,data[i].MCTval,data[i].flavvalue]);
-      }
+   var flavmixArr = [];
+    for(var f = 1; f <= 10;f++){
+    flavmixArr.push({
+    key:'flavMixName_'+f,
+    head:'F. Mix Flavour '+f+' Name', 
+    });
+   flavmixArr.push({
+    key:'flavMixVal_'+f,
+     head:'F. Mix Flavour '+f+' Value (MG)', 
+    });
+    }
+        var flavkeys= flavmixArr.map(function(item){ return item.key;});
+         var flavHeads= flavmixArr.map(function(item){ return item.head;});
+    var keys=['menu','notes','move','final_status','priority','batch','orderID','brand','productcode','productdescription','recipe.name','flavour.name','orderdate','QTY','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded'];
+
+    keys = keys.concat(flavkeys);
+    var keys_remaining = ['mixing','premixed','unbranded','branded','backtubed'];
+    keys = keys.concat(keys_remaining);
+    
+    var heads = ['Menu', 'Notes', 'Move', 'Completed', 'Priority', 'Batch', 'Order ID', 'Brand', 'Code', 'Description', 'Recipe', 'Flavour','Order Date',
+        'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix ammount needed (MG)'];
+     heads = heads.concat(flavHeads);
+   var heads_remaining = [ 'Backed By Mixing', 'Backed By Premix', 'Backed By Unbranded', 'Backed By Branded',
+        'Backed By Branded Packaged'
+    ];
+     heads = heads.concat(heads_remaining);
+    
+      var values = [];
+     values.push(heads);
+     values = values.concat(exportRows(keys, data));
+ 
       var sheet=file.insertSheet('Mixing');
       sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
-      
-       
-       
-       
-       
+ 
    }else if(tabs[j]== 'MixingTeam'){
 
      var data=JSONtoARR(base.getData('MixingTeam'));
         if(!data){continue;}
-     var headerRow=['Completed','Priority','Date of Production','Batch','Mix Batch','Recipe','Flavour','Order Date','QTY(Litres)','VG (MG)','AG (MG)',
-     'PG (MG)','Nicotine (MG)','Nicotine Salts (MG)','CBD (MG)','MCT (MG)','Flavour (MG)','Notes - Mixing Dept','Location','Start Date','Completion Date','VG supplier batch','PG supplier batch','Nicotine supplier batch','Flavour supplier batch'];
-       var values=[];
-      values.push(headerRow);
+     
+     
+     var flavmixArr = [];
+    for(var f = 1; f <= 10;f++){
+    flavmixArr.push({
+    key:'flavMixName_'+f,
+    head:'F. Mix Flavour '+f+' Name', 
+    });
+   flavmixArr.push({
+    key:'flavMixVal_'+f,
+     head:'F. Mix Flavour '+f+' Value', 
+    });
+    }
+     var flavkeys= flavmixArr.map(function(item){ return item.key;});
+     var flavHeads= flavmixArr.map(function(item){ return item.head;});
+     var keys=['Completed','priorities','prodDate','batches','customers','orderIDs','brands','MIXNAME','RECIPE','FLAVOUR','orderDates','QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded'];
+     
+     keys = keys.concat(flavkeys);
+     var keys_remaining = ['Notes','Location','factory','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier'];
+     keys = keys.concat(keys_remaining);
+     
+     var heads = [ 'Completed', 'Priority','Date of Production', 'Batch','Customers', 'Order IDs', 'Brands', 'Mix Batch Code', 'Recipe', 'Flavour','Order Date',
+                  'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix ammount needed (MG)'];
+     heads = heads.concat(flavHeads);
+     var heads_remaining = [ 'Notes - Mixing Dept', 'Location', 'Factory', 'Start Date',  'Completion Date','VG supplier batch','PG supplier batch','Nicotine supplier batch','Flavour supplier batch' ];
+     heads = heads.concat(heads_remaining);
+ 
       for(var i=0;i<data.length;i++){
       
-            var batches=[];
-            var orderDates=[];
-            var priorities=[];
-            var mixARR=[];
-            if(data[i].Batches){
-               var result = Object.keys(data[i].Batches).map(function(key) {
-                    return [Number(key), data[i].Batches[key]];
-                  });
-                  
-               
-                  for(var k=0;k<result.length;k++){
-                    mixARR.push(result[k][1]);
-                    
-                  }
-                  
-            for(var k=0;k<mixARR.length;k++){
-            batches.push(mixARR[k].batch);
-            orderDates.push(mixARR[k].orderdate);
-            priorities.push(mixARR[k].priority);
-            }      
-      values.push([data[i].Completed,priorities.join(),data[i].prodDate,batches.join(),data[i].MIXNAME,data[i].RECIPE,data[i].FLAVOUR,orderDates.join(),
-      data[i].QTYTOTAL,data[i].VGval,data[i].AGval,data[i].PGval,data[i].Nico,data[i].Nicosalts,data[i].CBDvalue,data[i].MCTval,data[i].flavvalue,data[i].Notes,data[i].Location,formatDateDisplay2(data[i].starttime),data[i].CompletionDate,data[i].vgSupplier,data[i].pgSupplier,data[i].nicSupplier,data[i].flavSupplier]);
+        var batches=[];
+        var orderDates=[];
+        var priorities=[];
+        var mixARR=[];
+        var customers=[];
+        var orderIDs=[];
+        var brands = [];
+        
+        var result = data[i].Batches? JSONtoARR(data[i].Batches) : [];
+        console.log('result',result);
+        
+        
+        for(var j=0;j<result.length;j++){
+          try{
+            result[j].brand = result[j].brand ? result[j].brand : "";
+            brands.push(result[j].brand);
+            batches.push(result[j].batch);
+            orderDates.push(formatDateDisplay(result[j].orderdate));
+            priorities.push(result[j].priority);
+            customers.push(result[j].customer);
+            orderIDs.push(result[j].orderID);
+        result[j].brands = brands.join();
+        result[j].batches = batches.join();
+       result[j].orderDates = orderDates.join();
+        result[j].priorities = priorities.join();
+        data[i].customers = customers.join();
+        data[i].orderIDs = orderIDs.join();
+          }catch(e){
+            
+            console.log('failed to push',e.message);}
+        }
+        data[i].brands = brands.join();
+        data[i].batches = batches.join();
+        data[i].orderDates = orderDates.join();
+        data[i].priorities = priorities.join();
+        data[i].customers = customers.join();
+        data[i].orderIDs = orderIDs.join();
       }
-      }
+     
+     var values = [];
+     values.push(heads);
+     values = values.concat(exportRows(keys, data));
       var sheet=file.insertSheet('Mixing Team');
       sheet.getRange(1, 1, values.length, values[0].length).setValues(values);
       
@@ -352,17 +410,32 @@ for(var j=0;j<tabs.length;j++){
      var baseData=base.getData('References/ProductCodes');
      var keys=Object.keys(baseData);
             var data=JSONtoARR(baseData);
-       var headerRow = ['Product Code','Product Description','Unbranded SKU','Unbranded Description','Premix SKU','Premix Description','Colored Premix SKU','Colored Premix Description','Linked BB SKU','Brand','Brand SKU',
-     'Bottle','Bottle SKU','Fill','Fill Time','Cap','Cap SKU','Packaging','Packaging SKU','Bottles Per Package','Box','Box SKU','Tubes Per Box','NIB','Flavour','Flavour SKU','Recipe','Recipe ID',
+       var flavMixHead = [];
+       var flavMixKey = [];
+ 
+       var headerRow1 = ['Product Code','Product Description','Unbranded SKU','Unbranded Description','Premix SKU','Premix Description','Colored Premix SKU','Colored Premix Description','Linked BB SKU','Brand','Brand SKU',
+     'Bottle','Bottle SKU','Fill','Fill Time','Cap','Cap SKU','Packaging','Packaging SKU','Bottles Per Package','Box','Box SKU','Tubes Per Box','NIB','Flavour','Flavour SKU'];
+       
+          var keyRow1 = ['prod', 'descr', 'unbrandSKU', 'unbranddescr', 'premixSKU', 'premixdescr','premixSKUColored','premixdescrColored','linkedBB','brand', 'brandSKU', 'btype', 'botSKU','fill','','lid','lidSKU', 
+                     'packagingType.name', 'packagingType.sku','', 'boxname.name', 'boxname.sku','','NIB','flavour.name', 'flavour.sku']
+       
+       
+             for (var i = 1; i <= 10; i++){
+         headerRow1.push('Flavour Mix Name Part '+i);	 
+         headerRow1.push('Flavour Mix SKU Part '+i);
+         headerRow1.push('Flavour Mix Value Part '+i);
+         keyRow1 = keyRow1.concat(['','','']);
+       
+     }
+        var headerRow = headerRow1.concat(['Recipe','Recipe ID',
      'VG','AG','PG','Nicotine','Nicotine Salts','CBD','MCT','Recipe Flavour','VG Ratio','PG Ratio','Strength','Color','Color SKU','Color %',
      'Bottle Label','Bottle Label SKU','Pre Printed Bottle Label','Pre Printed Bottle Label SKU','Pack Label','Pack Label SKU','Pre Printed Pack Label',
      'Pre Printed Pack Label SKU','Barcode','ECID','Price'
-                       ];
-       var keyRow = ['prod', 'descr', 'unbrandSKU', 'unbranddescr', 'premixSKU', 'premixdescr','premixSKUColored','premixdescrColored','linkedBB','brand', 'brandSKU', 'btype', 'botSKU','fill','','lid','lidSKU', 
-                     'packagingType.name', 'packagingType.sku','', 'boxname.name', 'boxname.sku','','NIB','flavour.name', 'flavour.sku','recipe.name', 'recipe.id',
+                       ]);
+     var keyRow = keyRow1.concat(['recipe.name', 'recipe.id',
                      '','','','','','','','','','','','','','',
                       'botlabel', 'botlabelsku', 'ppbotlabel', 'ppbotlabelsku', 'packlabel', 'packlabelsku', 'pppacklabel', 'pppacklabelsku', 'barcode', 'ecid', 'price'
-                    ];
+                    ]);
  
             var values = [];
             for (var i = 0; i < data.length; i++) {
@@ -1650,4 +1723,45 @@ function getPropByString(obj, propString) {
         }
     }
     return obj[props[i]] ? obj[props[i]] : '' ;
+}
+
+
+function exportRows(keys, data, machinesP) {
+    var values = [];
+    for (var i = 0; i < data.length; i++) {
+        var row = [];
+        for (var j = 0; j < keys.length; j++) {
+
+            if (keys[j] == 'orderdate' || keys[j] == 'dateshipped') {
+                row.push(formatDateDisplay(data[i][keys[j]]));
+            } else if (keys[j] == 'packagingType.name') {
+                row.push(getPropByString(data[i], 'packagingType.name'));
+            } else if (keys[j] == 'boxname.name') {
+                row.push(getPropByString(data[i], 'boxname.name'));
+            } else if (keys[j] == 'CompletionDate' || keys[j] == 'runtime' || keys[j] == 'starttime'|| keys[j] == 'prodDate') {
+                row.push(formatDateDisplay2(data[i][keys[j]]));
+            } else if (keys[j] == 'machineP') {
+
+                if (data[i].machineP) {
+                    row.push(machinesP[data[i].machineP] ? machinesP[data[i].machineP].name : '');
+                } else {
+                    row.push('');
+                }
+
+            } else if (keys[j] == 'machineL') {
+                if (data[i].machineL) {
+                    row.push(data[i].machineL);
+                } else {
+                    row.push('');
+                }
+
+            } else {
+                row.push(data[i][keys[j]] || ' ');
+            }
+
+        }
+        values.push(row);
+    }
+
+    return values;
 }

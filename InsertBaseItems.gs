@@ -340,7 +340,7 @@ function generateForSingleBrand2(prod,descr) {
           var sku=''
           var item = {
             "sku": link,
-            "name": 'BB '+descr.replace('3 x 10ml','10ml').replace('4 x 10ml','10ml').replace(/\./g, ""),
+            "name": 'BB '+fullProd.desc.replace('3 x 10ml','10ml').replace('4 x 10ml','10ml').replace(/\./g, ""),
             "Running": 0,
             "Reserved": 0,
             "Completed": 0,

@@ -1,3 +1,6 @@
+function fixValue(value){
+  return +(value).toFixed(12)
+}
 function fromRunningtoReserved(item, value) {
     if (isNaN(value)) {
         value = 0;
@@ -7,15 +10,15 @@ function fromRunningtoReserved(item, value) {
     if (orig1) {
   
       if(orig1.Running < 0){ 
-        orig1.Running = orig1.Running - value;
-        orig1.Reserved = orig1.Reserved + value;
+        orig1.Running = fixValue(orig1.Running - value);
+        orig1.Reserved = fixValue(orig1.Reserved + value);
         neg = -value; 
         
       }else{
-        orig1.Running = orig1.Running - value;
-        orig1.Reserved = orig1.Reserved + value;
+        orig1.Running = fixValue(orig1.Running - value);
+        orig1.Reserved = fixValue(orig1.Reserved + value);
         if( orig1.Running<0){
-         neg = orig1.Running;
+         neg = fixValue(orig1.Running);
         }
       
       }

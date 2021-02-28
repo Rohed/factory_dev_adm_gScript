@@ -87,7 +87,7 @@ function getSearchValues(page, DBpage, key, num) {
         }, {
             name: 'Not Run'
         }, {
-            name: 'Busy'
+            name: 'In Progress'
         }], 'final_status', num];
     } else {
         var list = JSONtoARR(base.getData(DBpage)).filter(function(item){return item.name}).sort(sortSTRINGLH('name'));
@@ -135,7 +135,7 @@ function getProductCodes() {
 }
 
 function getProductDescriptions() {
-    var data = base.getData('References/Descriptions');
+    var data = base.getData('References/ProductCodes');
     if (data) {
     
         return JSONtoARR(data).sort(sortFunction);
@@ -640,8 +640,7 @@ function delete_PCD(pc,pd){
     data:new Array()
   };
   base.removeData('References/ProductCodes/'+pc);
-  
-  base.removeData('References/Descriptions/'+pd);
+   
   LOGDATA.data.push(['Removed:',pc]);
 
 logItem(LOGDATA);
@@ -948,7 +947,7 @@ base.updateData('Orders',ordersBASE);
 
 function getSearchedArray(page, params) {
 
-if(params.equalTo == 'all'||page=='QTY'||page=='Locations'||page=='Finctions'){
+if(params.equalTo == 'all'||page=='QTY'||page=='Locations'||page=='Functions'){
 
  return [page,JSONtoARR(base.getData(page))];
 }
@@ -965,7 +964,7 @@ if(page=='Inventory'){
 
 }
   if(page == 'Shipping'){
-    if(params.equalTo == 'Not Run'||params.equalTo == 'Busy'||params.equalTo == 'Completed'){
+    if(params.equalTo == 'Not Run'||params.equalTo == 'In Progress'||params.equalTo == 'Completed'){
       return [page,JSONtoARR(base.getData(page))];
     }else{
         if(params.orderBy != 'word'){
@@ -1031,7 +1030,7 @@ var forord=false;
                         return item.final_status==0;
                       });
                         return [page, data];
-                    } else if (params.equalTo == 'Busy') {
+                    } else if (params.equalTo == 'In Progress') {
                         params.orderBy = 'final_status';
                         params.equalTo = 'started';
                         
@@ -1045,7 +1044,7 @@ var forord=false;
                      return [page, data];
                     }
                 } else if (page == 'MixingTeam') {
-                    if (params.equalTo == 'Busy') {
+                    if (params.equalTo == 'In Progress') {
                         params.orderBy = 'movedtoNext';
 
                     } else if (params.equalTo == 'Not Run') {
@@ -1057,7 +1056,7 @@ var forord=false;
                     }
 
                 } else {
-                    if (params.equalTo == 'Busy') {
+                    if (params.equalTo == 'In Progress') {
                         params.orderBy = 'movedtoNext';
                     } else if (params.equalTo == 'Not Run') {
                         params.equalTo = 0;
@@ -1107,19 +1106,19 @@ function TESTSEARCHFOR() {
 //    searcharr.push(['Shipping', params]);
 
     var params = {
-        orderBy: 'word',
-        equalTo: "VG",
+        orderBy: 'final_status',
+        equalTo: "Not Run",
 
     }
      
-    searcharr.push(['Inventory', params]);
+    searcharr.push(['FlavourMixMixingTeam', params]);
 
    var data=searchFor(searcharr);
     Logger.log(data);
 }
 
 function searchFor(searchARR) {
-if(searchARR[0][0] =='Reporting'|| searchARR[0][0] == 'Finctions'){
+if(searchARR[0][0] =='Reporting'|| searchARR[0][0] == 'Functions'){
 return [,]
 }
 
@@ -1383,16 +1382,14 @@ function save_PCD(obj, old, editold) {
     user:Session.getActiveUser().getEmail(),
     data:new Array()
   };
-    if (editold) {
-        //base.removeData('References/Descriptions/'+old.descr);
+    if (editold) { 
         //base.removeData('References/ProductCodes/'+old.prod);
         var descr = obj.productdescription;
         var prod = obj.productcode;
         descr = descr.replace(/&/g, '').replace('&', '').replace('/', '').replace('(', '').replace(')', '').replace('.', '');
         prod = prod.replace(/&/g, '').replace('&', '').replace('/', '').replace('(', '').replace(')', '').replace('.', '');
         obj.prod = prod;
-        obj.descr = descr;
-        base.updateData('References/Descriptions/' + descr, obj);
+        obj.descr = descr; 
         base.updateData('References/ProductCodes/' + prod, obj);
         var descr2 = descr.split(': ');
         var name2 = descr2[1].replace('3 x 10ml', '10ml').replace('4 x 10ml', '10ml').replace(/\./g, "");
@@ -1415,7 +1412,7 @@ LOGDATA.action='Edit';
         prod = prod.replace(/&/g, '').replace('&', '').replace('/', '').replace('(', '').replace(')', '').replace(/\./gi, '');
         obj.prod = prod;
         obj.descr = descr;
-        base.updateData('References/Descriptions/' + descr, obj);
+        
         base.updateData('References/ProductCodes/' + prod, obj);
         generateForSingleBrand3(prod, descr);
         var descr2 = descr.split(': ');
@@ -1444,7 +1441,7 @@ Logger.log('PC  '+PC);
         var formdata = getFormData();
 
         var EPC = base.getData('References/ProductCodes/' + PC);
-        var EPD = EPC.descr;
+        var EPD = EPC.productdescription;
         var arr = [formdata, EPC, EPD, 'EPC']
         return arr;
     } catch (e) {
@@ -1452,12 +1449,12 @@ Logger.log('PC  '+PC);
     }
 }
 
-function getEPDandFormdata(PD) {
-Logger.log('PD  '+PD);
+function getEPDandFormdata(productcode) {
+Logger.log('PD  '+productcode);
     try {
         var formdata = getFormData();
 
-        var EPD = base.getData('References/Descriptions/' + PD);
+        var EPD = base.getData('References/ProductCodes/' + productcode);
         var EPC = EPD.prod;
         var arr = [formdata, EPC, EPD, 'EPD']
         return arr;
@@ -1472,11 +1469,7 @@ function getPCSelect(PC) {
     return ret;
 }
 
-function getPDSelect(PD) {
-    var ret = base.getData('References/Descriptions/' + PD);
-    return ret;
-}
-
+ 
 
 function createDatalistPCPD() {
     var PD = getProductDescriptions();
@@ -1591,7 +1584,11 @@ function getFormDataSingle(item, type, num) {
     if (type == 'PC') {
         var data = base.getData('References/ProductCodes/' + item);
     } else {
-        var data = base.getData('References/Descriptions/' + item);
+        var dataArr =JSONtoARR(base.getData('References/ProductCodes'));
+      var  filterd = dataArr.filter(function(prod){
+        return prod.productdescription = item;
+      });
+      var data = filterd.length ? filterd[0] : {};
     }
     data.num = num;
     data.type = type;
@@ -1842,7 +1839,7 @@ var list=JSONtoARR(base.getData('Orders')).filter(function(item){
           list[i].packaging= dataPC.packaging;
           list[i].packagingType= dataPC.packagingType;
           list[i].productcode= dataPC.prod;
-          list[i].productdescription= dataPC.descr;
+          list[i].productdescription= dataPC.productdescription;
       if (list[i].ppb) {
         list[i].botlabel = dataPC.ppbotlabel;
         list[i].botlabelsku = dataPC.ppbotlabelsku;

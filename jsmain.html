@@ -20,7 +20,7 @@ function topFunction() {
 $('#save_sheet_btn').on('click',function(e){
 var id=$('#mysheet').val();
     $("#updating").css("display", "block");
- google.script.run.withSuccessHandler(stockCheck).QTYInport(id);
+ google.script.run.withSuccessHandler(htmlModalMSG).QTYInport(id);
 
 });
 
@@ -367,7 +367,7 @@ $('.tabs .tab-links a').on('click', function(e) {
        getSearchBoxData('Inventory');
     } else if (current == '#tab11') {
    
-        selPage='Finctions';
+        selPage='Functions';
     } else if (current == '#tab12') {
        google.script.run.withSuccessHandler(setupReporting).getReportingData();  
         selPage='Reporting';
@@ -488,15 +488,15 @@ console.log('PC');
 google.script.run.withSuccessHandler(repopFORM).getPCSelect(PC);
 }
 function pdselect(){
-var PD=$("#PDDSelect").val();
-console.log(PD);
-google.script.run.withSuccessHandler(repopFORM).getPDSelect(PD);
+    var PC = $("#PDDSelect option:selected").attr('key');
+    console.log(PC);
+    google.script.run.withSuccessHandler(repopFORM).getPCSelect(PC);
 }
 function repopFORM(data){
-console.log(data);
+console.log('data.productdescription',data.productdescription);
 $("#PCSelect").val(data.prod);
-$("#PDDSelect").val(data.descr);
-$("#recipeSelect").val(data.recipe.id);
+$("#PDDSelect").val(data.productdescription);
+$("#recipeSelect").val(data.recipe.name);
 $("#brandSelect").val(data.brandSKU);
 $("#flavourSelect").val(data.flavour.sku);
 $("#bottleType").val(data.botSKU);
@@ -591,9 +591,9 @@ edit_flavour_mix_order=true;
         
         var descSelect = '<option id="blank" value=""><option>';
         for (var i = 0; i < data.PD.length; i++) {
-            descSelect += '<option value="' + data.PD[i].descr + '" id="' + data.PD[i].descr + '">' + data.PD[i].productdescription + '<option>';
+            descSelect += '<option value="' + data.PD[i].productdescription + '" id="' + data.PD[i].productdescription + '" key="' + data.PD[i].prod + '">' + data.PD[i].productdescription + '<option>';
         }
-         html+='<td><select class="form-control" onchange="pdselect();" id="PDDSelect">' + descSelect + '</select></td>';
+         html+='<td><select class="form-control" onchange="pdselect();" id="PDDSelect" >' + descSelect + '</select></td>';
         
         
         html += '<td><div class="input-group"><input type="text" value="" name="orderbatch" id="orderID"  class="form-control" placeholder="OrderID" aria-describedby="sizing-addon2"></div></td>';
@@ -910,10 +910,10 @@ edit_flavour_mix_order=true;
     function buildOrders(data) {
     
     var machinesHTML='<option></option>';
-    google.script.run.withSuccessHandler(buildMachinesOptions).getMachines();
+    google.script.run.withSuccessHandler(buildMachinesOptions).getProductionSubData();
     function buildMachinesOptions(rett){
-      var machines=rett[0];
-      
+      var machines=rett.machines[0];
+      var levels = rett.levels[0];
       
       for(var i=0;i<machines.length;i++){
       machinesHTML+='<option sku="'+machines[i].sku+'" value="'+machines[i].sku+'">'+machines[i].name+'</option>';
@@ -1336,6 +1336,7 @@ edit_flavour_mix_order=true;
     console.log('handleMultiOrderRun',resp);
     MULTI_ORDER_LOG=resp;
     var html = '<div class ="section" ><h2>Bulk order run finished</h2></div>';
+         html+='<div class ="section" ><a href="'+resp.pickListUrl+'" target="_blank" >Current Pick List</a></div>';
     html+='<div class ="section" ><h2>Response Messages:</h2><p>'+resp.msg+'</p></div>';
     if(resp.hasNegative){
     var negativeHtml = '';
@@ -1343,7 +1344,7 @@ edit_flavour_mix_order=true;
     var negItems = '';
     var arr = resp.NEGATIVELOG[i].arr;
     arr.map(function(item){
-    negItems+='<div class="section sr" ><span>'+item.displayGroup+': '+item.name+'</span><div class="row"><input type="number" value="'+Math.abs(item.value)+'" id="'+item.sku +'_'+resp.NEGATIVELOG[i].batch+'" style="margin-right:10px;" />\
+    negItems+='<div class="section sr" ><span>'+item.displayGroup+': '+item.name+'</span><div class="row"><input type="number" min="0" value="'+Math.abs(+(item.value).toFixed(12))+'" id="'+item.sku +'_'+resp.NEGATIVELOG[i].batch+'" style="margin-right:10px;" />\
     <button class="btn btn-primary" onClick="addMissingStockItem(this)" sku="'+item.sku+'" '+(item.disabled === true ? 'disabled' : '')+'  tab="'+item.tab+'" batch="'+resp.NEGATIVELOG[i].batch+'">Add To Stock</button></div></div>';
     }) 
     negativeHtml+='<div class ="section" ><h3>'+resp.NEGATIVELOG[i].batch+':</h3><p>'+negItems+'</p></div>';
@@ -1358,12 +1359,28 @@ edit_flavour_mix_order=true;
     });
     
     }
+  
     closemainmodal();
      htmlModalMSG(html);
      filterpage('xx',true);
      $("#updating").css("display", "none");
     }
     
+    
+    function updateOrderLogInputs(){
+    
+      for(var i = 0; i < MULTI_ORDER_LOG.NEGATIVELOG.length;i++){
+       var arr = MULTI_ORDER_LOG.NEGATIVELOG[i].arr;
+ 
+         for(var j = 0 ; j < arr.length ;j++){
+          if(!arr[j].disabled){
+           var value =  $("#"+arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch).val();
+            MULTI_ORDER_LOG.NEGATIVELOG[i].arr[j].value = Math.abs(+(parseFloat(value)).toFixed(12));
+            }
+         }
+      
+       }
+    }
     function addMissingStockItem(event){
      $(event). attr("disabled", true);
     var batch = $(event).attr("batch");
@@ -1375,8 +1392,9 @@ edit_flavour_mix_order=true;
     sku:sku,
     batch:batch,
     tab:tab,
-    value:value
+    value:Math.abs(+(parseFloat(value)).toFixed(12))
     };
+   updateOrderLogInputs();
      google.script.run.withSuccessHandler(handleAddSingleStock).addMissingStockItem(data);
     }
     
@@ -1395,6 +1413,7 @@ edit_flavour_mix_order=true;
        }
      }
      
+     updateOrderLogInputs();
      handleMultiOrderRun(MULTI_ORDER_LOG);
       $("#updating").css("display", "none");
     }
@@ -1415,13 +1434,14 @@ edit_flavour_mix_order=true;
        sku:arr[j].sku,
        batch:MULTI_ORDER_LOG.NEGATIVELOG[i].batch,
        tab:arr[j].tab,
-       value:value
+       value:Math.abs(+(parseFloat(value)).toFixed(12))
        }
        dataArr.push(obj);
        }
        }
        }
        }
+       updateOrderLogInputs();
        google.script.run.withSuccessHandler(handleAddBatchStock).addMissingStockItemListBatch(dataArr,batch);
     }
     
@@ -1437,7 +1457,7 @@ edit_flavour_mix_order=true;
        sku:arr[j].sku,
        batch:MULTI_ORDER_LOG.NEGATIVELOG[i].batch,
        tab:arr[j].tab,
-       value:value
+       value:Math.abs(+(parseFloat(value)).toFixed(12))
        }
        dataArr.push(obj);
        }
@@ -1479,14 +1499,14 @@ edit_flavour_mix_order=true;
     
     function checkstock(){
       $("#updating").css("display", "block");
-     google.script.run.withSuccessHandler(stockCheck).checkStockValues(SELECTED);
+     google.script.run.withSuccessHandler(stockCheck).checkStockNew(SELECTED);
     }
      function printProduction(){
-     google.script.run.withSuccessHandler(stockCheck).printProductionBatches(SELECTED);
+     google.script.run.withSuccessHandler(htmlModalMSG).printProductionBatches(SELECTED);
     }
     
     function printOrders(){
-         google.script.run.withSuccessHandler(stockCheck).printOrdersBatches(SELECTED);
+         google.script.run.withSuccessHandler(htmlModalMSG).printOrdersBatches(SELECTED);
 
     }
 //      function printPackaging(){
@@ -1498,10 +1518,34 @@ edit_flavour_mix_order=true;
     function printSuccess(msg){
     alert(msg);
     }
-     function stockCheck(msg){
+     function stockCheck(resp){
+     var dataList = resp.dataList;
+     var link = resp.link;
       $("#updating").css("display", "none");
      $('#checkBatches').modal('show');
-     var html='<p >'+msg+'</p>';
+     var html='<div class = "check_stock_grid" >';
+     var titles = ['Name',	'Picklist',	'Available on hand',	'Shopping list',	'Required']
+     titles.map(function(item){
+     html+='<div  class = "stock_grid-item"><h2>'+item+'</h2></div>';
+     });
+     for(var i = 0; i < dataList.length;i++){
+       for(var j = 0; j < dataList[j].length;j++){
+       if(j == 0){
+       if(dataList[i][j+1] === ''){
+        html+='<div class = "stock_grid-item"><h4>'+dataList[i][j]+'</h4></div>';
+       }else{
+        html+='<div class = "stock_grid-item"><b>'+dataList[i][j]+'</b></div>';
+       }
+      
+       }else{
+       html+='<div class = "stock_grid-item">'+dataList[i][j]+'</div>';
+       }
+       
+      }
+     }
+     html+='<div></div></div>';
+           html+='<div class = "check_stock_grid" >';
+      html+='<a href = "'+link+'" target="_blank" >Shopping list<a></div>';
       $('#checkBatchesBody').html(html); 
     // alert(msg);
     }
@@ -1585,7 +1629,7 @@ edit_flavour_mix_order=true;
         
         for (var i = 0; i < data.PD.length; i++) {
         try{
-            descSelect += '<option value="' + data.PD[i].descr + '" >' + data.PD[i].productdescription + '<option>';
+            descSelect += '<option value="' + data.PD[i].productdescription + '" >' + data.PD[i].productdescription + '<option>';
             }catch(e){console.log(PD[i])}
         }
          html+='<td><select class="form-control" onchange="pdselect();" id="PDDSelect">' + descSelect + '</select></td>';
@@ -1677,123 +1721,301 @@ EDITORDER=true;
     }
 var EDITORDER=false;
 
+function getFlavourMixCodes(){
+var flavmixArr = [];
+   for(var i = 1; i <= 10;i++){
+    flavmixArr.push({
+    val:'flavMixVal_'+i,
+    name:'flavMixName_'+i,
+    sku:'flavMixSKU_'+i, 
+    });
+
+   }
+  return flavmixArr;
+}
 
         function populateMixingTab(){
         google.script.run.withSuccessHandler(buildMixingTable).getSheetData('Mixing');
         
         }
-        function buildMixingTable(data){
-        $(".searchBoxMixing").show();
-        $(".searchBoxMixingTeam").hide();
-                   getSearchBoxData('Mixing');
-
-        console.log(data);
-        thisData=data;
+        
+ function buildMixingTable(data){
+ $(".searchBoxMixing").show();
+ $(".searchBoxMixingTeam").hide();
+ getSearchBoxData('Mixing');
+ 
+ console.log(data);
+ thisData=data; 
         thisPage='Mixing';
       
-        var stockingTotal=0;
-        var qtyTotal=0;
-        var mixingTotal=0;
-        var premixTotal=0;
-        var unbrandedTotal=0;
-        var brandedTotal=0;
-     var tubesTotal=0;
-        var rowsTotal=0;
+      var stockingTotal=0;
+      var qtyTotal=0;
+      var mixingTotal=0;
+      var premixTotal=0;
+      var unbrandedTotal=0;
+      var brandedTotal=0;
+      var tubesTotal=0;
+      var rowsTotal=0;
 
         var html='';
-        html+='<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Completed</th><th>Priority</th><th>Batch</th><th>Order ID</th><th>Brand</th><th>Code</th><th>Description</th><th>Recipe</th><th>Flavour</th><th>Order Date</th><th>QTY(Litres)</th><th>VG (MG)</th><th>AG (MG)</th><th>PG (MG)</th><th>Nicotine (MG)</th><th>Nicotine Salts (MG)</th><th>CBD (MG)</th><th>MCT (MG)</th>';
-        html+='<th>Flavour (MG)</th>';
-        html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th><th>Backed By Branded Packaged</th>';
-        html+='</tr>';
-    html+='<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>QTY TOTAL</div><div id="qtyTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th>';
-    html+='<th><div>MIXING TOTAL</div><div id="mixingTotal'+thisPage+'"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal'+thisPage+'"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal'+thisPage+'"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal'+thisPage+'"></div></th><th><div>TUBES TOTAL</div><div id="tubesTotal'+thisPage+'"></div></th></tr>';
-    if(data){
-    var keys=['final_status','priority','batch','orderID','brand','productcode','productdescription','recipe.name','flavour.name','orderdate','QTY','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','mixing','premixed','unbranded','branded','backtubed'];
-    var drpdowns='';
-    html += '<tr><th></th><th></th><th></th>';
-    console.log(keys);
-    for(var l=0;l<keys.length;l++){
-    drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
+ 
+
+
+var flavmixArr = [];
+    for(var i = 1; i <= 10;i++){
+    flavmixArr.push({
+    key:'flavMixName_'+i,
+    head:'F. Mix Flavour '+i+' Name', 
+    });
+   flavmixArr.push({
+    key:'flavMixVal_'+i,
+     head:'F. Mix Flavour '+i+' Value (MG)', 
+    });
     }
+        var flavkeys= flavmixArr.map(function(item){ return item.key;});
+         var flavHeads= flavmixArr.map(function(item){ return item.head;});
+    var keys=['menu','notes','move','final_status','priority','batch','orderID','brand','productcode','productdescription','recipe.name','flavour.name','orderdate','QTY','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded'];
+
+    keys = keys.concat(flavkeys);
+    var keys_remaining = ['mixing','premixed','unbranded','branded','backtubed'];
+    keys = keys.concat(keys_remaining);
+    
+    var heads = ['Menu', 'Notes', 'Move', 'Completed', 'Priority', 'Batch', 'Order ID', 'Brand', 'Code', 'Description', 'Recipe', 'Flavour','Order Date',
+        'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix ammount needed (MG)'];
+     heads = heads.concat(flavHeads);
+   var heads_remaining = [ 'Backed By Mixing', 'Backed By Premix', 'Backed By Unbranded', 'Backed By Branded',
+        'Backed By Branded Packaged'
+    ];
+     heads = heads.concat(heads_remaining);
+    html += '<table class="table"><thead><tr>';
+    for (var i = 0; i < heads.length; i++) {
+        html += '<th>' + heads[i] + '</th>';
     }
-    html+=drpdowns;
-    html+='</tr>';
-    html += ' </thead>';
-        html+='<tbody>';
-        for(var i=0;i<data.length;i++){
-        if(!data[i].recipe){continue;}
-          if (data[i].movedtoNext == 0) {
-                 html+='<tr>'
-                 }else if (data[i].movedtoNext == 'Busy') {
-                  html+='<tr bgcolor="#1BCFEF">'
-                 }else{
-                  html+='<tr bgcolor="#1BEF5B">'
-                 }
+    html += '</tr>';
+    html += '<tr>';
+    for (var i = 0; i < heads.length; i++) {
+        if (heads[i] == 'Menu') {
+            html += '<th><div>ROWS TOTAL</div><div id="rowsTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Bottles') {
+            html += '<th><div>BOTTLES TOTAL</div><div id="bottlesTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'QTY') {
+            html += '<th><div>QTY TOTAL</div><div id="qtyTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Backed by Premixed') {
+            html += '<th><div>PREMIX TOTAL</div><div id="premixTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Backed by Branded') {
+            html += '<th><div>TUBES TOTAL</div><div id="tubesTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Bottle Labels QTY') {
+            html += '<th><div>BOTTLE LABELS TOTAL</div><div id="numLabelsBottlesTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Bottle Labels QTY') {
+            html += '<th><div>PACK LABELS TOTAL</div><div id="numLabelsTubesTotal' + thisPage + '"></div></th>';
+        } else {
+            html += '<th></th>';
+        }
+
+    }
+    html += '</tr>';
+    html += '<tr>';
+
+    for (var l = 0; l < keys.length; l++) {
+        if (keys[l] == 'row' || keys[l] == 'menu' || keys[l] == 'notes' || keys[l] == 'move') {
+            html += '<th></th>';
+
+        } else {
+            html += '<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#' + keys[l] + '" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#' + keys[l] + '" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>';
+
+        }
+    }
+
+    html += '</tr>';
+    html += '</thead><tbody>';
+    var bottlesTotal = 0;
+
+    var rowsTotal = 0;
+     console.log('keys',keys);
+         console.log('heads',heads);
+    for (var i = 0; i < data.length; i++) {
+        if (data[i].wentNegative) {
+            html += '<tr bgcolor="#FFC200" >';
+        } else if (data[i].final_status == 'Completed') {
+            html += '<tr bgcolor="#1BEF5B">';
+        } else if (data[i].final_status == 'started'  || data[i].movedtoNext == 'In Progress') {
+            html += '<tr bgcolor="#1BCFEF">';
+        } else {
+            html += '<tr>';
+        }
+       
+        for (var j = 0; j < keys.length; j++) {
+
+            if (keys[j] == 'menu') {
+                html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+                data[i].brand=data[i].brand ? data[i].brand: ' ';
+                html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteMix' + data[i].batch + '">Delete</a>';
                 
-                    html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
-          data[i].brand=data[i].brand ? data[i].brand: ' ';
-        html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteMix' + data[i].batch + '">Delete</a>';
-     
-        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
-     
-        html+=' </div></div></td>';
-         if(notesGlobalObj[data[i].orderID]){
-            html += '<td><div class="highlight"></div></td>';
-            }else{
-            html += '<td><div></div></td>';
+                html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+                
+                html += ' </div></div></td>';
+            } else if (keys[j] == 'row') {
+                html += '<td>' + i + '</td>';
+            } else if (keys[j] == 'orderdate') {
+                html += '<td>' + formatDateDisplay(data[i][keys[j]]) + '</td>';
+            } else if (keys[j] == 'packagingType.name') {
+                html += '<td>' + data[i]['packagingType']['name'] + '</td>';
+            } else if (keys[j] == 'boxname.name') {
+               html += '<td>' +  (data[i]['boxname']? data[i]['boxname']['name'] : '') + '</td>';
+            } else if (keys[j] == 'recipe.name') {
+               html += '<td>' +  (data[i]['recipe']? data[i]['recipe']['name'] : '') + '</td>';
+            }  else if (keys[j] == 'flavour.name') {
+               html += '<td>' +  (data[i]['flavour']? data[i]['flavour']['name'] : '') + '</td>';
+            } else if (keys[j] == 'CompletionDate' || keys[j] == 'starttime') {
+                html += '<td>' + formatDateDisplay2(data[i][keys[j]]) + '</td>';
+            } else if (keys[j] == 'move') {
+                html += '<td><button page="Mixing" batch="' + data[i].batch + '" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="Orders" batch="' + data[i].batch + '" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
+            } else if (keys[j] == 'notes') {
+                if (notesGlobalObj[data[i].orderID]) {
+                    html += '<td><div class="highlight"></div></td>';
+                } else {
+                    html += '<td><div></div></td>';
+                }
+            } else {
+                html += '<td>' + (data[i][keys[j]] || ' ') + '</td>';
             }
-        data[i].priority=data[i].priority ? data[i].priority: ' '; 
-        html += '<td><button page="Mixing" batch="'+data[i].batch+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="Mixing" batch="'+data[i].batch+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
-        html+='<td>'+data[i].final_status+'</td><td>'+data[i].priority+'</td><td>'+data[i].batch+'</td><td>' + data[i].orderID + '</td><td>' + data[i].brand + '</td><td>' + data[i].productcode + '</td><td>' + data[i].productdescription + '</td><td>'+data[i].recipe.name+'</td>';
-      
-        data[i].flavvalue=data[i].flavvalue ? data[i].flavvalue: ' ';
-        data[i].VGval=data[i].VGval ? data[i].VGval: ' ';
-        data[i].AGval=data[i].AGval ? data[i].AGval: ' ';
-        data[i].PGval=data[i].PGval ? data[i].PGval: ' ';
-        data[i].Nico=data[i].Nico ? data[i].Nico: ' ';
-        data[i].Nicosalts=data[i].Nicosalts ? data[i].Nicosalts: ' ';
-        data[i].CBDvalue=data[i].CBDvalue ? data[i].CBDvalue: ' ';
-        data[i].MCTval=data[i].MCTval ? data[i].MCTval: ' ';
-        
-        html+='<td>'+data[i].flavour.name+'</td><td>'+ formatDateDisplay(data[i].orderdate)+'</td><td>'+data[i].QTY+'</td><td>'+data[i].VGval+'</td><td>'+data[i].AGval+'</td><td>'+data[i].PGval+'</td><td>'+data[i].Nico+'</td><td>'+data[i].Nicosalts+'</td><td>'+data[i].CBDvalue+'</td><td>'+data[i].MCTval+'</td>';
-        html+='<td>'+data[i].flavvalue+'</td>';
-        html+='<td>'+data[i].mixing+'</td><td>'+data[i].premixed+'</td><td>'+data[i].unbranded+'</td><td>'+data[i].branded+'</td><td>'+data[i].backtubed+'</td></tr>';
-         stockingTotal+=parseInt(data[i].stocking,10);
-              if(data[i].QTY){
+
+        }
+        stockingTotal+=parseInt(data[i].stocking,10);
+        if(data[i].QTY){
         qtyTotal+=data[i].QTY;
         }
         mixingTotal+=parseInt(data[i].mixing,10);
         premixTotal+=parseInt(data[i].premixed,10);
         unbrandedTotal+=parseInt(data[i].unbranded,10);
         brandedTotal+=parseInt(data[i].branded,10);
-      tubesTotal+=parseInt(data[i].backtubed,10);
+        tubesTotal+=parseInt(data[i].backtubed,10);
 
-       
-       
-       }
-       
+        html += '</tr>';
+    }
+    
         rowsTotal=i;
 
-        html+='</tbody></table>';
-        $('#Mixing').html(html);
-        
-                 
-         $('#qtyTotal'+thisPage).html(qtyTotal);
-         $('#mixingTotal'+thisPage).html(mixingTotal);
-         $('#premixTotal'+thisPage).html(premixTotal);
-         $('#unbrandedTotal'+thisPage).html(unbrandedTotal);
-         $('#brandedTotal'+thisPage).html(brandedTotal);
-        $('#tubesTotal'+thisPage).html(tubesTotal);
-          $('#rowsTotal'+thisPage).html(rowsTotal);
+html+='</tbody></table>';
+$('#Mixing').html(html);
 
-        
-        
-        
-        
-        
-        
-        
-        }
+
+$('#qtyTotal'+thisPage).html(qtyTotal);
+$('#mixingTotal'+thisPage).html(mixingTotal);
+$('#premixTotal'+thisPage).html(premixTotal);
+$('#unbrandedTotal'+thisPage).html(unbrandedTotal);
+$('#brandedTotal'+thisPage).html(brandedTotal);
+$('#tubesTotal'+thisPage).html(tubesTotal);
+$('#rowsTotal'+thisPage).html(rowsTotal);
+
+}
+
+//
+//        function buildMixingTableOld(data){
+//        $(".searchBoxMixing").show();
+//        $(".searchBoxMixingTeam").hide();
+//                   getSearchBoxData('Mixing');
+//
+//        console.log(data);
+//        thisData=data;
+//        thisPage='Mixing';
+//      
+//      var stockingTotal=0;
+//      var qtyTotal=0;
+//      var mixingTotal=0;
+//      var premixTotal=0;
+//      var unbrandedTotal=0;
+//      var brandedTotal=0;
+//      var tubesTotal=0;
+//      var rowsTotal=0;
+//
+//        var html='';
+//        html+='<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Completed</th><th>Priority</th><th>Batch</th><th>Order ID</th><th>Brand</th><th>Code</th><th>Description</th><th>Recipe</th><th>Flavour</th><th>Order Date</th><th>QTY(Litres)</th><th>VG (MG)</th><th>AG (MG)</th><th>PG (MG)</th><th>Nicotine (MG)</th><th>Nicotine Salts (MG)</th><th>CBD (MG)</th><th>MCT (MG)</th>';
+//        html+='<th>Flavour (MG)</th>';
+//        html+='<th>Backed By Mixing</th><th>Backed By Premix</th><th>Backed By Unbranded</th><th>Backed By Branded</th><th>Backed By Branded Packaged</th>';
+//        html+='</tr>';
+//    html+='<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>QTY TOTAL</div><div id="qtyTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th>';
+//    html+='<th><div>MIXING TOTAL</div><div id="mixingTotal'+thisPage+'"></div></th><th><div>PREMIX TOTAL</div><div id="premixTotal'+thisPage+'"></div></th><th><div>UNBRANDED TOTAL</div><div id="unbrandedTotal'+thisPage+'"></div></th><th><div>BRANDED TOTAL</div><div id="brandedTotal'+thisPage+'"></div></th><th><div>TUBES TOTAL</div><div id="tubesTotal'+thisPage+'"></div></th></tr>';
+//    if(data){
+//    var keys=['final_status','priority','batch','orderID','brand','productcode','productdescription','recipe.name','flavour.name','orderdate','QTY','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','mixing','premixed','unbranded','branded','backtubed'];
+//    var drpdowns='';
+//    html += '<tr><th></th><th></th><th></th>';
+//    console.log(keys);
+//    for(var l=0;l<keys.length;l++){
+//    drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
+//    }
+//    }
+//    html+=drpdowns;
+//    html+='</tr>';
+//    html += ' </thead>';
+//        html+='<tbody>';
+//        for(var i=0;i<data.length;i++){
+//        if(!data[i].recipe){continue;}
+//          if (data[i].movedtoNext == 0) {
+//                 html+='<tr>'
+//                 }else if (data[i].movedtoNext == 'In Progress') {
+//                  html+='<tr bgcolor="#1BCFEF">'
+//                 }else{
+//                  html+='<tr bgcolor="#1BEF5B">'
+//                 }
+//                
+//                    html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+//          data[i].brand=data[i].brand ? data[i].brand: ' ';
+//        html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteMix' + data[i].batch + '">Delete</a>';
+//     
+//        html += '<a class="dropdown-item"   value="'+ data[i].orderID +'" onclick="return menuClick(this);" href="#orderID' + data[i].orderID + '">Notes</a>';
+//     
+//        html+=' </div></div></td>';
+//         if(notesGlobalObj[data[i].orderID]){
+//            html += '<td><div class="highlight"></div></td>';
+//            }else{
+//            html += '<td><div></div></td>';
+//            }
+//        data[i].priority=data[i].priority ? data[i].priority: ' '; 
+//        html += '<td><button page="Mixing" batch="'+data[i].batch+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="Mixing" batch="'+data[i].batch+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
+//        html+='<td>'+data[i].final_status+'</td><td>'+data[i].priority+'</td><td>'+data[i].batch+'</td><td>' + data[i].orderID + '</td><td>' + data[i].brand + '</td><td>' + data[i].productcode + '</td><td>' + data[i].productdescription + '</td><td>'+data[i].recipe.name+'</td>';
+//      
+//        data[i].flavvalue=data[i].flavvalue ? data[i].flavvalue: ' ';
+//        data[i].VGval=data[i].VGval ? data[i].VGval: ' ';
+//        data[i].AGval=data[i].AGval ? data[i].AGval: ' ';
+//        data[i].PGval=data[i].PGval ? data[i].PGval: ' ';
+//        data[i].Nico=data[i].Nico ? data[i].Nico: ' ';
+//        data[i].Nicosalts=data[i].Nicosalts ? data[i].Nicosalts: ' ';
+//        data[i].CBDvalue=data[i].CBDvalue ? data[i].CBDvalue: ' ';
+//        data[i].MCTval=data[i].MCTval ? data[i].MCTval: ' ';
+//        
+//        html+='<td>'+data[i].flavour.name+'</td><td>'+ formatDateDisplay(data[i].orderdate)+'</td><td>'+data[i].QTY+'</td><td>'+data[i].VGval+'</td><td>'+data[i].AGval+'</td><td>'+data[i].PGval+'</td><td>'+data[i].Nico+'</td><td>'+data[i].Nicosalts+'</td><td>'+data[i].CBDvalue+'</td><td>'+data[i].MCTval+'</td>';
+//        html+='<td>'+data[i].flavvalue+'</td>';
+//        html+='<td>'+data[i].mixing+'</td><td>'+data[i].premixed+'</td><td>'+data[i].unbranded+'</td><td>'+data[i].branded+'</td><td>'+data[i].backtubed+'</td></tr>';
+//         stockingTotal+=parseInt(data[i].stocking,10);
+//              if(data[i].QTY){
+//        qtyTotal+=data[i].QTY;
+//        }
+//        mixingTotal+=parseInt(data[i].mixing,10);
+//        premixTotal+=parseInt(data[i].premixed,10);
+//        unbrandedTotal+=parseInt(data[i].unbranded,10);
+//        brandedTotal+=parseInt(data[i].branded,10);
+//      tubesTotal+=parseInt(data[i].backtubed,10);
+//
+//       
+//       
+//       }
+//       
+//        rowsTotal=i;
+//
+//        html+='</tbody></table>';
+//        $('#Mixing').html(html);
+//        
+//                 
+//         $('#qtyTotal'+thisPage).html(qtyTotal);
+//         $('#mixingTotal'+thisPage).html(mixingTotal);
+//         $('#premixTotal'+thisPage).html(premixTotal);
+//         $('#unbrandedTotal'+thisPage).html(unbrandedTotal);
+//         $('#brandedTotal'+thisPage).html(brandedTotal);
+//        $('#tubesTotal'+thisPage).html(tubesTotal);
+//          $('#rowsTotal'+thisPage).html(rowsTotal);
+//
+//}
 
 
     function populateFlavourMixMixingTeamTab() {
@@ -1900,7 +2122,7 @@ var EDITORDER=false;
         for(var i=0;i<data.length;i++){
           if(data[i].final_status=='Completed'){
             html +='<tr bgcolor="#1BEF5B">';
-            }else if(data[i].final_status=='Busy'||data[i].final_status=='started'){
+            }else if(data[i].final_status=='In Progress'||data[i].final_status=='started'){
             html +='<tr bgcolor="#1BCFEF">';
             }else{
             html +='<tr>';
@@ -1955,122 +2177,315 @@ var EDITORDER=false;
     }
     
 
-
-    function buildMixingTeamTable(data) {
-    $(".searchBoxMixing").hide();
+ function buildMixingTeamTable(data){
+ 
+   $(".searchBoxMixing").hide();
      $(".searchBoxMixingTeam").show();
       getSearchBoxData('MixingTeam');
 
     console.log(data);
   
-        var html = '';
+  
         thisData=data;
         thisPage='MixingTeam';
         var qtyTotal=0;
         var rowsTotal=0;
-
-        html += '<table class="table"><thead><tr><th>Menu</th><th>Move</th><th>Completed</th><th>Priority</th><th>Date of Production</th><th>Batch</th><th>Customers</th><th>Order Ids</th><th>Brands</th><th>Mix Batch Code</th><th>Recipe</th><th>Flavour</th><th>Order Date</th><th>QTY(Litres)</th><th>VG (MG)</th><th>AG (MG)</th>';
-        html += '<th>PG (MG)</th><th>Nicotine (MG)</th><th>Nicotine Salts (MG)</th><th>CBD (MG)</th><th>MCT (MG)</th><th>Flavour (MG)</th><th>Notes - Mixing Dept</th><th>Location</th><th>Factory</th><th>Start Date</th><th>Completion Date</th><th>VG supplier batch </th><th>PG supplier batch </th><th>Nicotine supplier batch </th><th>Flavour supplier batch </th>';
-        html += '</tr>';
-         html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>QTY TOTAL</div><div id="qtyTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
-         if(data){
-         var keys=['Completed','priority','prodDate','batches','customer','orderID','brands','MIXNAME','RECIPE','FLAVOUR','orderDates','QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','Notes','Location','factory','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier'];
-         var drpdowns='';
-         html += '<tr><th></th><th></th>';
-         console.log(keys);
-         for(var l=0;l<keys.length;l++){
-         drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
-         }
-         }
-         html+=drpdowns;
-         html+='</tr>';
-         html += '</thead>';
-        html += '<tbody>';
-        if(data!=''){
-        for (var i = 0; i < data.length; i++) {
-     if (data[i].movedtoNext == 0) {
-         html+='<tr>'
-         }else if (data[i].movedtoNext == 'Busy') {
-          html+='<tr bgcolor="#1BCFEF">'
-         }else{
-          html+='<tr bgcolor="#1BEF5B">'
-         }
         
-            html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
-            if (data[i].movedtoNext == 0) {
-                html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#MixingMoveNext' + data[i].MIXNAME + '">Line Item Move</a>';
-            }
-            html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteMixingTeam' + data[i].MIXNAME + '">Delete</a>';
-            html += ' </div></div></td>';
-            var batches=[];
-            var orderDates=[];
-            var priorities=[];
-            var mixARR=[];
-             var customers=[];
-            var orderIDs=[];
-            var brands = [];
-               var result = data[i].Batches? Object.keys(data[i].Batches).map(function(key) {return [Number(key), data[i].Batches[key]]; }) : [];
-
-                  for(var j=0;j<result.length;j++){
-                    mixARR.push(result[j][1]);
-                    
-                  }
-                  
-            for(var j=0;j<mixARR.length;j++){
-            try{
-            mixARR[j].brand = mixARR[j].brand ? mixARR[j].brand : "";
-            brands.push(mixARR[j].brand);
-            batches.push(mixARR[j].batch);
-            orderDates.push(formatDateDisplay(mixARR[j].orderdate));
-            priorities.push(mixARR[j].priority);
-            customers.push(mixARR[j].customer);
-            orderIDs.push(mixARR[j].orderID);
-            }catch(e){console.log('failed to push');}
-            }
-            
-                    
-        data[i].flavvalue=data[i].flavvalue ? data[i].flavvalue: ' ';
-        data[i].VGval=data[i].VGval ? data[i].VGval: ' ';
-        data[i].AGval=data[i].AGval ? data[i].AGval: ' ';
-        data[i].PGval=data[i].PGval ? data[i].PGval: ' ';
-        data[i].Nico=data[i].Nico ? data[i].Nico: ' ';
-        data[i].Nicosalts=data[i].Nicosalts ? data[i].Nicosalts: ' ';
-        data[i].CBDvalue=data[i].CBDvalue ? data[i].CBDvalue: ' ';
-        data[i].MCTval=data[i].MCTval ? data[i].MCTval: ' ';
+        var html = '';
       
-            
-            html += '<td><button page="MixingTeam" batch="'+data[i].MIXNAME+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="MixingTeam" batch="'+data[i].MIXNAME+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
-            html += '<td>' + data[i].Completed + '</td><td>' + priorities.join() + '</td><td>' + formatDateDisplay2(data[i].prodDate) + '</td><td>' + batches.join() + '</td><td>' + customers.join() + '</td><td>' + orderIDs.join() + '</td><td>' + brands.join() + '</td><td>' + data[i].MIXNAME + '</td><td>' + data[i].RECIPE + '</td>';
-            html += '<td>' + data[i].FLAVOUR + '</td><td>' + orderDates.join() + '</td><td>' + data[i].QTYTOTAL + '</td><td>' + data[i].VGval + '</td><td>' + data[i].AGval + '</td><td>' + data[i].PGval + '</td><td>' + data[i].Nico + '</td><td>' + data[i].Nicosalts + '</td><td>' + data[i].CBDvalue + '</td><td>' + data[i].MCTval + '</td>';
-            html += '<td>' + data[i].flavvalue + '</td><td>' + data[i].Notes + '</td>';
-            html += '<td>' + data[i].Location + '</td>';
+      
+      if(data){
+     
+
+var flavmixArr = [];
+    for(var i = 1; i <= 10;i++){
+    flavmixArr.push({
+    key:'flavMixName_'+i,
+    head:'F. Mix Flavour '+i+' Name', 
+    });
+   flavmixArr.push({
+    key:'flavMixVal_'+i,
+     head:'F. Mix Flavour '+i+' Value', 
+    });
+    }
+    var flavkeys= flavmixArr.map(function(item){ return item.key;});
+    var flavHeads= flavmixArr.map(function(item){ return item.head;});
+   var keys=['menu','move','Completed','priorities','prodDate','batches','customers','orderIDs','brands','MIXNAME','RECIPE','FLAVOUR','orderDates','QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded'];
+         
+    keys = keys.concat(flavkeys);
+    var keys_remaining = ['Notes','Location','factory','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier'];
+    keys = keys.concat(keys_remaining);
+    
+    var heads = ['Menu', 'Move', 'Completed', 'Priority','Date of Production', 'Batch','Customers', 'Order IDs', 'Brands', 'Mix Batch Code', 'Recipe', 'Flavour','Order Date',
+    'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix ammount needed (MG)'];
+    heads = heads.concat(flavHeads);
+    var heads_remaining = [ 'Notes - Mixing Dept', 'Location', 'Factory', 'Start Date',  'Completion Date','VG supplier batch','PG supplier batch','Nicotine supplier batch','Flavour supplier batch' ];
+     heads = heads.concat(heads_remaining);
+    html += '<table class="table"><thead><tr>';
+    for (var i = 0; i < heads.length; i++) {
+        html += '<th>' + heads[i] + '</th>';
+    }
+    html += '</tr>';
+    html += '<tr>';
+    for (var i = 0; i < heads.length; i++) {
+        if (heads[i] == 'Menu') {
+            html += '<th><div>ROWS TOTAL</div><div id="rowsTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Bottles') {
+            html += '<th><div>BOTTLES TOTAL</div><div id="bottlesTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'QTY(Litres)') {
+            html += '<th><div>QTY TOTAL</div><div id="qtyTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Backed by Premixed') {
+            html += '<th><div>PREMIX TOTAL</div><div id="premixTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Backed by Branded') {
+            html += '<th><div>TUBES TOTAL</div><div id="tubesTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Bottle Labels QTY') {
+            html += '<th><div>BOTTLE LABELS TOTAL</div><div id="numLabelsBottlesTotal' + thisPage + '"></div></th>';
+        } else if (heads[i] == 'Bottle Labels QTY') {
+            html += '<th><div>PACK LABELS TOTAL</div><div id="numLabelsTubesTotal' + thisPage + '"></div></th>';
+        } else {
+            html += '<th></th>';
+        }
+
+    }
+    html += '</tr>';
+    html += '<tr>';
+
+    for (var l = 0; l < keys.length; l++) {
+        if (keys[l] == 'row' || keys[l] == 'menu' || keys[l] == 'notes' || keys[l] == 'move') {
+            html += '<th></th>';
+
+        } else {
+            html += '<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#' + keys[l] + '" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#' + keys[l] + '" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>';
+
+        }
+    }
+
+    html += '</tr>';
+    html += '</thead><tbody>';
+    var bottlesTotal = 0;
+
+    var rowsTotal = 0; 
+    for (var i = 0; i < data.length; i++) {
+        if (data[i].wentNegative) {
+            html += '<tr bgcolor="#FFC200" >';
+        } else if (data[i].final_status == 'Completed') {
+            html += '<tr bgcolor="#1BEF5B">';
+        } else if (data[i].final_status == 'started' || data[i].movedtoNext == 'In Progress') {
+            html += '<tr bgcolor="#1BCFEF">';
+        } else {
+            html += '<tr>';
+        }
+        var batches=[];
+        var orderDates=[];
+        var priorities=[];
+        var mixARR=[];
+        var customers=[];
+        var orderIDs=[];
+        var brands = [];
+         
+        var result = data[i].Batches? JSONtoARR(data[i].Batches) : [];
+        console.log('result',result);
+      
+        
+        for(var j=0;j<result.length;j++){
+        try{
+        result[j].brand = result[j].brand ? result[j].brand : "";
+        brands.push(result[j].brand);
+        batches.push(result[j].batch);
+        orderDates.push(formatDateDisplay(result[j].orderdate));
+        priorities.push(result[j].priority);
+        customers.push(result[j].customer);
+        orderIDs.push(result[j].orderID);
+        
+        }catch(e){
+        
+        console.log('failed to push',e.message);}
+        }
+        console.log('batches',batches);
+        data[i].brands = brands.join();
+        data[i].batches = batches.join();
+        data[i].orderDates = orderDates.join();
+        data[i].priorities = priorities.join();
+        data[i].customers = customers.join();
+        data[i].orderIDs = orderIDs.join();
+        console.log('data[i]',data[i]);
+        for (var j = 0; j < keys.length; j++) {
+
+            if (keys[j] == 'menu') {
+                html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+                if (data[i].movedtoNext === 0) {
+                html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#MixingMoveNext' + data[i].MIXNAME + '">Line Item Move</a>';
+                }
+                html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteMixingTeam' + data[i].MIXNAME + '">Delete</a>';
+                html += ' </div></div></td>';
+            } else if (keys[j] == 'row') {
+                html += '<td>' + i + '</td>';
+            } else if (keys[j] == 'orderdate') {
+                html += '<td>' + formatDateDisplay(data[i][keys[j]]) + '</td>';
+            } else if (keys[j] == 'packagingType.name') {
+                html += '<td>' + data[i]['packagingType']['name'] + '</td>';
+            } else if (keys[j] == 'boxname.name') {
+               html += '<td>' +  (data[i]['boxname']? data[i]['boxname']['name'] : '') + '</td>';
+            } else if (keys[j] == 'recipe.name') {
+               html += '<td>' +  (data[i]['recipe']? data[i]['recipe']['name'] : '') + '</td>';
+            }  else if (keys[j] == 'flavour.name') {
+               html += '<td>' +  (data[i]['flavour']? data[i]['flavour']['name'] : '') + '</td>';
+            } else if (keys[j] == 'CompletionDate' || keys[j] == 'starttime' || keys[j] == 'prodDate') {
+                html += '<td>' + formatDateDisplay2(data[i][keys[j]]) + '</td>';
+            } else if (keys[j] == 'move') {
+                html += '<td><button page="Mixing" batch="' + data[i].batch + '" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="Orders" batch="' + data[i].batch + '" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
+            } else if (keys[j] == 'notes') {
+                if (notesGlobalObj[data[i].orderID]) {
+                    html += '<td><div class="highlight"></div></td>';
+                } else {
+                    html += '<td><div></div></td>';
+                }
+            }else if (keys[i] == 'factory'){
              if(data[i].factory){
              html += '<td><select class="form-control" onChange=changefactory(this); batch="'+data[i].MIXNAME+'" ><option factory="' + data[i].factory + '" value="' + data[i].factory + '">' + data[i].factory + '</option>';
             }else{
              html += '<td><select class="form-control" batch="'+data[i].MIXNAME+'"  onChange=changefactory(this);><option ></option>';
             }
-           
-            html += '<option factory="Manchester" value="Manchester">Manchester</option>';
-            html += '<option factory="Halifax" value="Halifax">Halifax</option>';
-        
-            html += '</select></td>';
-            html += '<td>'+formatDateDisplay2(data[i].starttime)+'</td><td>'+formatDateDisplay2(data[i].CompletionDate)+'</td><td>'+data[i].vgSupplier+'</td><td>'+data[i].pgSupplier+'</td><td>'+data[i].nicSupplier+'</td><td>'+data[i].flavSupplier+'</td></tr>';
-        
-    
-       if(data[i].QTYTOTAL){
-        qtyTotal+=data[i].QTYTOTAL;
+            } else {
+                html += '<td>' + (data[i][keys[j]] || ' ') + '</td>';
+            }
+
         }
-        }
-        rowsTotal=i;
-        }
-        html += '</tbody></table>';
+         if(data[i].QTYTOTAL){
+         qtyTotal+=data[i].QTYTOTAL;
+         } 
+
+        html += '</tr>';
+    }
+    rowsTotal=i;
+     html += '</tbody></table>';
+    }
+     
+     
+  
 
 
         $('#Mixing').html(html);
         $('#qtyTotal'+thisPage).html(qtyTotal);
         $('#rowsTotal'+thisPage).html(rowsTotal);
 
-    }
+}
+
+//    function buildMixingTeamTableOLD(data) {
+//    $(".searchBoxMixing").hide();
+//     $(".searchBoxMixingTeam").show();
+//      getSearchBoxData('MixingTeam');
+//
+//    console.log(data);
+//  
+//        var html = '';
+//        thisData=data;
+//        thisPage='MixingTeam';
+//        var qtyTotal=0;
+//        var rowsTotal=0;
+//
+//        html += '<table class="table"><thead><tr><th>Menu</th><th>Move</th><th>Completed</th><th>Priority</th><th>Date of Production</th><th>Batch</th><th>Customers</th><th>Order Ids</th><th>Brands</th><th>Mix Batch Code</th><th>Recipe</th><th>Flavour</th><th>Order Date</th><th>QTY(Litres)</th><th>VG (MG)</th><th>AG (MG)</th>';
+//        html += '<th>PG (MG)</th><th>Nicotine (MG)</th><th>Nicotine Salts (MG)</th><th>CBD (MG)</th><th>MCT (MG)</th><th>Flavour (MG)</th><th>Notes - Mixing Dept</th><th>Location</th><th>Factory</th><th>Start Date</th><th>Completion Date</th><th>VG supplier batch </th><th>PG supplier batch </th><th>Nicotine supplier batch </th><th>Flavour supplier batch </th>';
+//        html += '</tr>';
+//         html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>QTY TOTAL</div><div id="qtyTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
+//         if(data){
+//         var keys=['Completed','priority','prodDate','batches','customer','orderID','brands','MIXNAME','RECIPE','FLAVOUR','orderDates','QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','Notes','Location','factory','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier'];
+//         var drpdowns='';
+//         html += '<tr><th></th><th></th>';
+//         console.log(keys);
+//         for(var l=0;l<keys.length;l++){
+//         drpdowns+=('<th><div class="dropdown"><button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Sort By<span class="caret"></span></button><ul class="dropdown-menu"><li><a href="#'+keys[l]+'" sorttype="HL" onclick="return sortClick(this);">High - Low/Z - A</a></li><li><a sorttype="LH" href="#'+keys[l]+'" onclick="return sortClick(this);">Low - High/A - Z</a></li></ul></div></th>');
+//         }
+//         }
+//         html+=drpdowns;
+//         html+='</tr>';
+//         html += '</thead>';
+//        html += '<tbody>';
+//        if(data!=''){
+//        for (var i = 0; i < data.length; i++) {
+//     if (data[i].movedtoNext == 0) {
+//         html+='<tr>'
+//         }else if (data[i].movedtoNext == 'In Progress') {
+//          html+='<tr bgcolor="#1BCFEF">'
+//         }else{
+//          html+='<tr bgcolor="#1BEF5B">'
+//         }
+//        
+//            html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+//            if (data[i].movedtoNext == 0) {
+//                html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#MixingMoveNext' + data[i].MIXNAME + '">Line Item Move</a>';
+//            }
+//            html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deleteMixingTeam' + data[i].MIXNAME + '">Delete</a>';
+//            html += ' </div></div></td>';
+//            var batches=[];
+//            var orderDates=[];
+//            var priorities=[];
+//            var mixARR=[];
+//             var customers=[];
+//            var orderIDs=[];
+//            var brands = [];
+//               var result = data[i].Batches? Object.keys(data[i].Batches).map(function(key) {return [Number(key), data[i].Batches[key]]; }) : [];
+//
+//                  for(var j=0;j<result.length;j++){
+//                    mixARR.push(result[j][1]);
+//                    
+//                  }
+//                  
+//            for(var j=0;j<mixARR.length;j++){
+//            try{
+//            mixARR[j].brand = mixARR[j].brand ? mixARR[j].brand : "";
+//            brands.push(mixARR[j].brand);
+//            batches.push(mixARR[j].batch);
+//            orderDates.push(formatDateDisplay(mixARR[j].orderdate));
+//            priorities.push(mixARR[j].priority);
+//            customers.push(mixARR[j].customer);
+//            orderIDs.push(mixARR[j].orderID);
+//            }catch(e){console.log('failed to push');}
+//            }
+//            
+//                    
+//        data[i].flavvalue=data[i].flavvalue ? data[i].flavvalue: ' ';
+//        data[i].VGval=data[i].VGval ? data[i].VGval: ' ';
+//        data[i].AGval=data[i].AGval ? data[i].AGval: ' ';
+//        data[i].PGval=data[i].PGval ? data[i].PGval: ' ';
+//        data[i].Nico=data[i].Nico ? data[i].Nico: ' ';
+//        data[i].Nicosalts=data[i].Nicosalts ? data[i].Nicosalts: ' ';
+//        data[i].CBDvalue=data[i].CBDvalue ? data[i].CBDvalue: ' ';
+//        data[i].MCTval=data[i].MCTval ? data[i].MCTval: ' ';
+//      
+//            
+//            html += '<td><button page="MixingTeam" batch="'+data[i].MIXNAME+'" onclick="moveUp(this)" id="moveUP"><i class="fa fa-arrow-up" aria-hidden="true"></i></button><button onclick="moveDown(this)" page="MixingTeam" batch="'+data[i].MIXNAME+'" id="moveDOWN"><i class="fa fa-arrow-down" aria-hidden="true"></i></button></td>';
+//            html += '<td>' + data[i].Completed + '</td><td>' + priorities.join() + '</td><td>' + formatDateDisplay2(data[i].prodDate) + '</td><td>' + batches.join() + '</td><td>' + customers.join() + '</td><td>' + orderIDs.join() + '</td><td>' + brands.join() + '</td><td>' + data[i].MIXNAME + '</td><td>' + data[i].RECIPE + '</td>';
+//            html += '<td>' + data[i].FLAVOUR + '</td><td>' + orderDates.join() + '</td><td>' + data[i].QTYTOTAL + '</td><td>' + data[i].VGval + '</td><td>' + data[i].AGval + '</td><td>' + data[i].PGval + '</td><td>' + data[i].Nico + '</td><td>' + data[i].Nicosalts + '</td><td>' + data[i].CBDvalue + '</td><td>' + data[i].MCTval + '</td>';
+//            html += '<td>' + data[i].flavvalue + '</td><td>' + data[i].Notes + '</td>';
+//            html += '<td>' + data[i].Location + '</td>';
+//             if(data[i].factory){
+//             html += '<td><select class="form-control" onChange=changefactory(this); batch="'+data[i].MIXNAME+'" ><option factory="' + data[i].factory + '" value="' + data[i].factory + '">' + data[i].factory + '</option>';
+//            }else{
+//             html += '<td><select class="form-control" batch="'+data[i].MIXNAME+'"  onChange=changefactory(this);><option ></option>';
+//            }
+//           
+//            html += '<option factory="Manchester" value="Manchester">Manchester</option>';
+//            html += '<option factory="Halifax" value="Halifax">Halifax</option>';
+//        
+//            html += '</select></td>';
+//            html += '<td>'+formatDateDisplay2(data[i].starttime)+'</td><td>'+formatDateDisplay2(data[i].CompletionDate)+'</td><td>'+data[i].vgSupplier+'</td><td>'+data[i].pgSupplier+'</td><td>'+data[i].nicSupplier+'</td><td>'+data[i].flavSupplier+'</td></tr>';
+//        
+//    
+//       if(data[i].QTYTOTAL){
+//        qtyTotal+=data[i].QTYTOTAL;
+//        }
+//        }
+//        rowsTotal=i;
+//        }
+//        html += '</tbody></table>';
+//
+//
+//        $('#Mixing').html(html);
+//        $('#qtyTotal'+thisPage).html(qtyTotal);
+//        $('#rowsTotal'+thisPage).html(rowsTotal);
+//
+//    }
 
 
 function changefactory(event){
@@ -2084,7 +2499,14 @@ google.script.run.withSuccessHandler(updateMachine).changeFactory(mixbatch,facto
 
 
 
+function formatHours(MINUTES){
+var m = MINUTES % 60;
 
+var h = (MINUTES-m)/60;
+
+var HHMM = h.toString() + ":" + (m<10?"0":"") + m.toString();
+return HHMM
+}
 
     function populateProductionTab() {
         google.script.run.withSuccessHandler(buildProductionTable).getSheetData('Production');
@@ -2092,10 +2514,11 @@ google.script.run.withSuccessHandler(updateMachine).changeFactory(mixbatch,facto
     }
 
     function buildProductionTable(data) {
-     google.script.run.withSuccessHandler(buildMachinesOptions2).getMachines();
+     google.script.run.withSuccessHandler(buildMachinesOptions2).getProductionSubData();
     function buildMachinesOptions2(rett){
-    var machines=rett[0];
-    
+    console.log("rett");
+    var machines=rett.machines[0];
+    var levels = rett.levels[0];
         var html = '';
         thisData=data;
         thisPage='Production';
@@ -2103,11 +2526,11 @@ google.script.run.withSuccessHandler(updateMachine).changeFactory(mixbatch,facto
         var rowsTotal=0;
 
         html += '<table class="table"><thead><tr><th>Menu</th><th>Notes</th><th>Move</th><th>Mixing Completed</th><th>Order Date</th><th>Batch</th><th>Order ID</th><th>Code</th><th>Description</th><th>Mix Batch Code</th><th>Priority</th><th>Customer</th><th>Brand</th><th>Recipe</th><th>Flavour</th>';
-        html += '<th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th><th>Start Date</th><th>Completion Date</th><th>Production Completed</th><th>Location</th><th>Machine</th>';
+        html += '<th>Bottles</th><th>Bottle Type</th><th>Lid Type</th><th>Pack Type</th><th>Start Date</th><th>Completion Date</th><th>Production Completed</th><th>Location</th><th>Machine</th><th>Production Duration</th>';
         html += '</tr>';
-        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
+        html += '<tr><th><div>ROWS TOTAL</div><div id="rowsTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th><div>BOTTLES TOTAL</div><div id="bottlesTotal'+thisPage+'"></div></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th><th></th></tr>';
         if(data){
-         var keys=['mixing_status','orderdate','batch','orderID','productcode','productdescription','mixbatch','priority','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineP'];
+         var keys=['mixing_status','orderdate','batch','orderID','productcode','productdescription','mixbatch','priority','customer','brand','recipe.name','flavour.name','bottles','btype','lid','packagingType.name','starttime','CompletionDate','Completed','Location','machineP','prodDuration'];
          var drpdowns='';
          html += '<tr><th></th><th></th><th></th>';
          console.log(keys);
@@ -2122,10 +2545,11 @@ google.script.run.withSuccessHandler(updateMachine).changeFactory(mixbatch,facto
         html += '<tbody>';
         if(data!=''){
         for (var i = 0; i < data.length; i++) {
+          data[i].prodDuration= formatHours(levels[data[i].fill] ? levels[data[i].fill].time *data[i].bottles  : 0)
           if(!data[i].recipe){continue;}
       if (data[i].movedtoNext == 0) {
          html+='<tr>'
-         }else if (data[i].movedtoNext == 'Busy') {
+         }else if (data[i].movedtoNext == 'In Progress') {
           html+='<tr bgcolor="#1BCFEF">'
          }else{
           html+='<tr bgcolor="#1BEF5B">'
@@ -2181,7 +2605,7 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
              }
              
              }
-            html += ' <td>' + machinePDisp + '</td></tr>';
+            html += ' <td>' + machinePDisp + '</td><td>' +  data[i].prodDuration  + '</td></tr>';
             bottlesTotal+=parseInt(data[i].bottles,10);
             
             }
@@ -2241,7 +2665,7 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
      if (data[i].movedtoNext == 0) {
      
          html+='<tr>'
-         }else if (data[i].movedtoNext == 'Busy') {
+         }else if (data[i].movedtoNext == 'In Progress') {
           html+='<tr bgcolor="#1BCFEF">'
          }else{
           html+='<tr bgcolor="#1BEF5B">'
@@ -2353,7 +2777,7 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
           if(!data[i].recipe){continue;}
       if (data[i].movedtoNext == 0) {
          html+='<tr>'
-         }else if (data[i].movedtoNext == 'Busy') {
+         }else if (data[i].movedtoNext == 'In Progress') {
           html+='<tr bgcolor="#1BCFEF">'
          }else{
           html+='<tr bgcolor="#1BEF5B">'
@@ -2454,7 +2878,7 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
           if(!data[i].recipe){continue;}
          if (data[i].movedtoNext == 0) {
          html+='<tr>'
-         }else if (data[i].movedtoNext == 'Busy') {
+         }else if (data[i].movedtoNext == 'In Progress') {
           html+='<tr bgcolor="#1BCFEF">'
          }else{
           html+='<tr bgcolor="#1BEF5B">'
@@ -2987,7 +3411,7 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
     var rounded = Math.round(total);
     console.log('rounded',rounded)
     if(rounded != 10){
-          alert('Mix must add up to 10ml.');
+          alert('Mix percentage must add up to 10ml.');
           return;
     }
 
@@ -3458,7 +3882,7 @@ console.log(rett);
 var page=rett[0];
 var data=rett[1] || [];
 console.log('page',page);
-if(page=='Finctions'||page==null){return;}
+if(page=='Functions'||page==null){return;}
 data=getSearchDates(data);
 if(pagesSplit==false){
  data=splitPages([data,page]);
@@ -3896,8 +4320,8 @@ function show2() {
 
         for (var i = 0; i < PDArr.length; i++) {
             var testableRegExp = new RegExp(RegExp.escape(textCountry), "i");
-            if (PDArr[i].descr.match(testableRegExp)) {
-                addValue2(PDArr[i].descr, PCArr[i].descr);
+            if (PDArr[i].productdescription.match(testableRegExp)) {
+                addValue2(PDArr[i].productdescription, PCArr[i].productdescription);
 
             }
         }
@@ -3951,20 +4375,29 @@ try{
  }
 });
 
-$('#EPD').on('keypress',function(event){
-console.log('in');
-  if (event.keyCode == 13) {
+$('#EPD').on('keypress', function(event) {
+    console.log('in');
+    if (event.keyCode == 13) {
 
-var PD=$('#EPD').val();
-console.log('form data for building edit pcd descr');
-$("#updating").css("display", "block");
-try{
- google.script.run.withSuccessHandler(buildeditPCD).getEPDandFormdata(PD);
-  }catch(e){
- $("#updating").css("display", "none");
- }
- }
+        var PD = $('#EPD').val();
+        var PC = '';
+        for(var i = 0 ; i < PDArr.length ; i++){
+         if(PD == PDArr[i].productdescription){
+         PC = PDArr[i].prod;
+         break;
+         }
+        }
+        console.log('form data for building edit pcd descr');
+        $("#updating").css("display", "block");
+        try {
+            google.script.run.withSuccessHandler(buildeditPCD).getEPCandFormdata(PC);
+           $("#dropdown2").css("display", "none"); 
+        } catch (e) {
+            $("#updating").css("display", "none");
+        }
+    }
 });
+
 
 
 function getdatalists(){
@@ -4446,7 +4879,7 @@ for(var i=0;i<myOpts.length;i++){
 arr.push(myOpts[i].value);
 }
 if(arr.length>0){
-google.script.run.withSuccessHandler(stockCheck).printShippingNote(arr, 1);
+google.script.run.withSuccessHandler(htmlModalMSG).printShippingNote(arr, 1);
 }else{
 alert('No codes selected.');
 }
@@ -4459,7 +4892,7 @@ for(var i=0;i<myOpts.length;i++){
 arr.push(myOpts[i].value);
 }
 if(arr.length>0){
-google.script.run.withSuccessHandler(stockCheck).printShippingNote(arr, 2);
+google.script.run.withSuccessHandler(htmlModalMSG).printShippingNote(arr, 2);
 }else{
 alert('No codes selected.');
 }
@@ -4473,7 +4906,7 @@ for(var i=0;i<myOpts.length;i++){
 arr.push(myOpts[i].value);
 }
 if(arr.length>0){
-google.script.run.withSuccessHandler(stockCheck).printxero(arr);
+google.script.run.withSuccessHandler(htmlModalMSG).printxero(arr);
 }else{
 alert('No codes selected.');
 }
@@ -5354,6 +5787,7 @@ google.script.run.withSuccessHandler(createFlavourDropdown).getFlavourDropdown()
 
 $("#editflavourmixButton").on('click',function(){
 EDIT_FLAVMIX_CONST=true;
+RENDER_TYPE = '%';
 $(".editflavourmixBody #flavourDropdowns").html('');
 $(".editflavourmixBody #flavourmixName").val('');
 $(".editflavourmixBody #flavourmixSKU").val('');
@@ -5443,9 +5877,7 @@ function renderBottle() {
 	var special = '';
 	var special2 = '';
     var max = 10;
-    if(RENDER_TYPE == '%'){
-    max = 100 
-    }
+  
 	if (EDIT_FLAVMIX_CONST) {
 		special2 = '.editflavourmixBody #';
 		special = '.editflavourmixBody #e';
@@ -5459,15 +5891,13 @@ function renderBottle() {
 	var vals = [];
 	for (var i = 1; i <= flavournum; i++) {
 		var val = handleFloat(handleFloat($(special + 'flavourAmount' + i).val()));//  Number(parseFloat($(special + 'flavourAmount' + i).val()).toPrecision(3));
-		vals.push(val);
-		for (var j = total + 1; j <= val + total + 1; j++) {
-			var rounded = 0;
-            if(RENDER_TYPE == '%'){
-            rounded = Math.floor(rounded/10);
-            }else{
-            rounded = Math.floor(j);
-            }
+		val =RENDER_TYPE == '%' ? val/10 : val;
+        vals.push(val);
+		for (var j = total+1; j <=   val + total; j++) {
     
+            rounded = Math.floor(j);
+            
+            console.log('rounded',rounded);
 			if ($(special2 + "bottleBlock" + rounded)) {
 				$(special2 + "bottleBlock" + rounded).css('background-color', colorsARR[i]);
 			}
@@ -5486,19 +5916,22 @@ function renderBottle() {
 	var html = '';
 	var totalHTML = '';
     var renderDisplaySwitch = '';
+    console.log('RENDER_TYPE',RENDER_TYPE);
+    var totalValueInML = total;
+    var totalValueInPercent = total * 10;
 	if (total == max) {
   
-        totalHTML = '<span style="color:green;">' + total +' '+RENDER_TYPE+ '</span>';
+        totalHTML = '<span style="color:green;">' + (RENDER_TYPE == 'ml' ? totalValueInML : totalValueInPercent) +' '+RENDER_TYPE+ '</span>';
         if(total){
-        renderDisplaySwitch = '<span style="color:green;">' +(RENDER_TYPE == 'ml' ? (total* 10) : (total/10))  +' '+(RENDER_TYPE == 'ml' ? '%' : 'ml')+ '</span>';
+        renderDisplaySwitch = '<span style="color:green;">' +(RENDER_TYPE == 'ml' ?  totalValueInPercent : totalValueInML)   +' '+(RENDER_TYPE == 'ml' ? '%' : 'ml')+ '</span>';
 
         }
         
         
 	} else {
-		totalHTML = '<span style="color:red;">' + total +' '+RENDER_TYPE+ '</span>';
+		totalHTML = '<span style="color:red;">' + (RENDER_TYPE == 'ml' ?  totalValueInML :totalValueInPercent) +' '+RENDER_TYPE+ '</span>';
         if(total){
-       renderDisplaySwitch = '<span style="color:red;">' +(RENDER_TYPE == 'ml' ? (total* 10) : (total/10))  +' '+(RENDER_TYPE == 'ml' ? '%' : 'ml')+ '</span>';
+       renderDisplaySwitch = '<span style="color:red;">' +(RENDER_TYPE == 'ml' ? totalValueInPercent : totalValueInML)  +' '+(RENDER_TYPE == 'ml' ? '%' : 'ml')+ '</span>';
 
         } 
 	}
@@ -5506,9 +5939,9 @@ function renderBottle() {
     
 	for (var i = 0; i < vals.length; i++) {
 		if (i < vals.length - 1) {
-			html += '<span style="color:' + colorsARR[i + 1] + ';">' + vals[i] + '</span>+';
+			html += '<span style="color:' + colorsARR[i + 1] + ';">' + (RENDER_TYPE == '%' ? vals[i]*10 : vals[i]) + '</span>+';
 		} else {
-			html += '<span style="color:' + colorsARR[i + 1] + ';">' + vals[i] + '</span>=' + totalHTML;
+			html += '<span style="color:' + colorsARR[i + 1] + ';">' + (RENDER_TYPE == '%' ? vals[i]*10 : vals[i]) + '</span>=' +  totalHTML;
                 $("#renderDisplaySwitch").html(renderDisplaySwitch);
 		}
 	}
@@ -5563,7 +5996,7 @@ var colorsARR=['black','#FF0000','#00FF00','#0000FF','#FFFF00','#00FFFF','#FF00F
 
 var selector='<div class="flavourBlock" id="'+spec+'flavourBlockID'+flavournum+'"><input type="text" class="form-control" oninput="renderBottle()"  style="width:150px;  display:inline-block; border:2px solid '+colorsARR[flavournum]+';" id="'+spec+'flavourAmount'+flavournum+'" placeholder="20"/><select style="margin: 5px auto; width: 400px; display: inline-block;" class="form-control" id="'+spec+'flavourSelect'+flavournum+'">' + FLAVOURDROPDOWN + '</select></div>';
 $(".editflavourmixBody #flavourDropdowns").prepend(selector);
-$("#"+spec+"flavourAmount"+flavournum).val(flavours[i].val);
+$("#"+spec+"flavourAmount"+flavournum).val(flavours[i].val*10);
 $("#"+spec+"flavourSelect"+flavournum).val(flavours[i].sku)
 flavournum++;
   }
@@ -5722,6 +6155,7 @@ return false;
 var htmlModalType;
 var modalclosed=true;
 var loopTimeout=0;
+var BUILD_HTML_MODAL_DATA;
 function buildhtmlmodal(rett){
 $('.htmlMSGmodalbody').html('');
 try{
@@ -5729,6 +6163,7 @@ loopTimeout=0;
 var data=rett[0];
 var type=rett[1];
 htmlModalType=type;
+BUILD_HTML_MODAL_DATA=data;
 var built='';
 switch (type){
     case 'backupAndRestore':
@@ -5779,6 +6214,9 @@ switch (type){
     case 'notesModal':
     built= buildNotesModal(data);
     break;
+    case 'AllocationScreen':
+    built= buildAllocationScreen(data);
+    break;
   default:
 
   break;
@@ -5792,7 +6230,8 @@ $('#htmlMSGmodal').show();
 
 
 }catch(e){
-
+console.log('err',e);
+console.log(rett);
 alert(rett);
 }
 $("#updating").css("display", "none");
@@ -5817,7 +6256,7 @@ html+='<td>'+list[i][j]+'</td>';
 
   if(list[i][j][0]=='Completed'){
   html+='<td bgcolor="#1BEF5B">';
-  }else if(list[i][j][0]=='Busy'||list[i][j][0]=='started'){
+  }else if(list[i][j][0]=='In Progress'||list[i][j][0]=='started'){
    html+='<td bgcolor="#1BCFEF">';
   }else{
    html+='<td>';
@@ -5854,7 +6293,7 @@ html+='<td>'+list[i][j]+'</td>';
 
   if(list[i][j][0]=='Completed'){
   html+='<td bgcolor="#1BEF5B">';
-  }else if(list[i][j][0]=='Busy'||list[i][j][0]=='started'){
+  }else if(list[i][j][0]=='In Progress'||list[i][j][0]=='started'){
    html+='<td bgcolor="#1BCFEF">';
   }else{
    html+='<td>';
@@ -5892,7 +6331,7 @@ html+='<td>'+list[i][j]+'</td>';
 }else{
   if(list[i][j][0]=='Completed'){
   html+='<td bgcolor="#1BEF5B">';
-  }else if(list[i][j][0]=='Busy'||list[i][j][0]=='started'){
+  }else if(list[i][j][0]=='In Progress'||list[i][j][0]=='started'){
    html+='<td bgcolor="#1BCFEF">';
   }else{
    html+='<td>';
@@ -7336,5 +7775,213 @@ $("#selectedOrderID").html(selectedNote);
 getNotesGlobal();
 
 }
+}
+
+
+function runAllocationScreen(){
+google.script.run.withSuccessHandler(buildhtmlmodal).getBatchesForAllocation();
+}
+
+
+function buildAllocationScreen(data){
+
+var html = '';
+html+='<div class="container">\
+<div>\
+<h3>Select the visibility of active orders</h3>\
+<br />\
+<div id="selected_orders_allocation">\
+</div>\
+<br />\
+<div>\
+</div>\
+<div class="form-group">\
+<div  style=" overflow:auto;">\
+'+buildOrdersGrids(data)+'\
+</div>\
+</div>\
+<br />\
+<br />\
+</div>';
+
+return html;
+
+
+}
+var SELECTED_ORDER_ID_ALLOCATION = [];
+function toggleOrderIDAllocation(orderID,explicit){
+var ind = SELECTED_ORDER_ID_ALLOCATION.indexOf(orderID);
+console.log('ind',ind);
+console.log('explicit',explicit);
+
+//if(explicit !== undefined){
+//if(explicit){
+//
+//if(ind === -1){
+//SELECTED_ORDER_ID_ALLOCATION.push(orderID);
+//}
+//}else{
+//if(ind !== -1){
+//SELECTED_ORDER_ID_ALLOCATION = SELECTED_ORDER_ID_ALLOCATION.filter(function(item){ return item != orderID});
+//}
+//}
+//}else{
+ if(ind === -1){
+SELECTED_ORDER_ID_ALLOCATION.push(orderID);
+ 
+$(".orders_allocation-header."+orderID).each(function(){
+$(this).addClass('selected');
+})
+}else{
+SELECTED_ORDER_ID_ALLOCATION = SELECTED_ORDER_ID_ALLOCATION.filter(function(item){ return item != orderID});
+$(".orders_allocation-header."+orderID).each(function(){
+$(this).removeClass('selected');
+})
+}
+//}
+
+renderSelectedOrderIDsAllocation();
+}
+
+function toggleOrderIDAllocationClick(event){
+var orderID =  $(event).attr('orderID');
+toggleOrderIDAllocation(orderID);
+}
+
+function renderSelectedOrderIDsAllocation(){
+console.log('SELECTED_ORDER_ID_ALLOCATION',SELECTED_ORDER_ID_ALLOCATION);
+  var html='';
+  if(SELECTED_ORDER_ID_ALLOCATION.length){
+    var html='<div class="selected-orders-holder"><div><p>Selected:</p>';
+    html+='<div class = "orders_grid">';
+    for(var i=0;i<SELECTED_ORDER_ID_ALLOCATION.length;i++){
+    html+='<span class="orders_grid-item " orderID="'+SELECTED_ORDER_ID_ALLOCATION[i]+'" onclick="toggleOrderIDAllocationClick(this)" >'+SELECTED_ORDER_ID_ALLOCATION[i]+'</span>';
+    
+    }
+    html+='</div></div><div class="selected-orders-action-holder"><select style="width:120px;" class="form-control" id="allocation-orders-action-select"><option>Show All</option><option>Hide All</option></select><button  class="btn btn-info go-button" onclick="toggleAllAllocation()">Go</button></div></div>';
+    }
+$("#selected_orders_allocation").html(html);
+}
+
+
+function buildOrdersGrids(data){
+ var html ='';
+ console.log('data',data);
+ data.map(function(item){
+ html+='<h3>'+item.page+'</h3>';
+ html+='<div  style="overflow-y:auto;" id="orders_allocation_'+item.page+'"  class="orders_allocation">';
+ if(item.batches.length){
+ var orderNums = { 
+// 'No Order Id':[]
+};
+ item.batches.map(function(batch){
+   if(batch.orderID && item.page!='MixingTeam'){
+     if(!orderNums[batch.orderID]){
+       orderNums[batch.orderID] = [];
+     } 
+    orderNums[batch.orderID].push(batch);
+   }else if(batch.orderID && item.page=='MixingTeam'){
+   if(batch.Batches){
+   var orderIDs = Object.keys(batch.Batches).map(function(id){
+   return batch.Batches[id].orderID;
+   });
+   console.log('buildOrdersGrids orderIDs',orderIDs);
+    if(!orderNums[orderIDs.join('_')]){
+       orderNums[orderIDs.join('_')] = [];
+     } 
+    orderNums[orderIDs.join('_')].push(batch);
+   }
+   
+   }else{
+    orderNums['Unspecified'].push(batch);
+   }
+ });
+ 
+ Object.keys(orderNums).map(function(orderID){
+ var batches = orderNums[orderID];
+ if(batches.length){
+ html+='<div class="orders_allocation-header '+orderID.replace(/_/gm,', ')+'" orderID="'+orderID+'" onclick="toggleOrderIDAllocationClick(this)"><span>'+orderID+'</span></div>';
+  batches.map(function(batch){
+ var id = item.page === 'MixingTeam' ? batch.MIXNAME : batch.batch;
+  html+='<div id="orders_allocation-item_'+item.page+'_'+id+'" class="'+orderID+' orders_allocation-item '+(batch.isShown ? 'isShown' : '')+'" isShown = "'+(batch.isShown)+'" batch="'+id+'" page="'+item.page+'" onclick="toggleIsShownAllocation(this)">';
+    if(item.page == 'MixingTeam'){
+       html+='<span>'+batch.MIXNAME+'</span><span>'+ (batch.Batches ? Object.keys(batch.Batches).join(','): "NO BATCHES" )+'</span><span>'+batch.RECIPE+'</span><span>'+batch.QTYTOTAL+' L</span><span id="swich_visibility">'+(batch.isShown? 'VISIBLE' : 'HIDDEN')+'</span>';
+    }else if(item.page == 'Mixing'){
+       html+='<span>'+batch.batch+'</span><span>'+batch.productcode+'</span><span>'+batch.productdescription+'</span><span>'+batch.QTY+' L</span><span  id="swich_visibility">'+(batch.isShown? 'VISIBLE' : 'HIDDEN')+'</span>';
+    }else{
+       html+='<span>'+batch.batch+'</span><span>'+batch.productcode+'</span><span>'+batch.productdescription+'</span><span>'+batch.bottles+' Bottles</span><span  id="swich_visibility">'+(batch.isShown? 'VISIBLE' : 'HIDDEN')+'</span>';
+    }
+   html+='</div>';
+
+ }); 
+ 
+ } 
+ })
+
+ }else{
+   html+='<p>This tab has no batches running or they are In Progress or Completed.</p>';
+ }
+ html+='</div>';
+ });
+ 
+ return html;
+}
+ 
+function toggleAllAllocation(){
+$("#updating").css("display", "block");
+var action =  $("#allocation-orders-action-select").val() != 'Show All';
+ 
+var orders = [];
+BUILD_HTML_MODAL_DATA.map(function(item){
+ item.batches.map(function(batch){
+ var id = item.page === 'MixingTeam' ? batch.MIXNAME : batch.batch;
+   if(batch.orderID && item.page!='MixingTeam' && SELECTED_ORDER_ID_ALLOCATION.indexOf(batch.orderID) > -1){
+ 
+   orders.push({batch:id,page:item.page,action:action});
+   }else if(batch.orderID && item.page=='MixingTeam'){
+   if(batch.Batches){
+   var orderIDs = Object.keys(batch.Batches).map(function(batchId){
+   return batch.Batches[batchId].orderID;
+   });
+   if(SELECTED_ORDER_ID_ALLOCATION.indexOf(orderIDs.join('_')) > -1){
+      orders.push({batch:id,page:item.page,action:action});
+    }
+   }
+   
+   }else if(SELECTED_ORDER_ID_ALLOCATION.indexOf('Unspecified') > -1){
+      orders.push({batch:id,page:item.page,action:action});
+   }
+   });
+});
+SELECTED_ORDER_ID_ALLOCATION = [];
+console.log('orders',JSON.stringify(orders))
+google.script.run.withSuccessHandler(function(resp){
+$("#updating").css("display", "none");
+if(resp.error){
+buildhtmlmodal([resp.msg,'htmlMSG']);
+}else{
+runAllocationScreen();
+renderSelectedOrderIDsAllocation();
+}
+}).toggleAllAllocation(orders);
+ 
+}
+function toggleIsShownAllocation(event){
+var page = $(event).attr('page');
+var batch = $(event).attr('batch');
+var isShown = $(event).attr('isShown') === 'true';
+google.script.run.withSuccessHandler(function(resp){
+if(resp.error){
+alert(resp.error);
+}else{
+if(resp.isShown){
+$("#orders_allocation-item_"+resp.page+"_"+resp.batch).addClass("isShown");
+}else{
+$("#orders_allocation-item_"+resp.page+"_"+resp.batch).removeClass("isShown");
+}
+$("#orders_allocation-item_"+resp.page+"_"+resp.batch).attr('isShown',resp.isShown);
+$("#orders_allocation-item_"+resp.page+"_"+resp.batch +' #swich_visibility').html( resp.isShown? 'VISIBLE' : 'HIDDEN');
+}
+}).updateBatchVisibility(page,batch, isShown);
 }
 </script>

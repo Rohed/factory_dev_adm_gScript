@@ -26,7 +26,7 @@ function generatePremixBrandUnbrand(){
         }
       }else if(sheets[j]=='BrandedTypes'){
         if(!raw[PCList[i].prod]){
-          toCreateBranded.push([PCList[i].prod,PCList[i].descr])
+          toCreateBranded.push([PCList[i].prod,PCList[i].productdescription])
         }
         
       }
@@ -402,7 +402,7 @@ function generateQTYBrandedJSON2(){
     if(PC[i].prod.length<=30){
     var item1={
       "sku":PC[i].prod,
-      "name":PC[i].descr,
+      "name":PC[i].productdescription,
       "Running":0,
       "Reserved":0,
       "Completed":0,

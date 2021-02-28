@@ -493,6 +493,7 @@ function getBatchInfo(batches, key) {
     var rett = [];
     for (var i = 0; i < sheets.length; i++) {
         var raw = base.getData(sheets[i]);
+      
         // var list=JSONtoARR(raw);
         for (var j = 0; j < batches.length; j++) {
             var suf2 = batches[j].substr(-2);
@@ -519,13 +520,13 @@ function getBatchInfo(batches, key) {
                     }
                 }
             }
-            var existsinRaw = raw[batches[j]];
+            var existsinRaw = raw? raw[batches[j]] : false;
             if (existsinRaw) {
                 if (existsinRaw.final_status == 0 || existsinRaw.final_status == null) {
                     existsinRaw.final_status = 'Not Run';
                 }
-                if (existsinRaw.movedtoNext == 'Busy') {
-                    existsinRaw.final_status = 'Busy';
+                if (existsinRaw.movedtoNext == 'In Progress') {
+                    existsinRaw.final_status = 'In Progress';
                 }
                 Logger.log('existsinRett '+existsinRett)
                  Logger.log(rett)
@@ -556,7 +557,7 @@ function deleteAndReverse(data, key) {
             if (sheets[i] == 'MixingTeam') {
                 var sheetItem = JSONtoARR(raw);
             } else {
-                var sheetItem = raw[data[j][0]];
+              var sheetItem = raw ? raw[data[j][0]] : false;
             }
             reverseLineItemMove(item, base.getData('Orders/' + data[j][0]), sheetItem, sheets[i], key);
         }
