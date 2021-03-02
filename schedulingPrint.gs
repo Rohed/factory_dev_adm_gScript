@@ -5,7 +5,7 @@ var type='Selected';
 var obj={
 from:new Date('06/19/2018').setHours(0,0,0,0),
 to:new Date('06/30/2018').setHours(0,0,0,0),
-selected:['1614278773183'],
+selected:['1614713316086'],
 };
 
 printSchedules(obj,type);
@@ -46,6 +46,7 @@ try{
     
   }
   var toPrint=getToPrint(printData[0]);
+  var simplePrint = formSimplePrint(printData[0],printData[1],allMachines);
   var startRow=3;
   var startCol=3;
   
@@ -57,6 +58,8 @@ try{
   Logger.log(SS.getUrl());
   var template=SS.getSheets()[0];
   var sheet=SS.getSheets()[1];
+  var simpleSheet = SS.getSheets()[2];
+  simpleSheet.getRange(1, 1, simplePrint.length, simplePrint[0].length).setValues(simplePrint);
   sheet.setName('Schedule');
   var initRange= template.getRange(1, 1, template.getLastRow(), 2);
   var initCol= template.getRange(1, 3, template.getLastRow(), 1);
@@ -130,9 +133,7 @@ try{
           sheet.getRange(startRow+v1, startCol,v2,1).merge().setValue(arrtoSet[0]).setBackground(BGColors[colindex]);
         }
       }else{
-        if(batchandbot.splice(0, 1)[0]){
-          Logger.log("SPLICE");
-          Logger.log(batchandbot);
+        if(batchandbot.splice(0, 1)[0]){ 
           sheet.getRange(startRow+v1, startCol).setValue(values.splice(0, 1)+' X '+batchandbot.splice(0, 1)[1]).setBackground(BGColors[colindex]); 
           // values=[];
         }else{
@@ -371,3 +372,78 @@ function getSelectedSchedules(selected){
   return [arr,botandbatchLarge];
   
 }
+
+
+function formSimplePrint(printKeys,printValues,allMachines){
+  var header = ['Date','Machine','Info','Bottles Total','Time']
+  var data = [header];
+  printKeys.map(function(item,index){
+    var date = item[0];
+    var machineID = item[1];
+    var formatDate = formatDateDisplay(parseInt(date,10));
+    var machineName = allMachines[item[1]] ? allMachines[item[1]].name : '';
+    var itemValues =  JSON.parse(JSON.stringify(item)).slice(2, item.length);
+    var printValuesSub = JSON.parse(JSON.stringify(printValues[index])).slice(2, item.length);
+    var groups = {};
+    var timeFrom = 0;
+    var timeTo = 0;
+    var currentItem = null;
+    itemValues.map(function(val,ind){
+       if(val){
+    if(!groups[val]){
+    groups[val] = {
+    timeFrom:timeFrom,
+        minTotal:1,
+    name:val,
+    bottles:printValuesSub[ind][1],
+    times:[ind]
+  }
+                }else{
+               groups[val].bottles += printValuesSub[ind][1]
+                 groups[val].minTotal ++;
+                  groups[val].times.push(ind);
+                }
+    
+    
+           
+       }
+    timeFrom++;
+    });
+  
+  Object.keys(groups).map(function(key){
+    var row = [formatDate,machineName,key,groups[key].bottles,formTimeForGroup(groups[key].timeFrom,groups[key].minTotal,groups[key].times)];
+    data.push(row)
+  })
+  })
+  return data;
+}
+
+function formTimeForGroup(from,mins,times){
+var date= new Date().setUTCHours(0,0,0,0);
+
+var groupedTimes = groupSequentialTimes (times)
+var times = groupedTimes.map(function(timesList){
+  var startData= new Date(date);
+  var ds = new Date(startData);
+  ds.setMinutes( ds.getMinutes() + timesList[0] );
+  
+  var de = new Date(startData);
+  de.setMinutes( de.getMinutes() + timesList[timesList.length-1] );
+  return formatAMPM2(ds)+' - '+formatAMPM2(de)
+}).join(', ');
+ return times;
+}
+
+
+function groupSequentialTimes (times) {
+  return times.reduce(function (memo, time, i) {
+    if (i === 0) {
+      memo.push([time])
+      return memo
+    }
+    if (times[i - 1] + 1 !== time) memo.push([])
+    memo[memo.length - 1].push(time)
+    return memo
+  }, [])
+}
+
