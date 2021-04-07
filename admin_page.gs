@@ -3,6 +3,18 @@ var data = JSONtoARR(base.getData('PremixesTypes'));
 
 return [data,'premixSafety'];
 }
+
+function getHighestBatch(){
+  var def =  911000;
+ var largestBatch=base.getData('highestBatch'); 
+  largestBatch = isNaN(largestBatch) ? def : largestBatch;  
+  return largestBatch + 1;
+}
+function getFormDataCustomer(){
+  var data = getFormData();
+  data.orderForm = include('orderFormCustomer.html');
+  return data;
+}
 function getFormData() {
     var PD = getProductDescriptions();
     var PC = getProductCodes();
@@ -26,7 +38,9 @@ function getFormData() {
         'PD': PD,
         'PC': PC,
         'boxes':boxes,
-        'labels':labels
+        'labels':labels,
+        'orderForm':include('orderFormSystem.html'),
+        'highest':getHighestBatch()
     };
     return data;
 }

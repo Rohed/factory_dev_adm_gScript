@@ -1,0 +1,106 @@
+<div class = 'orders_form_customer'>
+<div class ='orders_form_grid_item rown_num_count'>
+ <span  >Row ROW_NUM</span>
+</div>
+<div class ='orders_form_grid_wide' id='ORDER_GRID_ROW_NUM'>
+
+
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="PCROW_NUM">Code</label>
+<input autocomplete="on"  typ="PC" class="form-control" id="PCROW_NUM" num="ROW_NUM" placeholder="Product Code" aria-describedby="sizing-addon2"  onclick="searchFOR(this);" onkeyup="show3(this)"/>
+<div class="dropdowns"  id="dropdownCROW_NUM">
+<select typ="PC" num="ROW_NUM" name="listCROW_NUM" id="listCROW_NUM" onclick="presetVAL(this);"></select> 
+</div>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="PDROW_NUM">Description</label>
+<input autocomplete="on" typ="PD" class="form-control" id="PDROW_NUM" num="ROW_NUM"  placeholder="Product Description" aria-describedby="sizing-addon2"  onclick="searchFOR(this);"  onkeyup="show3(this)"/>
+<div  class="dropdowns" id="dropdownPROW_NUM">
+<select typ="PD" num="ROW_NUM" name="listDROW_NUM" id="listDROW_NUM"  onclick="presetVAL(this);"></select>
+</div>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="brandSelect">Brand</label>
+<select class="form-control"  id="brandSelect">BRAND_SELECT</select>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+ <div class="form-group">
+    <label for="checkUncolored">Check Uncolored(Premix Stock)</label>
+    <input type="checkbox" value=""  name="checkUncolored"  id="checkUncolored" class="form-control" > 
+  </div>
+</div>
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="recipeSelect">Recipe</label>
+<select class="form-control"  id="recipeSelect">RECIPE_SELECT</select>
+</div>
+</div>
+
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="flavourSelect">Flavour</label>
+<select class="form-control"  id="flavourSelect">FLAVOUR_SELECT</select>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+ <div class="form-group">
+    <label for="numBottles">Bottles</label>
+    <input type="number" value=""  name="numBottles"  id="numBottles" class="form-control" placeholder="Bottles"> 
+  </div>
+</div>
+
+
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="bottleType">Bottle Type</label>
+<select class="form-control"  id="bottleType">BOTTLE_TYPE_SELECT</select>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="lidType">Lid Type</label>
+<select class="form-control"  id="lidType">LID_SELECT</select>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+<div class="form-group">
+<label for="packagingType">Pack Type</label>
+<select class="form-control"  id="packagingType">PACKAGING_SELECT</select>
+</div>
+</div>
+
+<div class ='orders_form_grid_item'>
+ <div class="form-group">
+    <label for="prePrintedBottleLabels">Pre Printed Bottle Labels</label>
+    <input type="checkbox" value=""  name="prePrintedBottleLabels"  id="prePrintedBottleLabels" class="form-control" > 
+  </div>
+</div>
+
+<div class ='orders_form_grid_item'>
+ <div class="form-group">
+    <label for="prePrintedPackLabels">Pre Printed Pack Labels</label>
+    <input type="checkbox" value=""  name="prePrintedPackLabels"  id="prePrintedPackLabels" class="form-control" > 
+  </div>
+</div>
+ </div>
+<div class ='orders_form_grid_item save_btn_order_form'>
+<button class="btn btn-primary " id="savebtnROW_NUM" onclick="newrow(this)" type="button"><i class="fa fa-plus-square" aria-hidden="true"></i></button>
+</div>
+
+</div>

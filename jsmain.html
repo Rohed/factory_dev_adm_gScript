@@ -453,8 +453,8 @@ $('.tabs .tab-links a').on('click', function(e) {
        $('.modal-body').html('');
        $('#subModalForm').hide();
        $('#subflavourmixFormOrder').hide();
-        $("#updating").hide();
-        //google.script.run.withSuccessHandler(buildForm).getFormData();
+      
+       google.script.run.withSuccessHandler(buildForm).getFormData();
     });
     $('#newOrder').on('click', function(e) {
     $('.modal-body').html('');
@@ -577,83 +577,68 @@ edit_flavour_mix_order=true;
         console.log(data);
         $('#subModalForm').show();
         $('#subflavourmixFormOrder').hide();
-        var html = '';
-
-        html += '<table class="form_table">';
-        html += '<tr><td><h4>Order Date</h4></td><td><h4>Batch</h4></td><td><h4>Code</h4></td><td><h4>Description</h4></td><td><h4>OrderID</h4></td><td><h4>Priority</h4></td></tr>';
-        html += '<tr><td><div class="input-group"><input type="date" value=""  name="orderDate"  id="orderDate" class="form-control" placeholder="Order Date" aria-describedby="sizing-addon2"></div></td>';
-        html += '<td><div class="input-group"><input type="text" value="" name="orderbatch" id="orderbatch"  class="form-control" placeholder="Batch" aria-describedby="sizing-addon2"></div></td>';
-        var codeSelect = '<option id="blank" value=""><option>';
+        var html = data.orderForm;
+        
+       
+ 
+        var codeSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.PC.length; i++) {
-            codeSelect += '<option value="' + data.PC[i].prod + '" id="' + data.PC[i].prod + '">' + data.PC[i].productcode + '<option>';
+            codeSelect += '<option value="' + data.PC[i].prod + '" id="' + data.PC[i].prod + '">' + data.PC[i].productcode + '</option>';
         }
-        html+='<td><select class="form-control" onchange="pcselect();" id="PCSelect">' + codeSelect + '</select></td>';
         
-        var descSelect = '<option id="blank" value=""><option>';
+        var descSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.PD.length; i++) {
-            descSelect += '<option value="' + data.PD[i].productdescription + '" id="' + data.PD[i].productdescription + '" key="' + data.PD[i].prod + '">' + data.PD[i].productdescription + '<option>';
+            descSelect += '<option value="' + data.PD[i].productdescription + '" id="' + data.PD[i].productdescription + '" key="' + data.PD[i].prod + '">' + data.PD[i].productdescription + '</option>';
         }
-         html+='<td><select class="form-control" onchange="pdselect();" id="PDDSelect" >' + descSelect + '</select></td>';
-        
-        
-        html += '<td><div class="input-group"><input type="text" value="" name="orderbatch" id="orderID"  class="form-control" placeholder="OrderID" aria-describedby="sizing-addon2"></div></td>';
-        var customerSelect = '<option id="blank" value=""><option>';
+         
+        var customerSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.customers.length; i++) {
-            customerSelect += '<option value="' + data.customers[i].sku + '" id="' + data.customers[i].name + '">' + data.customers[i].name + '<option>';
+            customerSelect += '<option value="' + data.customers[i].sku + '" id="' + data.customers[i].name + '">' + data.customers[i].name + '</option>';
         }
 
-        var brandSelect = '<option id="blank" value=""><option>';
+        var brandSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.brands.length; i++) {
-            brandSelect += '<option value="' + data.brands[i].sku + '" id="' + data.brands[i].name + '">' + data.brands[i].name + '<option>';
+            brandSelect += '<option value="' + data.brands[i].sku + '" id="' + data.brands[i].name + '">' + data.brands[i].name + '</option>';
         }
-        html += '<td><div class="input-group"><input type="text" id="priority" class="form-control" placeholder="Priority" aria-describedby="sizing-addon2"></div></td></tr>';
-        
-        
-        
-        
-        html += '<tr><td><h4>Customer</h4></td><td><h4>Brand</h4></td><td><h4>Check Uncolored(Premix Stock)</h4></td><td><h4>Recipe</h4></td><td><h4>Flavour</h4></td><td><h4>Bottles</h4></td></tr>';
-        html += '<tr><td><select class="form-control" id="customerSelect">' + customerSelect + '</select></td><td><select class="form-control"  id="brandSelect">' + brandSelect + '</select></td><td>	<div class="form-check"><input type="checkbox"  id="checkUncolored"/></div></td>';
-        var recipeSelect = '<option id="blank" value=""><option>';
+        var recipeSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.recipes.length; i++) {
-        recipeSelect += '<option id="' + data.recipes[i][1] + '" value="' + data.recipes[i][0] + '" key="' + data.recipes[i][1] + '">' + data.recipes[i][0] + '<option>';
+        recipeSelect += '<option id="' + data.recipes[i][1] + '" value="' + data.recipes[i][0] + '" key="' + data.recipes[i][1] + '">' + data.recipes[i][0] + '</option>';
         }
-        html += '<td><select class="form-control" id="recipeSelect">' + recipeSelect + '</select></td>';
-        var flavourSelect = '<option id="blank" value=""><option>';
+        
+        var flavourSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.flavours.length; i++) {
-        flavourSelect += '<option value="' + data.flavours[i].sku + '">' + data.flavours[i].name+ '<option>';
-        }
-        html += '<td><select class="form-control" id="flavourSelect">' + flavourSelect + '</select></td>';
+        flavourSelect += '<option value="' + data.flavours[i].sku + '">' + data.flavours[i].name+ '</option>';
+        } 
         
-        html += '<td><div class="input-group"><input type="text" id="numBottles" class="form-control" placeholder="Bottles" aria-describedby="sizing-addon2"></div></td></tr>';
-        
-        
-        
-        
-        html += '<tr><td><h4>Stocking Amount (litre)</h4></td><td><h4>Bottle Type</h4></td><td><h4>Lid Type</h4></td>';
-        html += '<td><h4>Pack Type</h4></td><td><h4>Pre Printed Bottle Labels</h4></td><td><h4>Pre Printed Pack Labels</h4></td></tr>';
-        html += '<tr><td><div class="input-group"><input type="text" id="stocking" class="form-control" placeholder="Stocking Amount (litre)" aria-describedby="sizing-addon2"></div></td>';
-        var bottleSelect = '<option id="blank" value=""><option>';
+        var bottleSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.bottletypes.length; i++) {
-            bottleSelect += '<option value="' + data.bottletypes[i].sku + '" id="' + data.bottletypes[i].name + '">' + data.bottletypes[i].name + '<option>';
-        }
-        html += '<td><select class="form-control" id="bottleType">' + bottleSelect + '</select></td>';
-
-        var lidSelect = '<option id="blank" value=""><option>';
+            bottleSelect += '<option value="' + data.bottletypes[i].sku + '" id="' + data.bottletypes[i].name + '">' + data.bottletypes[i].name + '</option>';
+        } 
+        
+        var lidSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.lids.length; i++) {
-            lidSelect += '<option value="' + data.lids[i].sku + '" >' + data.lids[i].name + '<option>';
+            lidSelect += '<option value="' + data.lids[i].sku + '" >' + data.lids[i].name + '</option>';
         }
-        html += '<td><select class="form-control" id="lidType">' + lidSelect + '</select></td>';
-
-
-
-        var packagingSelect = '<option id="blank" value=""><option>';
+         
+        var packagingSelect = '<option id="blank" value=""></option>';
         for (var i = 0; i < data.packagings.length; i++) {
-            packagingSelect += '<option value="' + data.packagings[i].sku + '" id="' + data.packagings[i].sku + '">' + data.packagings[i].name + '<option>';
+            packagingSelect += '<option value="' + data.packagings[i].sku + '" id="' + data.packagings[i].sku + '">' + data.packagings[i].name + '</option>';
         }
-        html += '<td><select class="form-control" id="packagingType">' + packagingSelect + '</select></td>';
-        html += '<td>	<div class="form-check"><input type="checkbox"  id="prePrintedBottleLabels"/></div></td><td>	<div class="form-check"><input type="checkbox"  id="prePrintedPackLabels"/></div></td></tr></table>';
+     
+     html = html.replace('CODE_SELECT',codeSelect);
+     html = html.replace('DESCRIPTION_SELECT',descSelect);
+     html = html.replace('CUSTOMER_SELECT',customerSelect);
+     html = html.replace('BRAND_SELECT',brandSelect);
+     html = html.replace('RECIPE_SELECT',recipeSelect);
+     html = html.replace('FLAVOUR_SELECT',flavourSelect);
+     html = html.replace('BOTTLE_TYPE_SELECT',bottleSelect);
+     html = html.replace('LID_SELECT',lidSelect);
+     html = html.replace('PACKAGING_SELECT',packagingSelect);
+    
           $("#updating").hide();
         $('.modal-body').html(html);
+        
+        $('#orderbatch').val(data.highest)
              EDITORDER=false;
     }
 
@@ -1597,99 +1582,73 @@ edit_flavour_mix_order=true;
         var dataold = retval[1];
         console.log(data);
 
-        var html = '';
+        var html = data.orderForm;
 
-        var customerSelect = '<option value="'+ dataold.customerSKU +'" selected id="' + dataold.customer + '">' + dataold.customer + '<option>';
-        var brandSelect = '<option value="'+ dataold.brandSKU +'"  selected id="' + dataold.brand + '">' + dataold.brand + '<option>';
-        var recipeSelect = '<option selected id="' + dataold.recipe.id +'" value="' + dataold.recipe.name + '" key="' + dataold.recipe.id + '">' + dataold.recipe.name + '<option>';
-        var flavourSelect = '<option value="'+ dataold.flavour.sku +'"  selected >' + dataold.flavour.name + '<option>';
-        var bottleSelect = '<option value="'+ dataold.botSKU +'"  selected id="' + dataold.btype + '">' + dataold.btype + '<option>';
-        var lidSelect = '<option value="'+ dataold.lidSKU +'"  selected id="' + dataold.lid + '">' + dataold.lid + '<option>';
+        var customerSelect = '<option value="'+ dataold.customerSKU +'" selected id="' + dataold.customer + '">' + dataold.customer + '</option>';
+        var brandSelect = '<option value="'+ dataold.brandSKU +'"  selected id="' + dataold.brand + '">' + dataold.brand + '</option>';
+        var recipeSelect = '<option selected id="' + dataold.recipe.id +'" value="' + dataold.recipe.name + '" key="' + dataold.recipe.id + '">' + dataold.recipe.name + '</option>';
+        var flavourSelect = '<option value="'+ dataold.flavour.sku +'"  selected >' + dataold.flavour.name + '</option>';
+        var bottleSelect = '<option value="'+ dataold.botSKU +'"  selected id="' + dataold.btype + '">' + dataold.btype + '</option>';
+        var lidSelect = '<option value="'+ dataold.lidSKU +'"  selected id="' + dataold.lid + '">' + dataold.lid + '</option>';
+        var codeSelect = '<option id="blank" value="'+dataold.productcode+'">'+dataold.productcode+'</option>';
+        var descSelect = '<option id="blank"  value="'+dataold.productdescription+'">'+dataold.productdescription+'</option>'; 
         
         if (dataold.packagingType) {
-            var packagingSelect = '<option value="'+ dataold.packagingType.sku +'"  id="' + dataold.packagingType.sku + '">' + dataold.packagingType.name  + '<option>';
+            var packagingSelect = '<option value="'+ dataold.packagingType.sku +'"  id="' + dataold.packagingType.sku + '">' + dataold.packagingType.name  + '</option>';
         } else {
             var packagingSelect = '<option value=""></option>';
         }
-         html += '<table class="form_table">';
-        html += '<tr><td><h4>Order Date</h4></td><td><h4>Batch</h4></td><td><h4>Code</h4></td><td><h4>Description</h4></td><td><h4>OrderID</h4></td><td><h4>Priority</h4></td></tr>';
-        
+       
+       
+        for (var i = 0; i < data.PC.length; i++) {
+            codeSelect += '<option value="' + data.PC[i].prod + '" >' + data.PC[i].productcode + '</option>';
+        } 
         
        
-        html += '<tr><td><div class="input-group"><input type="date" value=""  name="orderDate"  id="orderDate" class="form-control" placeholder="Order Date" aria-describedby="sizing-addon2"></div></td>';
-        html += '<td><div class="input-group"><input type="text" value="" name="orderbatch" id="orderbatch"  class="form-control" placeholder="Batch" aria-describedby="sizing-addon2"></div></td>';
-        var codeSelect = '<option id="blank" value="'+dataold.productcode+'">'+dataold.productcode+'<option>';
-        for (var i = 0; i < data.PC.length; i++) {
-            codeSelect += '<option value="' + data.PC[i].prod + '" >' + data.PC[i].productcode + '<option>';
-        }
-        html+='<td><select class="form-control" onchange="pcselect();" id="PCSelect">' + codeSelect + '</select></td>';
-        
-        var descSelect = '<option id="blank"  value="'+dataold.productdescription+'">'+dataold.productdescription+'<option>';
-        console.log(data.PD);
-        
         for (var i = 0; i < data.PD.length; i++) {
         try{
-            descSelect += '<option value="' + data.PD[i].productdescription + '" >' + data.PD[i].productdescription + '<option>';
-            }catch(e){console.log(PD[i])}
-        }
-         html+='<td><select class="form-control" onchange="pdselect();" id="PDDSelect">' + descSelect + '</select></td>';
-        
-        
-        html += '<td><div class="input-group"><input type="text" value="" name="orderbatch" id="orderID"  class="form-control" placeholder="OrderID" aria-describedby="sizing-addon2"></div></td>';
-      
-        for (var i = 0; i < data.customers.length; i++) {
-            customerSelect += '<option value="' + data.customers[i].sku + '" id="' + data.customers[i].sku + '">' + data.customers[i].name + '<option>';
+         descSelect += '<option value="' + data.PD[i].productdescription + '" >' + data.PD[i].productdescription + '</option>';
+         }catch(e){console.log(PD[i])}
         }
 
-       
+        for (var i = 0; i < data.customers.length; i++) {
+         customerSelect += '<option value="' + data.customers[i].sku + '" id="' + data.customers[i].sku + '">' + data.customers[i].name + '</option>';
+        }
+      
          for (var i = 0; i < data.brands.length; i++) {
-         brandSelect += '<option value="' + data.brands[i].sku + '" id="' + data.brands[i].sku + '">' + data.brands[i].name + '<option>';
+         brandSelect += '<option value="' + data.brands[i].sku + '" id="' + data.brands[i].sku + '">' + data.brands[i].name + '</option>';
          }
-         html += '<td><div class="input-group"><input type="text" id="priority" class="form-control" placeholder="Priority" aria-describedby="sizing-addon2"></div></td></tr>';
-         
-         html += '<tr><td><h4>Customer</h4></td><td><h4>Brand</h4></td><td><h4>Check Uncolored (Premix Stock)</h4></td><td><h4>Recipe</h4></td><td><h4>Flavour</h4></td><td><h4>Bottles</h4></td></tr>';
-         html += '<td><select class="form-control" id="customerSelect">' + customerSelect + '</select></td><td><select class="form-control"  id="brandSelect">' + brandSelect + '</select></td><td><div class="form-check"><input type="checkbox"  id="checkUncolored"/></div></td>';
          
          for (var i = 0; i < data.recipes.length; i++) {
-         recipeSelect += '<option id="' + data.recipes[i][1]  + '" value="' + data.recipes[i][0] + '" key="' + data.recipes[i][1] + '">' + data.recipes[i][0] + '<option>';
+         recipeSelect += '<option id="' + data.recipes[i][1]  + '" value="' + data.recipes[i][0] + '" key="' + data.recipes[i][1] + '">' + data.recipes[i][0] + '</option>';
          }
          
-         html += '<td><select class="form-control" id="recipeSelect">' + recipeSelect + '</select></td>';
-         
-             
+       
         for (var i = 0; i < data.flavours.length; i++) {
-            flavourSelect += '<option value="' + data.flavours[i].sku + '" id="' + data.flavours[i].sku + '">' + data.flavours[i].name + '<option>';
+        flavourSelect += '<option value="' + data.flavours[i].sku + '" id="' + data.flavours[i].sku + '">' + data.flavours[i].name + '</option>';
         }
-        html += '<td><select class="form-control" id="flavourSelect">' + flavourSelect + '</select></td>';
-
-        html += '<td><div class="input-group"><input type="text" id="numBottles" class="form-control" placeholder="Bottles" aria-describedby="sizing-addon2"></div></td></tr>';
-
-
-        html += '<tr><td><h4>Stocking Amount (litre)</h4></td><td><h4>Bottle Type</h4></td><td><h4>Lid Type</h4></td>';
-        html += '<td><h4>Pack Type</h4></td><td><h4>Pre Printed Bottle Labels</h4></td><td><h4>Pre Printed Pack Labels</h4></td></tr>';
-        
-        
-        html += '<td><div class="input-group"><input type="text" id="stocking" class="form-control" placeholder="Stocking Amount (litre)" aria-describedby="sizing-addon2"></div></td>';
+      
         
         for (var i = 0; i < data.bottletypes.length; i++) {
-        bottleSelect += '<option value="' + data.bottletypes[i].sku + '" id="' + data.bottletypes[i].sku + '">' + data.bottletypes[i].name + '<option>';
+        bottleSelect += '<option value="' + data.bottletypes[i].sku + '" id="' + data.bottletypes[i].sku + '">' + data.bottletypes[i].name + '</option>';
         }
-        html += '<td><select class="form-control" id="bottleType">' + bottleSelect + '</select></td>';
-        
-        
+
         for (var i = 0; i < data.lids.length; i++) {
-        lidSelect += '<option value="' + data.lids[i].sku + '" id="' + data.lids[i].sku + '">' + data.lids[i].name + '<option>';
+        lidSelect += '<option value="' + data.lids[i].sku + '" id="' + data.lids[i].sku + '">' + data.lids[i].name + '</option>';
         }
-        html += '<td><select class="form-control" id="lidType">' + lidSelect + '</select></td>';
-        
-        
-        
+
         for (var i = 0; i < data.packagings.length; i++) {
-        packagingSelect += '<option value="' + data.packagings[i].sku + '" id="' + data.packagings[i].sku + '">' + data.packagings[i].name + '<option>';
+        packagingSelect += '<option value="' + data.packagings[i].sku + '" id="' + data.packagings[i].sku + '">' + data.packagings[i].name + '</option>';
         }
-        html += '<td><select class="form-control" id="packagingType">' + packagingSelect + '</select></td>';
-        html += '<td><div class="form-check"><input type="checkbox"  id="prePrintedBottleLabels"/></div></td><td><div class="form-check"><input type="checkbox"  id="prePrintedPackLabels"/></div></td></tr></table>';
-        
+        html = html.replace('CODE_SELECT',codeSelect);
+        html = html.replace('DESCRIPTION_SELECT',descSelect);
+        html = html.replace('CUSTOMER_SELECT',customerSelect);
+        html = html.replace('BRAND_SELECT',brandSelect);
+        html = html.replace('RECIPE_SELECT',recipeSelect);
+        html = html.replace('FLAVOUR_SELECT',flavourSelect);
+        html = html.replace('BOTTLE_TYPE_SELECT',bottleSelect);
+        html = html.replace('LID_SELECT',lidSelect);
+        html = html.replace('PACKAGING_SELECT',packagingSelect);     
          $('.modal-body').html(html);
           $("#updating").hide();
 
@@ -1728,6 +1687,7 @@ var flavmixArr = [];
     val:'flavMixVal_'+i,
     name:'flavMixName_'+i,
     sku:'flavMixSKU_'+i, 
+     supplier:'flavMixSupplier_'+i, 
     });
 
    }

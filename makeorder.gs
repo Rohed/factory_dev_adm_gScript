@@ -1019,9 +1019,9 @@ function checkBatchExistsFlavourMixer(orders, batch, num) {
 function getNewOrderID() {
 
     var params = {
-        orderBy: ['orderID']
+        orderBy:  'orderID'
     }
-    var ordersByOrderID = JSONtoARR(base.getData('Orders', params));
+    var ordersByOrderID = JSONtoARR(base.getData('Orders/', params));
     ordersByOrderID = ordersByOrderID.filter(function(item) {
         return item.orderID
     }).sort(sortOrderIDsHL)

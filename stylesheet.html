@@ -1,5 +1,15 @@
 
     <style>
+    
+    .function_dropdowns_holder{
+display:flex;
+flex-direction:row;
+justify-content:flex-start;
+    padding: .5rem 1rem;
+}
+ 
+ 
+
      .highlight{
     background-color:#1a73e8;
     width: 30px;
@@ -576,6 +586,55 @@ justify-content:space-between;
 flex-direction:row;
 }
 
+.orders_form_standard{
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  
+  padding: 10px;
+  margin-bottom:20px;
+}
+
+
+.orders_form_customer{
+  display: grid;
+  grid-template-columns: 0.1fr 0.8fr 0.1fr;
+  
+  padding: 10px;
+  margin-bottom:20px;
+}
+.rown_num_count{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+.save_btn_order_form{
+    justify-content: center;
+    align-items: center;
+    display: flex;
+}
+
+
+.orders_form_customer:nth-child(even) {background: #CCC;}
+.orders_form_customer:nth-child(odd) {background: #FFF;}
+.orders_form_grid{
+  display: grid;
+  grid-template-columns: auto auto auto auto ;
+  
+  padding: 10px;
+  margin-bottom:20px;
+} 
+.orders_form_grid_wide{
+  display: grid;
+  grid-template-columns: auto auto auto auto auto auto  ;
+  
+  padding: 10px;
+  margin-bottom:20px;
+} 
+.orders_form_grid_item{
+ padding: 5px; 
+  margin:5px;
+  text-align: left; 
+} 
 .orders_grid{
   display: grid;
   grid-template-columns: auto auto auto auto;
@@ -673,6 +732,7 @@ font-size:14px;
 font-size:18px;
 font-weight:500;
 }
+
 
 
     </style>

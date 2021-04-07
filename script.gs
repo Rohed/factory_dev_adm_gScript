@@ -302,7 +302,8 @@ var flavmixArr = [];
     flavmixArr.push({
     val:'flavMixVal_'+i,
     name:'flavMixName_'+i,
-    sku:'flavMixSKU_'+i, 
+    sku:'flavMixSKU_'+i,
+      supplier:'flavMixSupplier_'+i, 
     });
 
    }

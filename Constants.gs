@@ -8,7 +8,7 @@ var PREMIX_STOCK_SUFFIX='S';
 var UNBRANDED_STOCK_SUFFIX='U';
 var UNBRANDED_STOCK_SUFFIX2='OV';
 var BRANDED_STOCK_SUFFIX='B';
-
+ 
 function getRecipeDropdown1(){
 
 

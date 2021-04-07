@@ -454,6 +454,113 @@ function printxero(SELECTED){
 
 
 
+function TESTPRINTprintmixbatch(){
+printmixbatch(['GBVCO30011']);
+}
+function printmixbatch(SELECTED){
+  try{
+  var orderIDs=[];
+  var orderDates=[];
+  var formattedDate = Utilities.formatDate(new Date(), "GMT", "dd/MM/yyyy");
+  
+  var folder=DriveApp.getFolderById(MIXBATCH_FOLDER);
+  var misc = base.getData('Misc');
+
+    SELECTED.map(function(mixbatch){
+      var create=DriveApp.getFileById(MIXBATCH_TEMPLATE).makeCopy(mixbatch+' - '+formattedDate,folder);
+      var file=DocumentApp.openById(create.getId());
+      var data = base.getData('MixingTeam/'+mixbatch);
+      var recipe = base.getData('Recipes/'+data.recipe.id);
+      file.replaceText('{DATE}',formattedDate);
+      file.replaceText('{MIXBATCH}',mixbatch);
+      file.replaceText('{STR}',recipe.strength);
+      file.replaceText('{VG}',recipe.vg);
+      file.replaceText('{PG}',recipe.pg);
+      var useFlavour = recipe.color ? recipe.color.sku ? data.flavour.sku +': '+data.flavour.name + ' - ' + recipe.color.name:data.flavour.sku +': '+data.flavour.name:data.flavour.sku +': '+data.flavour.name;
+      file.replaceText('{FLAVOUR}',useFlavour);  
+      var vgTotal = 0;
+      var pgTotal = 0;
+      var flavTotal = 0;
+      var nicTotal = 0;
+      var saltsTotal = 0;
+      Object.keys(data.Batches).map(function(batch){
+        vgTotal+=data.VGval*data.Batches[batch].QTY;
+        pgTotal+=data.PGval*data.Batches[batch].QTY;
+        flavTotal+=data.flavvalue*data.Batches[batch].QTY;
+        nicTotal+=data.Nico*data.Batches[batch].QTY;
+        saltsTotal+=data.Nicosalts*data.Batches[batch].QTY;
+      });
+      file.replaceText('{NicotineSaltTotal}',saltsTotal); 
+      file.replaceText('{NicotineTotal}',nicTotal); 
+      file.replaceText('{VGTotal}',vgTotal); 
+      file.replaceText('{PGTotal}',pgTotal); 
+      file.replaceText('{FlavourTotal}',flavTotal);  
+      
+       file.replaceText('{NicotineSaltRunning}',saltsTotal); 
+      file.replaceText('{NicotineRunning}',nicTotal+saltsTotal); 
+      file.replaceText('{VGRunning}',vgTotal+nicTotal+saltsTotal); 
+      file.replaceText('{PGRunning}',pgTotal+vgTotal+nicTotal+saltsTotal);  
+      file.replaceText('{FlavourRunning}',flavTotal+pgTotal+vgTotal+nicTotal+saltsTotal);  
+      
+      
+      var recipeTotal = recipe.Nicorec + recipe.Nicorecsalts+ recipe.PGrec+ recipe.VGrec+ recipe.Flavrec;
+      var recipeFlavourPerc = parseInt(Math.ceil(recipe.Flavrec/(recipeTotal/100)),10);
+      file.replaceText('{FlavourPercent}',recipeFlavourPerc);  
+      
+      var table0  = file.getBody().getTables()[0];
+      if(nicTotal==0){
+        table0.removeRow(1);  
+      }
+      if(saltsTotal==0){
+        table0.removeRow(1);  
+      }
+      
+        file.replaceText('{Nicorec}',recipe.Nicorec || recipe.Nicorecsalts ); 
+        file.replaceText('{VGrec}',recipe.VGrec); 
+        file.replaceText('{PGrec}',recipe.PGrec); 
+        file.replaceText('{Flavrec}',recipe.Flavrec); 
+ 
+      file.replaceText('{VGSupplier}',data.vgSupplier || ''); 
+      file.replaceText('{PGSupplier}',data.pgSupplier || ''); 
+      file.replaceText('{NicotineSupplier}',data.nicSupplier || ''); 
+      file.replaceText('{FlavourSupplier}',data.flavSupplier || ''); 
+      file.replaceText('{QTY}',data.QTYTOTAL); 
+      
+      var fmixCodes = getFlavourMixCodes();
+      file.replaceText('{ISFLAVOURMIX}',(data.isFlavourMix === true).toString().toUpperCase()); 
+      if(data.isFlavourMix){
+        
+        
+        for (var i=0; i<fmixCodes.length; i++) {
+          if(data[fmixCodes[i].sku]){
+            file.replaceText('{Flavour Mix: Flavour '+(i+1)+' Supplier}', 'Flavour Mix: '+(data[fmixCodes[i].sku]+ ' '+data[fmixCodes[i].name])+' Supplier'); 
+            file.replaceText('{flavMixSupplier_'+(i+1)+'}', data[fmixCodes[i].supplier] || ''); 
+            
+          }else{
+                file.replaceText('{Flavour Mix: Flavour '+(i+1)+' Supplier}', 'Flavour Mix: Flavour '+(i+1)+' Supplier'); 
+          file.replaceText('{flavMixSupplier_'+(i+1)+'}', '');  
+          }
+        }
+      }else{
+        
+        for (var i=0; i<fmixCodes.length; i++) { 
+          file.replaceText('{Flavour Mix: Flavour '+(i+1)+' Supplier}', 'Flavour Mix: Flavour '+(i+1)+' Supplier'); 
+          file.replaceText('{flavMixSupplier_'+(i+1)+'}', ''); 
+          
+        }
+      }
+      
+     
+      
+    });
+  return ['Orders generated in folder: <br> <a  target="_blank" href="'+folder.getUrl()+'">'+folder.getName()+'</a>','htmlMSG'];
+ 
+  }catch(e){
+    return ["Error Printing Batches: "+e.message,'htmlMSG'];
+  
+  }
+}
+
 
 
 
