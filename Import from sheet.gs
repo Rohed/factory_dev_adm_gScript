@@ -207,7 +207,7 @@ function delsht() {
 
 
 function MANUALcreateRefferenceDB() {
-    var id = '1pMaZD7k0TKebo4VLHyU2J8PuhYL_Ix_L7pL61y-s5fs';
+    var id = '1D0iMfAfVdO9skoZ2vsxx0mBy0AqJIBHe6bDjycEtLbI';
     createRefferenceDB(id)
 }
 
@@ -238,6 +238,7 @@ function createRefferenceDB(id) {
     }
     var url = SERVER_URL + NODE_PATH + '/createrefferencedb';
     var response = UrlFetchApp.fetch(url, params).getContentText();
+  Logger.log(response);
     LOGDATA.msg = response;
     logItem(LOGDATA);
     return response;

@@ -27,9 +27,13 @@ var id=$('#mysheet').val();
 $('#save_sheet_btn2').on('click',function(e){
 var id=$('#mysheet2').val();
     $("#updating").css("display", "block");
- google.script.run.withSuccessHandler(save).createRefferenceDB(id);
+ google.script.run.withSuccessHandler(saveMessage).createRefferenceDB(id);
 
 });
+
+function saveMessage(msg){
+htmlModalMSG('<p>'+msg+'</p>');
+}
 
 
 $('#save_sheet_btn3').on('click',function(e){
@@ -1329,8 +1333,8 @@ edit_flavour_mix_order=true;
     var negItems = '';
     var arr = resp.NEGATIVELOG[i].arr;
     arr.map(function(item){
-    negItems+='<div class="section sr" ><span>'+item.displayGroup+': '+item.name+'</span><div class="row"><input type="number" min="0" value="'+Math.abs(+(item.value).toFixed(12))+'" id="'+item.sku +'_'+resp.NEGATIVELOG[i].batch+'" style="margin-right:10px;" />\
-    <button class="btn btn-primary" onClick="addMissingStockItem(this)" sku="'+item.sku+'" '+(item.disabled === true ? 'disabled' : '')+'  tab="'+item.tab+'" batch="'+resp.NEGATIVELOG[i].batch+'">Add To Stock</button></div></div>';
+    negItems+='<div class="section sr" ><span>'+item.displayGroup+': '+item.name+'</span><div class="row"><input type="number" min="0" value="'+Math.abs(+(item.value).toFixed(12))+'" id="'+sterilizeString(item.sku +'_'+resp.NEGATIVELOG[i].batch)+'" style="margin-right:10px;" />\
+    <button class="btn btn-primary" onClick="addMissingStockItem(this)" sku="'+ (item.sku)+'" '+(item.disabled === true ? 'disabled' : '')+'  tab="'+item.tab+'" batch="'+resp.NEGATIVELOG[i].batch+'">Add To Stock</button></div></div>';
     }) 
     negativeHtml+='<div class ="section" ><h3>'+resp.NEGATIVELOG[i].batch+':</h3><p>'+negItems+'</p></div>';
     negativeHtml+='<div class ="section sr" ><span></span><button class="btn btn-primary" '+(resp.NEGATIVELOG[i].disabled === true ? 'disabled' : '')+' batch="'+resp.NEGATIVELOG[i].batch+'"  id="batch_add_'+resp.NEGATIVELOG[i].batch+'" onClick="addBatchMissingStockItems(this)" >Add Batch Missing Items</button></div>';
@@ -1359,7 +1363,7 @@ edit_flavour_mix_order=true;
  
          for(var j = 0 ; j < arr.length ;j++){
           if(!arr[j].disabled){
-           var value =  $("#"+arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch).val();
+           var value =  $("#"+sterilizeString(arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch)).val();
             MULTI_ORDER_LOG.NEGATIVELOG[i].arr[j].value = Math.abs(+(parseFloat(value)).toFixed(12));
             }
          }
@@ -1371,7 +1375,7 @@ edit_flavour_mix_order=true;
     var batch = $(event).attr("batch");
     var sku = $(event).attr("sku");
      var tab = $(event).attr("tab");
-    var value = $("#"+sku+"_"+batch).val();
+    var value = $("#"+sterilizeString(sku+"_"+batch)).val();
     $("#updating").css("display", "block");
     var data = {
     sku:sku,
@@ -1414,7 +1418,7 @@ edit_flavour_mix_order=true;
        if(MULTI_ORDER_LOG.NEGATIVELOG[i].batch == batch){
        for(var j = 0 ; j < arr.length ;j++){
        if(!arr[j].disabled){
-       var value =  $("#"+arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch).val();
+       var value =  $("#"+sterilizeString(arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch)).val();
        var obj = {
        sku:arr[j].sku,
        batch:MULTI_ORDER_LOG.NEGATIVELOG[i].batch,
@@ -1437,7 +1441,7 @@ edit_flavour_mix_order=true;
        var arr = MULTI_ORDER_LOG.NEGATIVELOG[i].arr;
        for(var j = 0 ; j < arr.length ;j++){
        if(!arr[j].disabled){
-       var value =  $("#"+arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch).val();
+       var value =  $("#"+sterilizeString(arr[j].sku+"_"+MULTI_ORDER_LOG.NEGATIVELOG[i].batch)).val();
        var obj = {
        sku:arr[j].sku,
        batch:MULTI_ORDER_LOG.NEGATIVELOG[i].batch,
@@ -5416,6 +5420,7 @@ var index=SELECTARR.indexOf(id);
 var drop=SUGGESTARR[index][1];
 var inp=SUGGESTARR[index][0];
 var page=SUGGESTARR[index][4];
+INIT_RENDER= false;
 setValGLOBAL(event,drop,inp,page);
 
 }
@@ -5732,6 +5737,7 @@ $('#newColor').modal('toggle');
 $("#newflavourmixButton").on('click',function(){
 flavournum=0;
 EDIT_FLAVMIX_CONST=false;
+INIT_RENDER=true;
 $(".newflavourmixBody #flavourDropdowns").html('');
 $(".newflavourmixBody #flavourmixName").val('');
 $(".newflavourmixBody #flavourmixSKU").val('');
@@ -5748,6 +5754,7 @@ google.script.run.withSuccessHandler(createFlavourDropdown).getFlavourDropdown()
 $("#editflavourmixButton").on('click',function(){
 EDIT_FLAVMIX_CONST=true;
 RENDER_TYPE = '%';
+INIT_RENDER=true;
 $(".editflavourmixBody #flavourDropdowns").html('');
 $(".editflavourmixBody #flavourmixName").val('');
 $(".editflavourmixBody #flavourmixSKU").val('');
@@ -5830,6 +5837,7 @@ console.log('flavournum', flavournum)
 });
 var WARN_HI = false;
 var WARN_LO = false;
+var INIT_RENDER = true;
 function renderBottle() {
 	console.log('rendering');
 	var colorsARR = ['black', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#00FFFF', '#FF00FF', '#800000', '#808000', '#008000', '#008080', ];
@@ -5863,15 +5871,17 @@ function renderBottle() {
 			}
 		}
 		total += val;
-		if (total > max&& !WARN_HI) {
+	
+	}
+    	if (total > max&& !WARN_HI && !INIT_RENDER) {
 			alert('Warning! Mix will exceed the 10ml limit.');
             WARN_HI = true; 
-        }if(total < max && !WARN_LO){
+            WARN_LO =false;
+        }if(total < max && !WARN_LO && !INIT_RENDER){
             alert('Warning! Mix will be under the 10ml limit.');
-         
+            WARN_HI = false; 
              WARN_LO = true;
         }
-	}
 	console.log('total', total);
 	var html = '';
 	var totalHTML = '';
@@ -5907,6 +5917,7 @@ function renderBottle() {
 	}
 
 	$(special2 + 'totalsDiv').html(html);
+    INIT_RENDER= false;
 }
 function handleFloat(num){
 return Math.round(parseFloat((Number(num) * Math.pow(10, 2)).toFixed(2))) / Math.pow(10, 2);
@@ -7943,5 +7954,10 @@ $("#orders_allocation-item_"+resp.page+"_"+resp.batch).attr('isShown',resp.isSho
 $("#orders_allocation-item_"+resp.page+"_"+resp.batch +' #swich_visibility').html( resp.isShown? 'VISIBLE' : 'HIDDEN');
 }
 }).updateBatchVisibility(page,batch, isShown);
+}
+
+
+function sterilizeString(str){
+return str.replace(/[^0-9a-z]/gi, '_')
 }
 </script>
