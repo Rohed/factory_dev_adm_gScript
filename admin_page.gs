@@ -66,6 +66,21 @@ if(page == 'Inventory'){
 
 
 }
+  
+  if(page == 'MixingTeam'){
+
+    var arr = [
+        ['word', 'Keyword', 'word'],
+        ['Flavours', 'Flavour', 'flavour/name'],
+        ['Recipes', 'Recipe', 'recipe/name'],   
+        ['Customers', 'Last Customer', 'customer'],
+    ];
+
+    return [arr, page];
+
+
+
+}
     var arr = [
         ['word', 'Keyword', 'word'],
         ['Flavours', 'Flavour', 'flavour/name'],
@@ -1177,6 +1192,7 @@ if(searchARR[0][0] =='Inventory'){
       }
     }
     var searched = [];
+ 
     for (var i = 0; i < searchARR.length; i++) {
 
         searched.push(getSearchedArray(searchARR[i][0], searchARR[i][1]))
@@ -1997,4 +2013,30 @@ function addMissingStockItemListBatch(dataArr,batch){
 var resp = addMissingStockItemList(dataArr);
  resp.batch = batch;
 return resp;
+}
+
+function TESTcreateQuickPrintBatch(){
+createQuickPrintBatch('940071',50);
+}
+function createQuickPrintBatch(batch,value){
+  var printData = base.getData('Printing/'+batch);
+  var object = JSON.parse(JSON.stringify(printData));
+  object.batch = batch + PRINT_LABELS_SUFFIX;
+  object.final_status = 0;
+  object.bottles = 0;
+  object.numLabelsBottles = value;
+  object.printing_status = 0;
+  object.movedtoNext = 0;
+  printData.quickPrintBatch = batch + PRINT_LABELS_SUFFIX;
+  printData.quickPrintValue = value; 
+  var neg = fromRunningtoReserved('Labels/'+object.botlabelsku,value);
+  if (neg < 0) {
+    fromReservedToRunning('Labels/'+object.botlabelsku,value);
+    return "Not enough stock for: "+object.botlabelsku;
+  }
+  base.updateData('Printing/'+object.batch,object);
+  base.updateData('Printing/'+batch,printData);
+ 
+  
+  return 'Created '+ batch + PRINT_LABELS_SUFFIX;
 }

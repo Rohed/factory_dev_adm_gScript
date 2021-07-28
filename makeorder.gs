@@ -93,7 +93,7 @@ function saveOrder(data, edit) {
         data.orderdate = (new Date(data.orderdate)).getTime();
         var suffix = data.batch.substr(-1);
         var suf2 = data.batch.substr(-2);
-        if (suf2 == 'RU') {} else {
+        if (suf2 == 'RU' || suf2 == 'TU') {} else {
             if (suffix == 'U') {
                 if (data.bype == '' || data.lid == '') {
                     LOGDATA.status = false;
@@ -219,7 +219,7 @@ function saveOrder(data, edit) {
 
 function TESTBULKRUN() {
 
-    bulkrun(['940015'], 'Orders');
+    bulkrun(['940086'], 'Orders');
 }
 
 function bulkrun(arr, page) {
@@ -335,7 +335,7 @@ function mapPickList(BATCHES){
   return create.getUrl();
 }
 function testrun() {
-    runItem('940000', false);
+    runItem('940079', false);
 
 }
 
@@ -358,7 +358,16 @@ function runItem(batch, frombulk) {
         //data = JSON.parse(JSON.stringify(data).replace(/\#N\/A/,"0"));
         data.wentNegative = false;
         base.updateData('Orders/' + batch, data);
-        if (data.botSKU != "") {
+      var suffix = data.batch.substr(-1);
+      var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
+      var for_unbranded_stock = suffix == UNBRANDED_STOCK_SUFFIX ? true : false;
+      if (!for_unbranded_stock) {
+        suffix = data.batch.substr(-2);
+        for_unbranded_stock = suffix == UNBRANDED_STOCK_SUFFIX2 ? true : false;
+      }
+        var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
+
+        if (data.botSKU != "" && !for_premixed_stock) {
             var bottleexist = base.getData('BottleTypes/' + data.botSKU);
             if (!bottleexist) {
                 missingmsg += 'Missing Bottle: ' + data.botSKU + '\n';
@@ -374,7 +383,7 @@ function runItem(batch, frombulk) {
         } else {
             var flavourexists = 1
         }
-        if (data.brand != "") {
+        if (data.brand != ""&& !for_premixed_stock) {
             var brandexists = base.getData('Brands/' + data.brandSKU);
             if (!brandexists) {
                 missingmsg += 'Missing Brand: ' + data.brand + '\n';
@@ -382,7 +391,7 @@ function runItem(batch, frombulk) {
         } else {
             var brandexists = 1
         }
-        if (data.customer != "") {
+        if (data.customer != ""&& !for_premixed_stock) {
             var customerexists = base.getData('Customers/' + data.customerSKU);
             if (!customerexists) {
                 missingmsg += 'Missing Customer: ' + data.customer + '\n';
@@ -390,7 +399,7 @@ function runItem(batch, frombulk) {
         } else {
             var customerexists = 1
         }
-        if (data.lidSKU != "") {
+        if (data.lidSKU != ""&& !for_premixed_stock) {
             var lidexists = base.getData('Lids/' + data.lidSKU);
             if (!lidexists) {
                 missingmsg += 'Missing Cap: ' + data.lidSKU + '\n';
@@ -399,7 +408,7 @@ function runItem(batch, frombulk) {
             var lidexists = 1
         }
 
-        if (data.botlabelsku != "") {
+        if (data.botlabelsku != ""&& !for_premixed_stock) {
             var labelexists = base.getData('Labels/' + data.botlabelsku);
             if (!labelexists) {
                 missingmsg += 'Missing Label: ' + data.botlabelsku + '\n';
@@ -409,7 +418,7 @@ function runItem(batch, frombulk) {
         }
 
         var packagingTypeexists = 1;
-        if (data.packagingType) {
+        if (data.packagingType&& !for_premixed_stock) {
             if (data.packagingType.sku != '') {
 
 
@@ -613,239 +622,245 @@ function assignMixture2(data) {
                 ORDER_FLOW.hasNegative = PMIXRUN.hasNegative;
                 ORDER_FLOW.hasFailed = PMIXRUN.hasFailed;
             } else {
-                if (data.recipe.Color) {
-                    ORDER_FLOW.USAGE.Color = {
-                        sku: data.recipe.Color.sku,
-                        name: data.recipe.Color.name,
-                        qty: data.colorval,
-                    };
-                    var obj = {
-                        displayGroup: 'Colors',
-                        tab: 'Color',
-                        sku: data.recipe.Color.sku,
-                        name: data.recipe.Color.name,
-                        value: data.colorval
-                    }
-                    ORDER_FLOW.LOG.push(obj);
-                    ORDER_FLOW.LOGARR.push(['Color - ' + data.recipe.Color.sku, data.colorval]);
-                    var neg = fromRunningtoReserved("Color/" + data.recipe.Color.sku, data.colorval);
-                    if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                    toPremixColoring(data);
-                }
-                ORDER_FLOW.LOGARR.push(['Order Type:', 'Premix Stock']);
-
-                ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
-                ORDER_FLOW.USAGE.Mixing = {
-                    vg: data.VGrecipe,
-                    pg: data.PGrecipe,
-                    mct: data.MCTrecipe,
-                    nic: data.Nicotrecipe,
-                    nicsalt: data.Nicotrecipesalts,
-                    cbd: data.CBDrecipe,
-                };
-                ORDER_FLOW.USAGE.Flavour = {
-                    sku: data.flavour.sku,
-                    name: data.flavour.name,
-                    qty: data.flavrecipe,
-                };
-                var obj = {
-                    displayGroup: 'Flavours',
-                    tab: 'Flavours',
-                    sku: data.flavour.sku,
-                    name: data.flavour.name,
-                    value: data.flavrecipe
-                }
-                ORDER_FLOW.LOG.push(obj);
-                var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, data.flavrecipe);
-                if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                ORDER_FLOW.LOGARR.push(['Flavour ' + data.flavour.sku, data.flavrecipe]);
-                if (neg < 0) {
-                   var baseFlavour = base.getData('Flavours/' + data.flavour.sku);
-                  if(baseFlavour){
-                    if(baseFlavour.type === 'mix'){
-                      obj.displayGroup = 'Flavour Mix'
-                      ORDER_FLOW.hasNegative = true;
-                      var newObj = JSON.parse(JSON.stringify(obj))
-                      newObj.value = neg;
-                      ORDER_FLOW.NEGATIVELOG.push(newObj);
-                      
-                       var flavourMix = base.getData('FlavourMixes/' + data.flavour.sku);
-                      if(flavourMix){
-                        var flavourValue = Math.abs(neg);
-                        var flavourList = JSONtoARR(flavourMix.flavours);
-                        for(var f = 0; f < flavourList.length ;f++){
-                          var rawValue = (flavourValue * ( flavourList[f].val/10))
-                          var listItemValue =  parseFloat(parseFloat(rawValue).toFixed(2));
-                          ORDER_FLOW.USAGE.Flavour = {
-                            sku: flavourList[f].sku,
-                            name: flavourList[f].name,
-                            qty: listItemValue,
-                          };
-                          data.used.push(['Flavours/',flavourList[f].sku,listItemValue]);
-                          var obj = {
-                            displayGroup: 'Flavours',
-                            tab: 'Flavours',
-                            sku: flavourList[f].sku,
-                            name: flavourList[f].name,
-                            value: listItemValue
-                          }
-                          ORDER_FLOW.LOG.push(obj);
-                          ORDER_FLOW.LOGARR.push(['Flavour:', listItemValue]);
-                          var neg = fromRunningtoReserved('Flavours/' + flavourList[f].sku, listItemValue);
-                          
-                          if (neg < 0) {
-                            ORDER_FLOW.hasNegative = true;
-                            var newObj = JSON.parse(JSON.stringify(obj))
-                            newObj.value = neg;
-                            ORDER_FLOW.NEGATIVELOG.push(newObj);
-                          }
-                        }
-                        
-                      }
-                        
-                      
-                    }else{
-                       ORDER_FLOW.hasNegative = true;
-                      var newObj = JSON.parse(JSON.stringify(obj))
-                      newObj.value = neg;
-                      ORDER_FLOW.NEGATIVELOG.push(newObj);
-               
-                    }
-                    
-                  }
-                }
-
-                var obj = {
-                    displayGroup: 'Misc',
-                    tab: 'Misc',
-                    sku: 'VG',
-                    name: 'VG',
-                    value: data.VGrecipe
-                }
-                ORDER_FLOW.LOG.push(obj);
-                var neg = fromRunningtoReserved("Misc/VG", data.VGrecipe);
-                if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                ORDER_FLOW.LOGARR.push(['VG:', data.VGrecipe]);
-                var obj = {
-                    displayGroup: 'Misc',
-                    tab: 'Misc',
-                    sku: 'PG',
-                    name: 'PG',
-                    value: data.PGrecipe
-                }
-                ORDER_FLOW.LOG.push(obj);
-                var neg = fromRunningtoReserved("Misc/PG", data.PGrecipe);
-                if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                ORDER_FLOW.LOGARR.push(['PG:', data.PGrecipe]);
-
-                var obj = {
-                    displayGroup: 'Misc',
-                    tab: 'Misc',
-                    sku: 'MCT',
-                    name: 'MCT',
-                    value: data.MCTrecipe
-                }
-                ORDER_FLOW.LOG.push(obj);
-                var neg = fromRunningtoReserved("Misc/MCT", data.MCTrecipe);
-                if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                ORDER_FLOW.LOGARR.push(['MCT:', data.MCTrecipe]);
-                var obj = {
-                    displayGroup: 'Misc',
-                    tab: 'Misc',
-                    sku: 'AG',
-                    name: 'AG',
-                    value: data.AGrecipe
-                }
-                ORDER_FLOW.LOG.push(obj);
-                var neg = fromRunningtoReserved("Misc/AG", data.AGrecipe);
-                if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                ORDER_FLOW.LOGARR.push(['AG:', data.AGrecipe]);
-                if (data.Nicotrecipe) {
-                    ORDER_FLOW.LOGARR.push(['Nicotine:', data.Nicotrecipe]);
-                    var obj = {
-                        displayGroup: 'Misc',
-                        tab: 'Misc',
-                        sku: 'Nicotine',
-                        name: 'Nicotine',
-                        value: data.Nicotrecipe
-                    }
-                    ORDER_FLOW.LOG.push(obj);
-                    var neg = fromRunningtoReserved("Misc/Nicotine", data.Nicotrecipe);
-                    if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                }
-
-                if (data.Nicotrecipesalts) {
-                    ORDER_FLOW.LOGARR.push(['Nicotine Salts:', data.Nicotrecipesalts]);
-                    var obj = {
-                        displayGroup: 'Misc',
-                        tab: 'Misc',
-                        sku: 'Nicotine Salts',
-                        name: 'Nicotine Salts',
-                        value: data.Nicotrecipesalts
-                    }
-                    ORDER_FLOW.LOG.push(obj);
-                    var neg = fromRunningtoReserved("Misc/Nicotine Salts", data.Nicotrecipesalts);
-                    if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                }
-                if (data.CBDrecipe) {
-                    ORDER_FLOW.LOGARR.push(['CBD:', data.CBDrecipe]);
-                    var obj = {
-                        displayGroup: 'Misc',
-                        tab: 'Misc',
-                        sku: 'CBD',
-                        name: 'CBD',
-                        value: data.CBDrecipe
-                    }
-                    ORDER_FLOW.LOG.push(obj);
-                    var neg = fromRunningtoReserved("Misc/CBD", data.CBDrecipe);
-                    if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                }
-
+                     var PMIXRUN = CheckPremixed(data,true);
+            ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(PMIXRUN.LOGARR)
+            ORDER_FLOW.LOG = ORDER_FLOW.LOG.concat(PMIXRUN.LOG)
+            ORDER_FLOW.NEGATIVELOG = ORDER_FLOW.NEGATIVELOG.concat(PMIXRUN.NEGATIVELOG)
+            ORDER_FLOW.USAGE = jsonConcat(ORDER_FLOW.USAGE, PMIXRUN.USAGE);
+            ORDER_FLOW.hasNegative = PMIXRUN.hasNegative;
+            ORDER_FLOW.hasFailed = PMIXRUN.hasFailed;
+//                if (data.recipe.Color) {
+//                    ORDER_FLOW.USAGE.Color = {
+//                        sku: data.recipe.Color.sku,
+//                        name: data.recipe.Color.name,
+//                        qty: data.colorval,
+//                    };
+//                    var obj = {
+//                        displayGroup: 'Colors',
+//                        tab: 'Color',
+//                        sku: data.recipe.Color.sku,
+//                        name: data.recipe.Color.name,
+//                        value: data.colorval
+//                    }
+//                    ORDER_FLOW.LOG.push(obj);
+//                    ORDER_FLOW.LOGARR.push(['Color - ' + data.recipe.Color.sku, data.colorval]);
+//                    var neg = fromRunningtoReserved("Color/" + data.recipe.Color.sku, data.colorval);
+//                    if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                    toPremixColoring(data);
+//                }
+//                ORDER_FLOW.LOGARR.push(['Order Type:', 'Premix Stock']);
+//
+//                ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
+//                ORDER_FLOW.USAGE.Mixing = {
+//                    vg: data.VGrecipe,
+//                    pg: data.PGrecipe,
+//                    mct: data.MCTrecipe,
+//                    nic: data.Nicotrecipe,
+//                    nicsalt: data.Nicotrecipesalts,
+//                    cbd: data.CBDrecipe,
+//                };
+//                ORDER_FLOW.USAGE.Flavour = {
+//                    sku: data.flavour.sku,
+//                    name: data.flavour.name,
+//                    qty: data.flavrecipe,
+//                };
+//                var obj = {
+//                    displayGroup: 'Flavours',
+//                    tab: 'Flavours',
+//                    sku: data.flavour.sku,
+//                    name: data.flavour.name,
+//                    value: data.flavrecipe
+//                }
+//                ORDER_FLOW.LOG.push(obj);
+//                var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, data.flavrecipe);
+//                if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                ORDER_FLOW.LOGARR.push(['Flavour ' + data.flavour.sku, data.flavrecipe]);
+//                if (neg < 0) {
+//                   var baseFlavour = base.getData('Flavours/' + data.flavour.sku);
+//                  if(baseFlavour){
+//                    if(baseFlavour.type === 'mix'){
+//                      obj.displayGroup = 'Flavour Mix'
+//                      ORDER_FLOW.hasNegative = true;
+//                      var newObj = JSON.parse(JSON.stringify(obj))
+//                      newObj.value = neg;
+//                      ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                      
+//                       var flavourMix = base.getData('FlavourMixes/' + data.flavour.sku);
+//                      if(flavourMix){
+//                        var flavourValue = Math.abs(neg);
+//                        var flavourList = JSONtoARR(flavourMix.flavours);
+//                        for(var f = 0; f < flavourList.length ;f++){
+//                          var rawValue = (flavourValue * ( flavourList[f].val/10))
+//                          var listItemValue =  parseFloat(parseFloat(rawValue).toFixed(2));
+//                          ORDER_FLOW.USAGE.Flavour = {
+//                            sku: flavourList[f].sku,
+//                            name: flavourList[f].name,
+//                            qty: listItemValue,
+//                          };
+//                          data.used.push(['Flavours/',flavourList[f].sku,listItemValue]);
+//                          var obj = {
+//                            displayGroup: 'Flavours',
+//                            tab: 'Flavours',
+//                            sku: flavourList[f].sku,
+//                            name: flavourList[f].name,
+//                            value: listItemValue
+//                          }
+//                          ORDER_FLOW.LOG.push(obj);
+//                          ORDER_FLOW.LOGARR.push(['Flavour:', listItemValue]);
+//                          var neg = fromRunningtoReserved('Flavours/' + flavourList[f].sku, listItemValue);
+//                          
+//                          if (neg < 0) {
+//                            ORDER_FLOW.hasNegative = true;
+//                            var newObj = JSON.parse(JSON.stringify(obj))
+//                            newObj.value = neg;
+//                            ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                          }
+//                        }
+//                        
+//                      }
+//                        
+//                      
+//                    }else{
+//                       ORDER_FLOW.hasNegative = true;
+//                      var newObj = JSON.parse(JSON.stringify(obj))
+//                      newObj.value = neg;
+//                      ORDER_FLOW.NEGATIVELOG.push(newObj);
+//               
+//                    }
+//                    
+//                  }
+//                }
+//
+//                var obj = {
+//                    displayGroup: 'Misc',
+//                    tab: 'Misc',
+//                    sku: 'VG',
+//                    name: 'VG',
+//                    value: data.VGrecipe
+//                }
+//                ORDER_FLOW.LOG.push(obj);
+//                var neg = fromRunningtoReserved("Misc/VG", data.VGrecipe);
+//                if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                ORDER_FLOW.LOGARR.push(['VG:', data.VGrecipe]);
+//                var obj = {
+//                    displayGroup: 'Misc',
+//                    tab: 'Misc',
+//                    sku: 'PG',
+//                    name: 'PG',
+//                    value: data.PGrecipe
+//                }
+//                ORDER_FLOW.LOG.push(obj);
+//                var neg = fromRunningtoReserved("Misc/PG", data.PGrecipe);
+//                if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                ORDER_FLOW.LOGARR.push(['PG:', data.PGrecipe]);
+//
+//                var obj = {
+//                    displayGroup: 'Misc',
+//                    tab: 'Misc',
+//                    sku: 'MCT',
+//                    name: 'MCT',
+//                    value: data.MCTrecipe
+//                }
+//                ORDER_FLOW.LOG.push(obj);
+//                var neg = fromRunningtoReserved("Misc/MCT", data.MCTrecipe);
+//                if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                ORDER_FLOW.LOGARR.push(['MCT:', data.MCTrecipe]);
+//                var obj = {
+//                    displayGroup: 'Misc',
+//                    tab: 'Misc',
+//                    sku: 'AG',
+//                    name: 'AG',
+//                    value: data.AGrecipe
+//                }
+//                ORDER_FLOW.LOG.push(obj);
+//                var neg = fromRunningtoReserved("Misc/AG", data.AGrecipe);
+//                if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                ORDER_FLOW.LOGARR.push(['AG:', data.AGrecipe]);
+//                if (data.Nicotrecipe) {
+//                    ORDER_FLOW.LOGARR.push(['Nicotine:', data.Nicotrecipe]);
+//                    var obj = {
+//                        displayGroup: 'Misc',
+//                        tab: 'Misc',
+//                        sku: 'Nicotine',
+//                        name: 'Nicotine',
+//                        value: data.Nicotrecipe
+//                    }
+//                    ORDER_FLOW.LOG.push(obj);
+//                    var neg = fromRunningtoReserved("Misc/Nicotine", data.Nicotrecipe);
+//                    if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                }
+//
+//                if (data.Nicotrecipesalts) {
+//                    ORDER_FLOW.LOGARR.push(['Nicotine Salts:', data.Nicotrecipesalts]);
+//                    var obj = {
+//                        displayGroup: 'Misc',
+//                        tab: 'Misc',
+//                        sku: 'Nicotine Salts',
+//                        name: 'Nicotine Salts',
+//                        value: data.Nicotrecipesalts
+//                    }
+//                    ORDER_FLOW.LOG.push(obj);
+//                    var neg = fromRunningtoReserved("Misc/Nicotine Salts", data.Nicotrecipesalts);
+//                    if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                }
+//                if (data.CBDrecipe) {
+//                    ORDER_FLOW.LOGARR.push(['CBD:', data.CBDrecipe]);
+//                    var obj = {
+//                        displayGroup: 'Misc',
+//                        tab: 'Misc',
+//                        sku: 'CBD',
+//                        name: 'CBD',
+//                        value: data.CBDrecipe
+//                    }
+//                    ORDER_FLOW.LOG.push(obj);
+//                    var neg = fromRunningtoReserved("Misc/CBD", data.CBDrecipe);
+//                    if (neg < 0) {
+//                    ORDER_FLOW.hasNegative = true;
+//                    var newObj = JSON.parse(JSON.stringify(obj))
+//                    newObj.value = neg;
+//                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+//                }
+//                }
 
             }
 
@@ -906,7 +921,10 @@ function assignMixture2(data) {
         //return 'success';
         return ORDER_FLOW;
     } catch (e) {
-        ORDER_FLOW.LOGARR.push(['FAILED', e.message]);
+      ORDER_FLOW.hasFailed=true;
+      Logger.log(e.stack);
+      ORDER_FLOW.LOGARR.push(['FAILED', e.stack]);
+      ORDER_FLOW.LOGARR.push(['FAILED', e.message]);
         var dat1 = {
             final_status: 0,
             runtime: "",
@@ -1240,7 +1258,7 @@ function saveOrderArray(arr) {
             data.orderdate = (new Date(data.orderdate)).getTime();
             var suffix = data.batch.substr(-1);
             var suf2 = data.batch.substr(-2);
-            if (suf2 == 'RU') {} else {
+            if (suf2 == 'RU' || suf2 == PRINT_LABELS_SUFFIX) {} else {
                 if (suffix == 'U') {
                     if (data.bype == '' || data.lid == '') {
                         LOGDATA.status = false;

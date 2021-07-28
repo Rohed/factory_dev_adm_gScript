@@ -11,14 +11,16 @@ Logger.log(page);
     };
  try{   if (page == 'Flavours') {
     
-        var sku = 'FLAV' + getRandom() + name.substr(0, 1).toUpperCase();
-      LOGDATA.batch=name;
+        var sku = 'FLAV' + getRandom() + name.name.substr(0, 1).toUpperCase();
+       LOGDATA.batch=name;
         var dat1={
         Running:0,
         Completed:0,
         Reserved:0,
         sku:sku,
-        name:name,
+        name:name.name,
+        supplierSKU:name.supplierSKU,
+        supplierName:name.supplierName,
         type:'base',
         }
         LOGDATA.data.push(['New Flavour',name+' '+sku]);
@@ -340,7 +342,7 @@ function generateForSingleBrand2(prod,descr) {
           var sku=''
           var item = {
             "sku": link,
-            "name": 'BB '+fullProd.desc.replace('3 x 10ml','10ml').replace('4 x 10ml','10ml').replace(/\./g, ""),
+            "name": 'BB '+fullProd.descr.replace('3 x 10ml','10ml').replace('4 x 10ml','10ml').replace(/\./g, ""),
             "Running": 0,
             "Reserved": 0,
             "Completed": 0,

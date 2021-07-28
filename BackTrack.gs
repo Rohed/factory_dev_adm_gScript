@@ -415,18 +415,24 @@ function updateOrder(batch, bottles, sheet, originalItem) {
     if (sheet == 'Production') {
         var dat1 = {
             partialProduction: bottles,
-            removedProduction: originalItem.bottles - bottles
+            removedProduction: originalItem.bottles - bottles,
+            bottles:bottles,
         };
         LOGARR.push(['Partial Production:', bottles]);
         LOGARR.push(['Removed:', originalItem.bottles - bottles]);
+        base.updateData('Production/' + batch, dat1);
     } else {
         var dat1 = {
             partialPackaging: bottles,
-            removedPackaging: originalItem.bottles - bottles
+            removedPackaging: originalItem.bottles - bottles,
+            bottles:bottles,
         };
         LOGARR.push(['Partial Packaging:', bottles]);
         LOGARR.push(['Removed:', originalItem.bottles]);
+        base.updateData('Packaging/' + batch, dat1);
     }
+  
+    
     base.updateData('Orders/' + batch, dat1);
     var leftover = originalItem.bottles - bottles;
     var item = base.getData(sheet + '/' + batch);

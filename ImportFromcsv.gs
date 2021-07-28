@@ -275,6 +275,9 @@ ordersByOrderID = {};
                           if(values[i][6]){
                         values[i][6] = values[i][6].toLowerCase();
                         }
+                    if(values[i][7]){
+                        values[i][7] = values[i][7].toLowerCase();
+                        }
                             if(values[i][5]=='y'){
                             item.ppb=true;
                               item.botlabel = dataPC.ppbotlabel;
@@ -292,6 +295,10 @@ ordersByOrderID = {};
                                 item.ppp=false;
                               item.packlabel = dataPC.packlabel;
                               item.packlabelsku = dataPC.packlabelsku;
+                            }
+                  
+                            if(values[i][7]=='y'){
+                              item.useBothLabels=true; 
                             }
                         } else {
                           LOGDATA.data.push(['Missing PC',PC]);
@@ -337,6 +344,7 @@ ordersByOrderID = {};
                         var resp = saveOrder2(item,row);
                         LOGDATA.data.push(['Added Batch',item.batch +'With Order ID: '+orderID ]);
                         options += '"' + item.batch + '":' + resp + ',';
+                      msg+='Added Batch: '+ item.batch +' With Order ID: '+orderID + '<br>' ;
                     } else {
                         //   Logger.log(item);
                       LOGDATA.data.push(['Failed Batch',PC]);
@@ -393,7 +401,7 @@ ordersByOrderID = {};
        
        }
         //setPriorityARR(newPRIORITIES);
-      return msg+' '+i;
+   return msg+'<br> Number of rows Processed:'+i;
    } catch (e) {
     LOGDATA.data.push(['Failed: ',msg+' - '+e.toString()]); 
       logItem(LOGDATA);

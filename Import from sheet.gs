@@ -552,8 +552,10 @@ function importFlavoursFromSheet(id) {
         origItems = {};
     }
     for (var i = 1; i < data.length; i++) {
-        var sku = data[i][0];
-        var name = data[i][1];
+      var sku = data[i][0];
+      var name = data[i][1];
+      var supplierSKU = data[i][2];
+      var supplierName = data[i][3];
         if (sku == '') {
             LOGDATA.data.push(['Failed - NO ID:', name]);
             LOGDATA.msg += 'Failed - NO ID: ' + name + '\n';
@@ -568,6 +570,8 @@ function importFlavoursFromSheet(id) {
         var flav = {
             sku: sku,
             name: name,
+            supplierSKU:supplierSKU,
+            supplierName:supplierName,
             Running: 0,
             Reserved: 0,
             Completed: 0,
@@ -576,6 +580,8 @@ function importFlavoursFromSheet(id) {
             origItems[sku] = flav;
         } else {
             origItems[sku].name = name;
+            origItems[sku].supplierSKU=supplierSKU;
+            origItems[sku].supplierName=supplierName;
         }
         options += '"' + flav.sku + '":' + JSON.stringify(flav) + ',';
         LOGDATA.data.push(['Added:', sku + ' - ' + name]);

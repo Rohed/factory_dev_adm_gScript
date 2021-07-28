@@ -45,8 +45,8 @@ function fromReservedtoCompleted(item, value) {
     }
     var orig1 = base.getData(item);
     if (orig1) {
-        orig1.Reserved = orig1.Reserved - value;
-        orig1.Completed = orig1.Completed + value;
+        orig1.Reserved = fixValue(orig1.Reserved - value);
+        orig1.Completed = fixValue(orig1.Completed + value);
 
         base.updateData(item, orig1);
     }

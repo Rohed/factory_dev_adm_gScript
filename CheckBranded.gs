@@ -218,7 +218,7 @@ function CheckBranded(data) {
 
                     }
                     if (data.packlabelsku != "" && data.packlabelsku != undefined) {
- 
+                      
                         var neg = fromRunningtoReserved('Labels/' + data.packlabelsku, data.bottles / tube);
                       
 
@@ -236,12 +236,82 @@ function CheckBranded(data) {
                     }
                     numLabelsTubes = data.bottles / tube;
                    if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
-                }
-                }
+                     
+                              if(data.useBothLabels && data.ppp){
+                                 var total = data.bottles / tube;
+                                 var remaining  = (data.bottles / tube) + neg
+                                 var prods = base.getData('References/ProductCodes/'+data.productcode);
+                                 var printPackLabelSku = prods.packlabelsku;
+                                if(printPackLabelSku){
+                                  var neg2 = fromRunningtoReserved('Labels/' + printPackLabelSku, remaining);
+                                  
+                                  if(neg2 <0){
+                                  
+                                  fromReservedToRunning('Labels/' + printPackLabelSku, remaining)
+                                  ORDER_FLOW.hasNegative = true;
+                                  var newObj = JSON.parse(JSON.stringify(obj))
+                                  newObj.value = neg;
+                                  ORDER_FLOW.NEGATIVELOG.push(newObj);
+                                  }else{
+                                    
+                                    var obj = {
+                                      displayGroup: 'Labels',
+                                      tab: 'Labels',
+                                      sku: data.packlabelsku,
+                                      name: data.packlabel,
+                                      value:(data.bottles / tube) - remaining
+                                    }
+                                    data.used[  data.used.length - 1] =  ['Labels/', data.packlabelsku, (data.bottles / tube)  - remaining];
+                                    ORDER_FLOW.LOG[ ORDER_FLOW.LOG.length - 1]= obj;
+                                    ORDER_FLOW.LOGARR[ ORDER_FLOW.LOGARR.length - 1] = [data.packlabelsku, (data.bottles / tube) - remaining];
+                                    
+                                    
+                                  data.used.push(['Labels/',printPackLabelSku, remaining]);
+                                    fromReservedToRunning('Labels/' + data.packlabelsku, remaining)
+                                    var obj = {
+                                      displayGroup: 'Labels',
+                                      tab: 'Labels',
+                                      sku: printPackLabelSku,
+                                      name: prods.packlabel,
+                                      value: remaining
+                                    }
+                                    ORDER_FLOW.USAGE.PrePackLabel = {
+                                      sku: data.packlabelsku,
+                                      name: data.packlabel,
+                                      qty: (data.bottles / tube) - remaining
+                                    };
+                                    ORDER_FLOW.USAGE.PackLabel = {
+                                      sku: printPackLabelSku,
+                                      name:prods.packlabel,
+                                      qty: remaining
+                                    };
+                                    ORDER_FLOW.LOG.push(obj);
+                                    ORDER_FLOW.LOGARR.push([printPackLabelSku,remaining]);
+                                    
+                                    var datLabels = {
+                                      packlabelprintingSku:printPackLabelSku,
+                                      packlabelprintingValue:remaining,
+                                    }
+                                    base.updateData('Orders/' + data.batch, datLabels);
+                                  }
+                                  
+                                
+                                }else{
+                                   ORDER_FLOW.hasNegative = true;
+                                  var newObj = JSON.parse(JSON.stringify(obj))
+                                  newObj.value = neg;
+                                  ORDER_FLOW.NEGATIVELOG.push(newObj);
+                                }
+                              }else{
+                                
+                                ORDER_FLOW.hasNegative = true;
+                                var newObj = JSON.parse(JSON.stringify(obj))
+                                newObj.value = neg;
+                                ORDER_FLOW.NEGATIVELOG.push(newObj);
+                             }
+               
+                       }
+                 }
 
 
                 data.numLabelsTubes = numLabelsTubes;

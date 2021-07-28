@@ -357,7 +357,8 @@ function createMixOrder(data) {
             'productcode': data.productcode,
             'productdescription': data.productdescription,
             'isFlavourMix':data.isFlavourMix,
-            'mixAmountNeeded':data.mixAmountNeeded
+            'mixAmountNeeded':data.mixAmountNeeded,
+            'backedByPrimaryFlavour':data.backedByPrimaryFlavour
         };
       if(orig.isFlavourMix){
         flavourMixCodes.map(function(item){
@@ -434,7 +435,8 @@ function createMixOrder(data) {
                     'productcode': data.productcode,
                     'productdescription': data.productdescription,
                     'isFlavourMix': data.isFlavourMix,
-                    'mixAmountNeeded':data.mixAmountNeeded
+                    'mixAmountNeeded':data.mixAmountNeeded,
+                    'backedByPrimaryFlavour':data.backedByPrimaryFlavour
                 };
               
                     newData.Nico = data.Nico;
@@ -582,7 +584,8 @@ function toMixingTeam(data, createNew, old) {
             'priority': data.priority,
             'Location': 0,
            'isFlavourMix': data.isFlavourMix,
-          'mixAmountNeeded':data.mixAmountNeeded
+          'mixAmountNeeded':data.mixAmountNeeded,
+          'backedByPrimaryFlavour':data.backedByPrimaryFlavour
         };
       
         if (data.haspremix) {
@@ -635,7 +638,8 @@ function toMixingTeam(data, createNew, old) {
             'customer': data.customer,
             'orderID': data.orderID,
             'isFlavourMix': data.isFlavourMix,
-           'mixAmountNeeded':data.mixAmountNeeded
+           'mixAmountNeeded':data.mixAmountNeeded,
+          'backedByPrimaryFlavour':data.backedByPrimaryFlavour
         };
       
             MIXBATCH.Nico = data.Nico;
@@ -661,6 +665,7 @@ function toMixingTeam(data, createNew, old) {
         var MIXBATCH = base.getData('MixingTeam/' + old.MIXNAME);
         MIXBATCH.QTYTOTAL = MIXBATCH.QTYTOTAL + data.QTY;
       MIXBATCH.mixAmountNeeded = MIXBATCH.mixAmountNeeded + data.mixAmountNeeded;
+        MIXBATCH.backedByPrimaryFlavour = (MIXBATCH.backedByPrimaryFlavour || 0) + data.backedByPrimaryFlavour;
        if(data.isFlavourMix){
         flavourMixCodes.map(function(item){
           var keys = Object.keys(item);
@@ -706,7 +711,8 @@ function toMixingTeam(data, createNew, old) {
             'priority': data.priority,
             'Location': 0,
             'isFlavourMix':data.isFlavourMix, 
-            'mixAmountNeeded':data.mixAmountNeeded, 
+            'mixAmountNeeded':data.mixAmountNeeded,
+          'backedByPrimaryFlavour':data.backedByPrimaryFlavour
         };
         if (data.haspremix) {
             mixingData.haspremix = true;
@@ -801,7 +807,8 @@ function toMixing(data) {
         'productcode': data.productcode,
         'productdescription': data.productdescription,
       'isFlavourMix':data.isFlavourMix, 
-      'mixAmountNeeded':data.mixAmountNeeded, 
+      'mixAmountNeeded':data.mixAmountNeeded,
+          'backedByPrimaryFlavour':data.backedByPrimaryFlavour
     };
     if (data.haspremix) {
         mixingData.haspremix = true;
@@ -847,7 +854,7 @@ function toMixing(data) {
 }
 
 function testmove() {
-    MoveItem('914932', 'Production')
+    MoveItem('940079', 'Labelling')
 }
 
 
@@ -1148,6 +1155,17 @@ function moveMain(item) {
             toLabelling(item);
             LOGARR.push(['Sent to Labelling', item.bottles]);
             updateAllTabs(item.batch);
+          
+          if(item.quickPrintBatch){
+            var dat3 =  {
+                printing_status: 'Completed',
+                final_status: 'Completed',
+                movedtoNext: 1
+            };
+          
+              base.updateData('Printing/' + item.quickPrintBatch, dat3);
+             fromReservedtoCompleted('Labels/'+item.botlabelsku,item.quickPrintValue);
+          }
         } else if (sheet_name == 'Labelling') {
             var unbrand = getUnbrandName(order);
             LOGARR.push(['Unbranded SKU:', unbrand]); 
@@ -1170,11 +1188,25 @@ function moveMain(item) {
             if(tube){
             if (item.packlabelsku != ""  && item.packlabelsku != undefined  ) {
                 LOGARR.push([item.packlabelsku, tubes]);
-                fromReservedtoCompleted('Labels/' + item.packlabelsku, tubes);
+               
+              
+              if(order.ppp && order.useBothLabels && order.packlabelprintingValue){
+               fromReservedtoCompleted('Labels/' + item.packlabelsku, tubes - order.packlabelprintingValue);
+               fromReservedtoCompleted('Labels/' + order.packlabelprintingSku, order.packlabelprintingValue);
+              }else{
+               fromReservedtoCompleted('Labels/' + item.packlabelsku, tubes);
+              }
             }
             }
             LOGARR.push([label, item.bottles]);
-            fromReservedtoCompleted('Labels/' + label, item.bottles);
+          
+            if(order.ppb && order.useBothLabels && order.botlabelprintingValue){
+               fromReservedtoCompleted('Labels/' + label, item.bottles - order.botlabelprintingValue);
+               fromReservedtoCompleted('Labels/' + order.botlabelprintingSku, order.botlabelprintingValue);
+              }else{
+               fromReservedtoCompleted('Labels/' + label, item.bottles);
+              }
+     
             var suffix = item.batch.substr(-1);
             var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
             if (for_branded_stock) {

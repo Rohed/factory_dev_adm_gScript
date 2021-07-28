@@ -1,4 +1,4 @@
-function CheckPremixed(data) {
+function CheckPremixed(data,checkStock) {
     var ORDER_FLOW = {
         hasNegative: data.hasNegative,
         LOGARR: [],
@@ -7,7 +7,7 @@ function CheckPremixed(data) {
         NEGATIVELOG: [],
     }
     try {
-
+        data.backedByPrimaryFlavour  = 0;
         var suffix = data.batch.substr(-1);
         var for_premixed_stock = suffix == PREMIX_STOCK_SUFFIX ? true : false;
 
@@ -91,7 +91,7 @@ function CheckPremixed(data) {
                 }
             toPremixColoring(data);
         }
-
+   
 
         var premixstock = base.getData("PremixesTypes/" + premix);
         var pom1 = premixstock.Reserved;
@@ -100,7 +100,7 @@ function CheckPremixed(data) {
             premixstock.Running = 0;
         }
         var helper = premixstock.Running - data.QTY;
-        if (helper == 0) {
+        if (helper == 0 && !checkStock) {
             var dat3 = {
                 premixed: premixstock.Running
 
@@ -134,7 +134,7 @@ function CheckPremixed(data) {
 
 
 
-        } else if (helper > 0) {
+        } else if (helper > 0 && !checkStock) {
 
             var dat3 = {
                 premixed: data.QTY
@@ -170,6 +170,7 @@ function CheckPremixed(data) {
 
 
         } else if (helper < 0) {
+          if(!checkStock){
             var dat3 = {
                 premixed: premixstock.Running
 
@@ -206,6 +207,7 @@ function CheckPremixed(data) {
             base.updateData('Orders/' + data.batch, dat3)
 
             data.QTY = newmixvol;
+          }
             data.tomixing = 'Sent';
             var RU = getRoundups()[0];
             if (data.Nico || data.Nicosalts) {
@@ -262,22 +264,30 @@ function CheckPremixed(data) {
             var neg = fromRunningtoReserved('Flavours/' + data.flavour.sku, flavourNeeded);
             var flavourValue = Math.abs(+(neg).toFixed(12));
           var flavourToReturn =+(flavourNeeded > flavourValue? flavourNeeded - flavourValue :flavourValue-  flavourNeeded).toFixed(12) ;
+          var wasReturned = false;
+          var returnIndexes = {
+            used: data.used.length - 1,
+            LOG: ORDER_FLOW.LOG.length - 1,
+            LOGARR: ORDER_FLOW.LOGARR.length - 1
+          };
             if (neg < 0) {
-                   
+              if(flavourValue == flavourNeeded){
+                wasReturned = true;  
+              }
                   var baseFlavour = base.getData('Flavours/' + data.flavour.sku);
                   if(baseFlavour){
                     if(baseFlavour.type === 'mix'){
                       data.flavourMixPartsMissing =false;
                       data.isFlavourMix = true;
-                       
+                      data.backedByPrimaryFlavour = flavourToReturn;
                       data.mixAmountNeeded =parseFloat((parseFloat(flavourValue)*1000).toFixed(2)); 
                       obj.displayGroup = 'Flavour Mix'
                    
-                      ORDER_FLOW.hasNegative = true;
+                      ORDER_FLOW.hasNegative = true; 
                       var newObj = JSON.parse(JSON.stringify(obj))
-                      newObj.value = neg;
+                      newObj.value = wasReturned ? 0  : neg ;
                       ORDER_FLOW.NEGATIVELOG.push(newObj);
-                      
+                      returnIndexes.NEGATIVELOG =  ORDER_FLOW.NEGATIVELOG.length-1;
                        var flavourMix = base.getData('FlavourMixes/' + data.flavour.sku);
                       if(flavourMix){
                        
@@ -309,9 +319,7 @@ function CheckPremixed(data) {
                             var newObj = JSON.parse(JSON.stringify(obj))
                             newObj.value = neg;
                             ORDER_FLOW.NEGATIVELOG.push(newObj);
-                          }else{
-                            //TODO FIX DISPLAYED VALUE TO MATCH MG
-                            // CHECK IF Showing missing flav mix, flavour
+                          }else{ 
                             data[flavourMixCodes[f].name] = flavourList[f].name;
                             data[flavourMixCodes[f].sku] = flavourList[f].sku;
                             data[flavourMixCodes[f].val] =  parseFloat((parseFloat(rawValue)*1000).toFixed(2));
@@ -333,6 +341,20 @@ function CheckPremixed(data) {
                     }
                     
                   }
+              
+                if(wasReturned && data.flavourMixPartsMissing == false && data.isFlavourMix){ 
+                fromReservedToRunning('Flavours/' + data.flavour.sku, flavourNeeded);
+                ORDER_FLOW.USAGE.Flavour.qty = 0;
+                data.used[returnIndexes.used] = ['Flavours/', data.flavour.sku,0];
+                ORDER_FLOW.LOG[returnIndexes.LOG] = {
+                  displayGroup: 'Flavours',
+                  tab: 'Flavours',
+                  sku: data.flavour.sku,
+                  name: data.flavour.name,
+                  value: 0
+                };
+                ORDER_FLOW.LOGARR[ returnIndexes.LOGARR] = ['Flavour:', 0];
+              }
             }
 
 
@@ -499,10 +521,15 @@ function CheckPremixed(data) {
             var negativeItems = ORDER_FLOW.NEGATIVELOG.filter(function(obj){
               return obj.tab !== 'Flavours';
             });
+            if(!wasReturned){
+             ORDER_FLOW.NEGATIVELOG.splice(returnIndexes.NEGATIVELOG,1);
+            }
             if(negativeItems.length === 0){
-              
-                 fromReservedToRunning('Flavours/' + data.flavour.sku, flavourNeeded);
-              fromRunningtoReserved('Flavours/' + data.flavour.sku, flavourToReturn);
+              if(!wasReturned){
+                fromReservedToRunning('Flavours/' + data.flavour.sku, flavourNeeded);
+                fromRunningtoReserved('Flavours/' + data.flavour.sku, flavourToReturn);
+                
+              }
              ORDER_FLOW.LOGARR = ORDER_FLOW.LOGARR.concat(createMixOrder(data));
             }
           }

@@ -62,10 +62,78 @@ function CheckUnbranded(data) {
                     data.used.push(['Labels/', data.packlabelsku, tubes]);
                     ORDER_FLOW.LOGARR.push([data.packlabelsku, tubes]);
                   if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+                      if(data.useBothLabels && data.ppp){
+                                 var total = tubes;
+                                 var remaining  = tubes+ neg
+                                 var prods = base.getData('References/ProductCodes/'+data.productcode);
+                                 var printPackLabelSku = prods.packlabelsku;
+                                if(printPackLabelSku){
+                                  var neg2 = fromRunningtoReserved('Labels/' + printPackLabelSku, remaining);
+                                  
+                                  if(neg2 <0){
+                                  
+                                  fromReservedToRunning('Labels/' + printPackLabelSku, remaining)
+                                  ORDER_FLOW.hasNegative = true;
+                                  var newObj = JSON.parse(JSON.stringify(obj))
+                                  newObj.value = neg;
+                                  ORDER_FLOW.NEGATIVELOG.push(newObj);
+                                  }else{
+                                    
+                                      var obj = {
+                                      displayGroup: 'Labels',
+                                      tab: 'Labels',
+                                      sku: data.packlabelsku,
+                                      name: data.packlabel,
+                                      value: tubes  - remaining
+                                    }
+                                    data.used[  data.used.length - 1] =  ['Labels/', data.packlabelsku, tubes  - remaining];
+                                    ORDER_FLOW.LOG[ ORDER_FLOW.LOG.length - 1]= obj;
+                                    ORDER_FLOW.LOGARR[ ORDER_FLOW.LOGARR.length - 1] = [data.packlabelsku,  tubes - remaining];
+                                    
+                                    
+                                    
+                                  data.used.push(['Labels/',printPackLabelSku, remaining]);
+                                  fromReservedToRunning('Labels/' + data.packlabelsku, remaining)
+                                  var obj = {
+                                    displayGroup: 'Labels',
+                                    tab: 'Labels',
+                                    sku: printPackLabelSku,
+                                    name: prods.packlabel,
+                                    value: remaining
+                                  }
+                                  ORDER_FLOW.USAGE.PrePackLabel = {
+                                    sku: data.packlabelsku,
+                                    name: data.packlabel,
+                                    qty:  tubes - remaining
+                                  };
+                                    ORDER_FLOW.USAGE.PackLabel = {
+                                      sku: printPackLabelSku,
+                                      name:prods.packlabel,
+                                      qty: remaining
+                                    };
+                                  ORDER_FLOW.LOG.push(obj);
+                                  ORDER_FLOW.LOGARR.push([printPackLabelSku,remaining]);
+                                    var datLabels = {
+                                      packlabelprintingSku:printPackLabelSku,
+                                      packlabelprintingValue:remaining,
+                                    }
+                                    base.updateData('Orders/' + data.batch, datLabels);
+                                  }
+                                  
+                                
+                                }else{
+                                   ORDER_FLOW.hasNegative = true;
+                                  var newObj = JSON.parse(JSON.stringify(obj))
+                                  newObj.value = neg;
+                                  ORDER_FLOW.NEGATIVELOG.push(newObj);
+                                }
+                              }else{
+                                
+                                ORDER_FLOW.hasNegative = true;
+                                var newObj = JSON.parse(JSON.stringify(obj))
+                                newObj.value = neg;
+                                ORDER_FLOW.NEGATIVELOG.push(newObj);
+                             }
                 }
                 }
            
@@ -198,10 +266,79 @@ function CheckUnbranded(data) {
         ORDER_FLOW.LOG.push(obj);
         ORDER_FLOW.LOGARR.push([label, data.bottles]);
         if (neg < 0) {
-                    ORDER_FLOW.hasNegative = true;
-                    var newObj = JSON.parse(JSON.stringify(obj))
-                    newObj.value = neg;
-                    ORDER_FLOW.NEGATIVELOG.push(newObj);
+             if(data.useBothLabels && data.ppb){
+                                 var total = data.bottles  ;
+                                 var remaining  =  data.bottles   + neg
+                                 var prods = base.getData('References/ProductCodes/'+data.productcode);
+                                 var printBotLabelSku = prods.botlabelsku;
+                                if(printBotLabelSku){
+                                  var neg2 = fromRunningtoReserved('Labels/' + printBotLabelSku, remaining);
+                                  
+                                  if(neg2 <0){
+                                  
+                                  fromReservedToRunning('Labels/' + printBotLabelSku, remaining)
+                                  ORDER_FLOW.hasNegative = true;
+                                  var newObj = JSON.parse(JSON.stringify(obj))
+                                  newObj.value = neg;
+                                  ORDER_FLOW.NEGATIVELOG.push(newObj);
+                                  }else{
+                                    
+                                    var obj = {
+                                      displayGroup: 'Labels',
+                                      tab: 'Labels',
+                                      sku: data.botlabelsku,
+                                      name: data.botlabel,
+                                      value: data.bottles   - remaining
+                                    }
+                                    data.used[  data.used.length - 1] =  ['Labels/', label, data.bottles  - remaining];
+                                    ORDER_FLOW.LOG[ ORDER_FLOW.LOG.length - 1]= obj;
+                                    ORDER_FLOW.LOGARR[ ORDER_FLOW.LOGARR.length - 1] = [data.packlabelsku,  data.bottles  - remaining];
+                                    
+                                    
+                                    
+                                  data.used.push(['Labels/',printBotLabelSku, remaining]);
+                                  fromReservedToRunning('Labels/' + data.botlabelsku, remaining)
+                                  var obj = {
+                                    displayGroup: 'Labels',
+                                    tab: 'Labels',
+                                    sku: printBotLabelSku,
+                                    name: prods.botlabel,
+                                    value: remaining
+                                  }
+                                  ORDER_FLOW.LOG.push(obj);
+                                  ORDER_FLOW.LOGARR.push([printBotLabelSku,remaining]);
+                                    
+                                    ORDER_FLOW.USAGE.PreBottleLabel = {
+                                      sku: data.botlabelsku,
+                                      name: data.botlabel,
+                                      qty: data.bottles - remaining
+                                    };
+                                    ORDER_FLOW.USAGE.BottleLabel = {
+                                      sku: printBotLabelSku,
+                                      name:prods.botlabel,
+                                      qty: remaining
+                                    };
+                                               var datLabels = {
+                                         botlabelprintingSku:printBotLabelSku,
+                                         botlabelprintingValue:remaining,
+                                        }
+                                        base.updateData('Orders/' + data.batch, datLabels);
+                                  }
+                                  
+                                
+                                }else{
+                                   ORDER_FLOW.hasNegative = true;
+                                  var newObj = JSON.parse(JSON.stringify(obj))
+                                  newObj.value = neg;
+                                  ORDER_FLOW.NEGATIVELOG.push(newObj);
+                                }
+                              }else{
+                                
+                                ORDER_FLOW.hasNegative = true;
+                                var newObj = JSON.parse(JSON.stringify(obj))
+                                newObj.value = neg;
+                                ORDER_FLOW.NEGATIVELOG.push(newObj);
+                             }
                 }
         var unbrandedstock = base.getData("UnbrandedTypes/" + unbranded);
         var pom1 = unbrandedstock.Reserved;

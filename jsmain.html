@@ -728,6 +728,7 @@ edit_flavour_mix_order=true;
             orderID:orderID,
             ppp:$('#prePrintedPackLabels').is(":checked"),
             ppb:$('#prePrintedBottleLabels').is(":checked"),
+            useBothLabels:$('#useBothLabels').is(":checked"),
             checkUncolored:$('#checkUncolored').is(":checked"),
         };
         
@@ -1240,6 +1241,8 @@ edit_flavour_mix_order=true;
           generateSafetyReportsSingle(href.substr(9, href.length));
         }else if(href.substr(0,8) == '#orderID'){
           selectNotesForBatch(href.substr(8, href.length));
+        }else if(href.substr(0,17) == '#createQuickPrint'){
+          createQuickPrint(href.substr(17, href.length));
         }
 
         return false;
@@ -1667,6 +1670,9 @@ edit_flavour_mix_order=true;
         if(dataold.ppb){
         $('#prePrintedBottleLabels').prop('checked', true);
         }
+          if(dataold.useBothLabels){
+        $('#useBothLabels').prop('checked', true);
+        }
         if (dataold.bottles) {
             $('#numBottles').val(dataold.bottles);
         } else {
@@ -1738,14 +1744,14 @@ var flavmixArr = [];
     }
         var flavkeys= flavmixArr.map(function(item){ return item.key;});
          var flavHeads= flavmixArr.map(function(item){ return item.head;});
-    var keys=['menu','notes','move','final_status','priority','batch','orderID','brand','productcode','productdescription','recipe.name','flavour.name','orderdate','QTY','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded'];
+    var keys=['menu','notes','move','final_status','priority','batch','orderID','brand','productcode','productdescription','recipe.name','flavour.name','orderdate','QTY','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded','backedByPrimaryFlavour'];
 
     keys = keys.concat(flavkeys);
     var keys_remaining = ['mixing','premixed','unbranded','branded','backtubed'];
     keys = keys.concat(keys_remaining);
     
     var heads = ['Menu', 'Notes', 'Move', 'Completed', 'Priority', 'Batch', 'Order ID', 'Brand', 'Code', 'Description', 'Recipe', 'Flavour','Order Date',
-        'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix ammount needed (MG)'];
+        'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix amount needed (MG)','Primary Flavour Mix Amount from Stock'];
      heads = heads.concat(flavHeads);
    var heads_remaining = [ 'Backed By Mixing', 'Backed By Premix', 'Backed By Unbranded', 'Backed By Branded',
         'Backed By Branded Packaged'
@@ -2174,14 +2180,14 @@ var flavmixArr = [];
     }
     var flavkeys= flavmixArr.map(function(item){ return item.key;});
     var flavHeads= flavmixArr.map(function(item){ return item.head;});
-   var keys=['menu','move','Completed','priorities','prodDate','batches','customers','orderIDs','brands','MIXNAME','RECIPE','FLAVOUR','orderDates','QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded'];
+   var keys=['menu','move','Completed','priorities','prodDate','batches','customers','orderIDs','brands','MIXNAME','RECIPE','FLAVOUR','orderDates','QTYTOTAL','VGval','AGval','PGval','Nico','Nicosalts','CBDvalue','MCTval','flavvalue','isFlavourMix','mixAmountNeeded','backedByPrimaryFlavour'];
          
     keys = keys.concat(flavkeys);
     var keys_remaining = ['Notes','Location','factory','starttime','CompletionDate','vgSupplier','pgSupplier','nicSupplier','flavSupplier'];
     keys = keys.concat(keys_remaining);
     
     var heads = ['Menu', 'Move', 'Completed', 'Priority','Date of Production', 'Batch','Customers', 'Order IDs', 'Brands', 'Mix Batch Code', 'Recipe', 'Flavour','Order Date',
-    'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix ammount needed (MG)'];
+    'QTY(Litres)', 'VG (MG)', 'AG (MG)', 'PG (MG)', 'Nicotine (MG)', 'Nicotine Salts (MG)', 'CBD (MG)', 'MCT (MG)', 'Flavour (MG)','IS FLAVOUR MIX','Mix amount needed (MG)','Primary Flavour Mix Amount from Stock'];
     heads = heads.concat(flavHeads);
     var heads_remaining = [ 'Notes - Mixing Dept', 'Location', 'Factory', 'Start Date',  'Completion Date','VG supplier batch','PG supplier batch','Nicotine supplier batch','Flavour supplier batch' ];
      heads = heads.concat(heads_remaining);
@@ -2654,7 +2660,8 @@ html += '<td><button page="Production" batch="'+data[i].batch+'" onclick="moveUp
             if (data[i].movedtoNext == 0) {
                 html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#PrintingMoveNext' + data[i].batch + '">Line Item Move</a>';
             }
-                            html += '<a class="dropdown-item" onclick="return menuClick(this);" id="select'+data[i].batch+'" href="#select' + data[i].batch + '">Select</a>';
+             html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#createQuickPrint' + data[i].batch + '">Create Quick Print</a>';
+            html += '<a class="dropdown-item" onclick="return menuClick(this);" id="select'+data[i].batch+'" href="#select' + data[i].batch + '">Select</a>';
 
             html += '<a class="dropdown-item" onclick="return menuClick(this);" href="#deletePrinting' + data[i].batch + '">Delete</a>';
         
@@ -3058,11 +3065,21 @@ $('#rowsTotal'+thisPage).html(rowsTotal);
     }
 
     function populateQTYTable(data,page) {
-  
-       
-        var html = '';
+    if(page == 'Flavours'){
+    var header = ['Row','SKU','Menu','Name','Supplier SKU','Supplier Name','Running','Reserved','Completed','Stock on Order'];
+    var keys = ['row','sku','menu','name','supplierSKU','supplierName','Running','Reserved','Completed','Stock']
+    }else{
+    var header = ['Row','SKU','Menu','Name','Running','Reserved','Completed','Stock on Order'];
+    var keys = ['row','sku','menu','name','Running','Reserved','Completed','Stock']
+    } 
+    var html = '';
     
-        html += '<table class="table"><thead><tr><th>Row</th><th>SKU</th><th>Menu</th><th>Name</th><th>Running</th><th>Reserved</th><th>Completed</th><th>Stock on Order</th></tr></thead>';
+        html += '<table class="table"><thead><tr>';
+        header.map(function(key){
+          html += '<th>'+key+'</th>';
+        });
+        
+        html+='</tr></thead>';
         html += '<tbody>';
         for (var i = 0; i < data.length; i++) {
         try{
@@ -3082,11 +3099,17 @@ $('#rowsTotal'+thisPage).html(rowsTotal);
             if(isNaN(data[i].Completed)){
             data[i].Completed=0;
             }
+            
+            if(isNaN(data[i].Stock)){
+            data[i].Stock=0;
+            }
             html += '<tr>';
-            html += '<td>' + i + '</td>';
-            html += '<td>' + data[i].sku + '</td>';
-         
-            html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
+            
+            keys.map(function(key){
+            if(key == 'row'){
+              html += '<td>' + i + '</td>';
+            }else if(key == 'menu'){
+                html += '<td><div class="dropdown"><button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button><div class="dropdown-menu" aria-labelledby="dropdownMenuButton">';
 
             if(page=='BrandedTypes'||page=='UnbrandedTypes'||page=='PremixesTypes'||page=='Packages'||page=='Labels'||page=='Boxes'||page=='Flavours'||page=='BottleTypes'||page=='Lids'||page=='Color'){
             html += '<a class="dropdown-item" onclick="return menuClick(this);" data-toggle="modal" data-target="#myModal4" page="'+page+'" href="#editQTY' + data[i].sku + '">Edit</a>';
@@ -3099,15 +3122,22 @@ $('#rowsTotal'+thisPage).html(rowsTotal);
             html += '<a class="dropdown-item" onclick="return menuClick(this);" data-toggle="modal" data-target="#myModal4" page="'+page+'" href="#editQTY' + data[i].name + '">Edit</a></div></div></td>';
             
             }
-            if(page=='Flavours'||page=='PremixesTypes'){
-            html += '<td>' + data[i].name + '</td><td>' + parseFloat(data[i].Running).toFixed(2) + '</td><td>' + parseFloat(data[i].Reserved).toFixed(2) + '</td><td>' + parseFloat(data[i].Completed).toFixed(2) + '</td>';
+            }else if(key =='Running' ||key =='Reserved'||key =='Completed' ||key =='Stock' ){
+               if(page=='Flavours'||page=='PremixesTypes'){
+                   html += '<td>' + parseFloat(data[i][key]).toFixed(2)  + '</td>';
+               }else{
+                   html += '<td>' + data[i][key] + '</td>';
+               }
+          
             }else{
-            html += '<td>' + data[i].name + '</td><td>' + data[i].Running + '</td><td>' + data[i].Reserved + '</td><td>' + data[i].Completed + '</td>';
-
+              html += '<td>' +(typeof data[i][key] === 'undefined' ? '' : data[i][key])+ '</td>';
             }
-            if(data[i].Stock){
-            html+='<td>' + data[i].Stock + '</td></tr>';
-            }else{html+='<td>0</td></tr>';}
+            
+            });
+            
+            html+='</tr>';
+            
+        
             
         }catch(e){console.log(data[i],e);}
         }
@@ -3115,10 +3145,7 @@ $('#rowsTotal'+thisPage).html(rowsTotal);
         $("#updating").css("display", "none");
         console.log('done');
         $('#QTYbody').html(html);
-        
-
-
-
+         
     }
    
 var editpage;
@@ -3153,12 +3180,21 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
         html += '<td><div class="input-group"><input type="text" id="Reserved" class="form-control"  aria-describedby="sizing-addon1"></div></td>';
         html += '<td><div class="input-group"><input type="text" id="Completed" class="form-control" aria-describedby="sizing-addon1"></div></td></tr>';
 
+     if(page === 'Flavours'){
+      html += '<tr><td><h4>Supplier Name</h4></td><td><h4>Supplier SKU</h4></td></tr>';
+        html += '<tr><td><div class="input-group"><input type="text" id="supplierName" class="form-control" aria-describedby="sizing-addon1"></div></td>';
+          html += '<td><div class="input-group"><input type="text" id="supplierSKU" class="form-control" aria-describedby="sizing-addon1"></div></td></tr>';
+     }
     html+='</table>';
         $('.modal-body4').html(html);
         $('#Completed').val(data.Completed);
         $('#Running').val(data.Running);
         $('#Reserved').val(data.Reserved);
         $('#qtyname').val(data.name);
+        if(page === 'Flavours'){
+        $('#supplierName').val(data.supplierName);
+        $('#supplierSKU').val(data.supplierSKU);
+        }
 
 
     }
@@ -3183,6 +3219,10 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
             name:name,
 
         };
+          if(editpage === 'Flavours'){
+               obj.supplierName  = $('#supplierName').val();
+               obj.supplierSKU  = $('#supplierSKU').val();
+          }
         console.log(obj);
         google.script.run.withSuccessHandler(populateQTYTab).updatesingleQTY(dataname,editpage, obj);
 
@@ -3307,7 +3347,9 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
 
     $('#subflavourForm').on('click', function(e) {
         var name = $('#flavName').val();
-        google.script.run.withSuccessHandler(newbasicitemsuccess).newBasicItem(name, 'Flavours');
+         var supplierSKU = $('#supplierSKU').val();
+          var supplierName = $('#supplierName').val();
+        google.script.run.withSuccessHandler(newbasicitemsuccess).newBasicItem({name:name,supplierSKU:supplierSKU,supplierName:supplierName}, 'Flavours');
     });
     
     $('#subflavourmixForm').on('click', function(e) {
@@ -6123,6 +6165,7 @@ if (r == true) {
 }
 return false;
 }
+
 var htmlModalType;
 var modalclosed=true;
 var loopTimeout=0;
@@ -6133,6 +6176,7 @@ try{
 loopTimeout=0;
 var data=rett[0];
 var type=rett[1];
+console.log({data:data,type:type});
 htmlModalType=type;
 BUILD_HTML_MODAL_DATA=data;
 var built='';
@@ -6187,6 +6231,9 @@ switch (type){
     break;
     case 'AllocationScreen':
     built= buildAllocationScreen(data);
+    break;
+    case 'createQuickPrint':
+    built= buildcreateQuickPrintScreen(data);
     break;
   default:
 
@@ -6800,7 +6847,7 @@ function buildFillTimeManagement(data){
 var html='';
 
 html+='<div>';
-html+='<p>Please write in the ammount of time in <b>minutes.</b> Ex. 30ml: 1.5 </p>';
+html+='<p>Please write in the amount of time in <b>minutes.</b> Ex. 30ml: 1.5 </p>';
 html+='<table class="table"><head>';
 html+='<tr><th>Fill</th><th>Time</th><th></th></tr></head>';
 html+='<body>';
@@ -7754,6 +7801,7 @@ google.script.run.withSuccessHandler(buildhtmlmodal).getBatchesForAllocation();
 }
 
 
+
 function buildAllocationScreen(data){
 
 var html = '';
@@ -7798,14 +7846,14 @@ console.log('explicit',explicit);
 //}
 //}else{
  if(ind === -1){
-SELECTED_ORDER_ID_ALLOCATION.push(orderID);
+SELECTED_ORDER_ID_ALLOCATION.push(orderID || 'Unspecified');
  
-$(".orders_allocation-header."+orderID).each(function(){
+$(".orders_allocation-header."+(orderID || 'Unspecified')).each(function(){
 $(this).addClass('selected');
 })
 }else{
 SELECTED_ORDER_ID_ALLOCATION = SELECTED_ORDER_ID_ALLOCATION.filter(function(item){ return item != orderID});
-$(".orders_allocation-header."+orderID).each(function(){
+$(".orders_allocation-header."+(orderID || 'Unspecified')).each(function(){
 $(this).removeClass('selected');
 })
 }
@@ -7816,7 +7864,7 @@ renderSelectedOrderIDsAllocation();
 
 function toggleOrderIDAllocationClick(event){
 var orderID =  $(event).attr('orderID');
-toggleOrderIDAllocation(orderID);
+toggleOrderIDAllocation((orderID || 'Unspecified'));
 }
 
 function renderSelectedOrderIDsAllocation(){
@@ -7837,7 +7885,7 @@ $("#selected_orders_allocation").html(html);
 
 function buildOrdersGrids(data){
  var html ='';
- console.log('data',data);
+ 
  data.map(function(item){
  html+='<h3>'+item.page+'</h3>';
  html+='<div  style="overflow-y:auto;" id="orders_allocation_'+item.page+'"  class="orders_allocation">';
@@ -7845,7 +7893,12 @@ function buildOrdersGrids(data){
  var orderNums = { 
 // 'No Order Id':[]
 };
+ 
  item.batches.map(function(batch){
+ if(!batch.orderID){
+ batch.orderID = 'Unspecified';
+ }
+ 
    if(batch.orderID && item.page!='MixingTeam'){
      if(!orderNums[batch.orderID]){
        orderNums[batch.orderID] = [];
@@ -7854,8 +7907,9 @@ function buildOrdersGrids(data){
    }else if(batch.orderID && item.page=='MixingTeam'){
    if(batch.Batches){
    var orderIDs = Object.keys(batch.Batches).map(function(id){
-   return batch.Batches[id].orderID;
+   return batch.Batches[id].orderID || 'Unspecified';
    });
+ 
    console.log('buildOrdersGrids orderIDs',orderIDs);
     if(!orderNums[orderIDs.join('_')]){
        orderNums[orderIDs.join('_')] = [];
@@ -7864,17 +7918,23 @@ function buildOrdersGrids(data){
    }
    
    }else{
+   console.log('noorderid',batch);
+   if(!orderNums['Unspecified']){
+    orderNums['Unspecified'] = [];
+   }
     orderNums['Unspecified'].push(batch);
    }
  });
  
+ console.log('orderNums',orderNums);
  Object.keys(orderNums).map(function(orderID){
- var batches = orderNums[orderID];
+ 
+ var batches = orderNums[(orderID || 'Unspecified')];
  if(batches.length){
- html+='<div class="orders_allocation-header '+orderID.replace(/_/gm,', ')+'" orderID="'+orderID+'" onclick="toggleOrderIDAllocationClick(this)"><span>'+orderID+'</span></div>';
+ html+='<div class="orders_allocation-header '+(orderID || 'null').replace(/_/gm,', ')+'" orderID="'+(orderID || 'Unspecified')+'" onclick="toggleOrderIDAllocationClick(this)"><span>'+(orderID || 'Unspecified')+'</span></div>';
   batches.map(function(batch){
  var id = item.page === 'MixingTeam' ? batch.MIXNAME : batch.batch;
-  html+='<div id="orders_allocation-item_'+item.page+'_'+id+'" class="'+orderID+' orders_allocation-item '+(batch.isShown ? 'isShown' : '')+'" isShown = "'+(batch.isShown)+'" batch="'+id+'" page="'+item.page+'" onclick="toggleIsShownAllocation(this)">';
+  html+='<div id="orders_allocation-item_'+item.page+'_'+id+'" class="'+(orderID || 'null')+' orders_allocation-item '+(batch.isShown ? 'isShown' : '')+'" isShown = "'+(batch.isShown)+'" batch="'+id+'" page="'+item.page+'" onclick="toggleIsShownAllocation(this)">';
     if(item.page == 'MixingTeam'){
        html+='<span>'+batch.MIXNAME+'</span><span>'+ (batch.Batches ? Object.keys(batch.Batches).join(','): "NO BATCHES" )+'</span><span>'+batch.RECIPE+'</span><span>'+batch.QTYTOTAL+' L</span><span id="swich_visibility">'+(batch.isShown? 'VISIBLE' : 'HIDDEN')+'</span>';
     }else if(item.page == 'Mixing'){
@@ -7905,6 +7965,9 @@ var action =  $("#allocation-orders-action-select").val() != 'Show All';
 var orders = [];
 BUILD_HTML_MODAL_DATA.map(function(item){
  item.batches.map(function(batch){
+  if(!batch.orderID){
+ batch.orderID = 'null';
+ }
  var id = item.page === 'MixingTeam' ? batch.MIXNAME : batch.batch;
    if(batch.orderID && item.page!='MixingTeam' && SELECTED_ORDER_ID_ALLOCATION.indexOf(batch.orderID) > -1){
  
@@ -7959,5 +8022,42 @@ $("#orders_allocation-item_"+resp.page+"_"+resp.batch +' #swich_visibility').htm
 
 function sterilizeString(str){
 return str.replace(/[^0-9a-z]/gi, '_')
+}
+
+
+function createQuickPrint(batch){
+buildhtmlmodal([{batch:batch,quickPrintValue:0},'createQuickPrint']);
+}
+
+
+function buildcreateQuickPrintScreen(data){
+var html = '';
+html+='<div class="container">\
+<div>\
+<h3>Quick Print Labels for:'+data.batch+'</h3>\
+<br />\
+<div class="form-group">\
+<label for="quickPrintBottleAmount">Labels to print</label> \
+<input type="number" placeholder="500"  class="form-control" id="quickPrintBottleAmount" value="'+data.quickPrintValue+'" />\
+</div>\
+<br />\
+<br />\
+<div class="row">\
+<div class="col" >\
+<button  type="button" class="btn btn-primary" batch ="'+data.batch+'" onclick="createQuickPrintBatch(this)" >Submit</button>\
+</div>\
+</div>\
+</div>';
+
+return html;
+}
+
+function createQuickPrintBatch(event){
+var batch = $(event).attr('batch');
+var value = parseInt($('#quickPrintBottleAmount').val(),10);
+ google.script.run.withSuccessHandler(function(msg){
+ saveMessage(msg);
+ filterpage('xx',true);
+ }).createQuickPrintBatch(batch,value);
 }
 </script>

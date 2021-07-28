@@ -435,7 +435,7 @@ function printxero(SELECTED){
      var PC = base.getData("References/ProductCodes/"+data[i].productcode);
     shipItem = shipItem? shipItem : {}
       values.push([data[i].customer,'','','','','','','','','',data[i].orderID,shipItem.SHIPPINGCODE || "",shipItem.dateshipped || '',shipItem.dateshipped || '','',
-                   data[i].productcode,data[i].productdescription,data[i].bottles,PC.price || '','','212 - Sales of Product Income','20% (VAT on Income)']);
+                   data[i].productcode,data[i].productdescription,data[i].bottles,PC.price || '','','200','20% (VAT on Income)']);
       
     }
     
