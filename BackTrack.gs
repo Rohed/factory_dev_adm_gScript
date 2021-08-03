@@ -476,7 +476,7 @@ function updateOrder(batch, bottles, sheet, originalItem) {
 }
 //REVERSE DELETION
 function TESTREVERSEINFO() {
-    getBatchInfo(['918709']);
+    getBatchInfo(['940748'],'deleteandreverse');
 }
 
 function getBatchInfo(batches, key) {
@@ -546,9 +546,9 @@ function getBatchInfo(batches, key) {
 }
 
 function testDELANREV() {
-//var batchInfo = getBatchInfo(['918709'],'deleteandreverse')[0];
+ var batchInfo = getBatchInfo(['940793PO'],'deleteandreverse')[0];
 //base.updateData('batchInfo',{'info':JSON.stringify(batchInfo)});
-var batchInfo = JSON.parse(base.getData('batchInfo/info'))
+//var batchInfo = JSON.parse(base.getData('batchInfo/info'))
 Logger.log(batchInfo);
 deleteAndReverse(batchInfo, 'deleteandreverse')
 }
@@ -559,20 +559,27 @@ function deleteAndReverse(data, key) {
     for (var i = 0; i < sheets.length; i++) {
         var raw = base.getData(sheets[i]);
         for (var j = 0; j < data.length; j++) {
+          try{
             var item = data[j];
             if (sheets[i] == 'MixingTeam') {
                 var sheetItem = JSONtoARR(raw);
             } else {
               var sheetItem = raw ? raw[data[j][0]] : false;
             }
-            reverseLineItemMove(item, base.getData('Orders/' + data[j][0]), sheetItem, sheets[i], key);
-        }
+            var order =  base.getData('Orders/' + data[j][0])
+            if(order){
+              reverseLineItemMove(item,order, sheetItem, sheets[i], key);
+            } 
+          }catch(e){
+            Logger.log('Failed to reverse:'+sheets[i]+' '+ data[j][0])
+          }
+        } 
     }
     var removed = [];
     for (var j = 0; j < data.length; j++) {
         removed.push(data[j][0]);
     }
-    if (key == 'delete') {
+    if (key == 'deleteandreverse') {
         return 'Removed: ' + removed.join(', ');
     } else {
         return 'Reversed: ' + removed.join(', ');
@@ -580,9 +587,7 @@ function deleteAndReverse(data, key) {
 }
 
 function reverseLineItemMove(sheetItem, order, item, sheet, key) {
-    Logger.log(item);
-    Logger.log(order);
-    Logger.log(sheetItem);
+ 
     //   var suffix = sheetItem[0].replace(/[^a-zA-Z]+/g, '');
     if (sheet == 'Packaging' && sheetItem[6][0] == 'Not Run') {
         var brandname = getBrandName(order, false);
@@ -1046,7 +1051,7 @@ function reverseLineItemMove(sheetItem, order, item, sheet, key) {
         base.removeData('Labelling/' + sheetItem[0]);
         base.removeData('Packaging/' + sheetItem[0]);
         base.removeData('Shipping/' + sheetItem[0]);
-        if (key == 'delete') {
+        if (key == 'deleteandreverse') {
             LogDARTransaction(sheetItem[0]);
             base.removeData('Orders/' + sheetItem[0]);
         } else {
