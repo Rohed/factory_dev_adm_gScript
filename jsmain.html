@@ -6234,6 +6234,12 @@ switch (type){
     break;
     case 'createQuickPrint':
     built= buildcreateQuickPrintScreen(data);
+    case 'promptModal':
+    built= buildPromptModal(data);
+    case 'confirmModal':
+    built= buildConfirmModal(data);
+    case 'alertModal':
+    built= buildAlertModal(data);
     break;
   default:
 
@@ -8060,4 +8066,57 @@ var value = parseInt($('#quickPrintBottleAmount').val(),10);
  filterpage('xx',true);
  }).createQuickPrintBatch(batch,value);
 }
+
+//
+// case 'promptModal':
+//    built= buildPromptModal(data);
+//    case 'confirmModal':
+//    built= buildConfirmModal(data);
+//    case 'alertModal':
+//    built= buildAlertModal(data);
+function testModalPrompt(){
+
+}
+
+function testModalConfirm(){
+
+}
+function testModalAlert(){
+buildhtmlmodal(['This asdasdsadis an alert.','alertModal']);
+}
+function alert(msg){
+buildhtmlmodal([msg,'alertModal']);
+}
+
+function buildPromptModal(data){
+
+}
+
+
+function buildConfirmModal(data){
+
+}
+
+
+function buildAlertModal(msg){
+var html = '';
+html+='<div class="container">\
+<div>\
+<br />\
+<div class="form-group">\
+<h4>'+msg+'</h4>\
+</div>\
+<br />\
+<br />\
+<div class="row">\
+<div class="col" >\
+<button  type="button" class="btn btn-primary"onclick="closemainmodal()" >OK</button>\
+</div>\
+</div>\
+</div>';
+
+return html;
+}
+
+
 </script>

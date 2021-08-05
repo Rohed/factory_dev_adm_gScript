@@ -342,8 +342,8 @@ function fromPackaging(batch, bottles) {
     var order = base.getData('Orders/' + batch);
     var packagingData = base.getData('Packaging/' + batch);
     var ORIGBOTTLES = packagingData.bottles;
-    var removeFromProduction = ORIGBOTTLES - bottles;
-    var packagingData = base.getData('Packaging/' + batch);
+    packagingData = JSON.parse(JSON.stringify(packagingData));
+    var removeFromProduction = ORIGBOTTLES - bottles; 
     if (packagingData) {
         if (packagingData.movedtoNext == 0) {
             var origbottles = packagingData.bottles;
@@ -546,7 +546,9 @@ function getBatchInfo(batches, key) {
 }
 
 function testDELANREV() {
- var batchInfo = getBatchInfo(['940793PO'],'deleteandreverse')[0];
+  
+  //940748  and 940793PO,940748,940793PO,941863
+ var batchInfo = getBatchInfo(['941863'],'deleteandreverse')[0];
 //base.updateData('batchInfo',{'info':JSON.stringify(batchInfo)});
 //var batchInfo = JSON.parse(base.getData('batchInfo/info'))
 Logger.log(batchInfo);
@@ -695,11 +697,24 @@ function reverseLineItemMove(sheetItem, order, item, sheet, key) {
         var tubes = botQ2 / tube;
         var box = tubes / packData.divTubesForBox;
         if (tube) {
-            if (item.packlabelsku != "" && item.packlabelsku != undefined) {
-                fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
+            if (item.packlabelsku != "" && item.packlabelsku != undefined) { 
+              
+                if (order.ppp && order.useBothLabels && order.packlabelprintingValue) {
+                    fromReservedToRunning('Labels/' + item.packlabelsku, tubes - order.packlabelprintingValue);
+                    fromReservedToRunning('Labels/' + order.packlabelprintingSku, order.packlabelprintingValue);
+                } else {
+                    fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
+                }
             }
+        } 
+         
+       if (order.ppb && order.useBothLabels && order.botlabelprintingValue) {
+            fromReservedToRunning('Labels/' + label, item.bottles - order.botlabelprintingValue);
+            fromReservedToRunning('Labels/' + order.botlabelprintingSku, order.botlabelprintingValue);
+        } else {
+            fromReservedToRunning('Labels/' + label, item.bottles);
         }
-        fromReservedToRunning('Labels/' + label, item.bottles);
+
         var suffix = order.batch.substr(-1);
         var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
         if (for_branded_stock) {
@@ -743,11 +758,23 @@ function reverseLineItemMove(sheetItem, order, item, sheet, key) {
         var tubes = botQ2 / tube;
         var box = tubes / packData.divTubesForBox;
         if (tube) {
-            if (item.packlabelsku != "" && item.packlabelsku != undefined) {
-                fromCompletedToRunning('Labels/' + item.packlabelsku, tubes);
+            if (item.packlabelsku != "" && item.packlabelsku != undefined) { 
+                 if (order.ppp && order.useBothLabels && order.packlabelprintingValue) {
+                    fromCompletedToRunning('Labels/' + item.packlabelsku, tubes - order.packlabelprintingValue);
+                    fromCompletedToRunning('Labels/' + order.packlabelprintingSku, order.packlabelprintingValue);
+                } else {
+                    fromCompletedToRunning('Labels/' + item.packlabelsku, tubes);
+                }
             }
         }
-        fromCompletedToRunning('Labels/' + label, item.bottles);
+      
+       if (order.ppb && order.useBothLabels && order.botlabelprintingValue) {
+            fromCompletedToRunning('Labels/' + label, item.bottles - order.botlabelprintingValue);
+            fromCompletedToRunning('Labels/' + order.botlabelprintingSku, order.botlabelprintingValue);
+        } else {
+            fromCompletedToRunning('Labels/' + label, item.bottles);
+        }
+      
         var suffix = order.batch.substr(-1);
         var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
         if (for_branded_stock) {
@@ -794,11 +821,23 @@ function reverseLineItemMove(sheetItem, order, item, sheet, key) {
         var tubes = botQ2 / tube;
         var box = tubes / packData.divTubesForBox;
         if (tube) {
-            if (item.packlabelsku != "" && item.packlabelsku != undefined) {
-                fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
+            if (item.packlabelsku != "" && item.packlabelsku != undefined) { 
+                 if (order.ppp && order.useBothLabels && order.packlabelprintingValue) {
+                    fromReservedToRunning('Labels/' + item.packlabelsku, tubes - order.packlabelprintingValue);
+                    fromReservedToRunning('Labels/' + order.packlabelprintingSku, order.packlabelprintingValue);
+                } else {
+                    fromReservedToRunning('Labels/' + item.packlabelsku, tubes);
+                }
             }
         }
-        fromReservedToRunning('Labels/' + label, item.bottles);
+      
+        if (order.ppb && order.useBothLabels && order.botlabelprintingValue) {
+            fromReservedToRunning('Labels/' + label, item.bottles - order.botlabelprintingValue);
+            fromReservedToRunning('Labels/' + order.botlabelprintingSku, order.botlabelprintingValue);
+        } else {
+            fromReservedToRunning('Labels/' + label, item.bottles);
+        } 
+      
         var suffix = order.batch.substr(-1);
         var for_branded_stock = suffix == BRANDED_STOCK_SUFFIX ? true : false;
         if (for_branded_stock) {
@@ -914,12 +953,29 @@ function reverseLineItemMove(sheetItem, order, item, sheet, key) {
                 MixingGroups.push([item[m].Batches[sheetItem[0]], item[m].movedtoNext, item[m]])
             }
         }
+      
+       var flavourMixCodes = getFlavourMixCodes();
+      
         for (var m = 0; m < MixingGroups.length; m++) {
             var batchitem = MixingGroups[m][0];
             var status = MixingGroups[m][1];
             var mixbatch = MixingGroups[m][2];
             if (status == 0) {
-                fromReservedToRunning("Flavours/" + batchitem.flavour.sku, batchitem.flavvalue * batchitem.QTY / 1000);
+               
+              if (batchitem.isFlavourMix) {
+                var valueFromFlavour = fixValue(batchitem.flavvalue - batchitem.mixAmountNeeded)
+                if (valueFromFlavour) {
+                  fromReservedToRunning("Flavours/" + batchitem.flavour.sku, valueFromFlavour * batchitem.QTY / 1000); 
+                }
+                for (var f = 0; f < flavourMixCodes.length; f++) {
+                  if (batchitem[flavourMixCodes[f].val]) {
+                    fromReservedToRunning("Flavours/" + batchitem[flavourMixCodes[f].sku], batchitem[flavourMixCodes[f].val] * batchitem.QTY / 1000); 
+                  }
+                }
+              } else {
+                fromReservedToRunning("Flavours/" + batchitem.flavour.sku, batchitem.flavvalue * batchitem.QTY / 1000); 
+              }
+              
                 fromReservedToRunning("Misc/VG", batchitem.VGval * batchitem.QTY);
                 if (isNaN(batchitem.AGval)) {
                     batchitem.AGval = 0;
@@ -955,7 +1011,22 @@ function reverseLineItemMove(sheetItem, order, item, sheet, key) {
                     }
                 }
             } else if (status == 1) {
-                fromCompletedToRunning("Flavours/" + batchitem.flavour.sku, batchitem.flavvalue * batchitem.QTY / 1000);
+                
+                 if (batchitem.isFlavourMix) {
+                var valueFromFlavour = fixValue(batchitem.flavvalue - batchitem.mixAmountNeeded)
+                if (valueFromFlavour) {
+                  fromCompletedToRunning("Flavours/" + batchitem.flavour.sku, valueFromFlavour * batchitem.QTY / 1000); 
+                }
+                for (var f = 0; f < flavourMixCodes.length; f++) {
+                  if (batchitem[flavourMixCodes[f].val]) {
+                    fromCompletedToRunning("Flavours/" + batchitem[flavourMixCodes[f].sku], batchitem[flavourMixCodes[f].val] * batchitem.QTY / 1000); 
+                  }
+                }
+              } else {
+                fromCompletedToRunning("Flavours/" + batchitem.flavour.sku, batchitem.flavvalue * batchitem.QTY / 1000); 
+              }
+              
+              
                 fromCompletedToRunning("Misc/VG", batchitem.VGval * batchitem.QTY);
                 if (isNaN(batchitem.AGval)) {
                     batchitem.AGval = 0;
