@@ -201,11 +201,24 @@ function printPackagingBatches(SELECTED,force) {
 
 function testPRING(){
   
-  printShippingNote(['29046171','33269366','34217526','4383440'],1);
+  printShippingNote(['5684815'],1);
 }
 
 
 function printShippingNote(data,x){
+  
+      var LOGDATA = {
+        status: true,
+        msg: '',
+        action: 'Print Shipping Note',
+        batch: JSON.stringify(data),
+        page: 'Shipping',
+        user: Session.getActiveUser().getEmail(),
+        data: new Array()
+    };
+
+  try{
+  
   var orderIDs=[];
   var orderDates=[];
   var incomplete=[];
@@ -274,7 +287,7 @@ function printShippingNote(data,x){
             }
             orderIDs.push(list[j].orderID);
             orderDates.push(formatDateDisplay(list[j].orderdate));
-            batches.push(list[j].batch);
+          
           }else{
             incomplete.push([data[i],list[j].batch+' '+orders[list[j].batch].productcode+' '+orders[list[j].batch].productdescription,orders[list[j].batch].bottles,'',packagingData[list[j].batch].bottles]);
             
@@ -282,6 +295,7 @@ function printShippingNote(data,x){
         }else{
           incomplete.push([data[i],list[j].batch+' '+list[j].productcode+' '+list[j].productdescription,packagingData[list[j].batch] ? packagingData[list[j].batch].bottles : 0,'',packagingData[list[j].batch] ? packagingData[list[j].batch].bottles : 0]);
         }
+          batches.push(list[j].batch);
       }
       
       
@@ -348,7 +362,13 @@ function printShippingNote(data,x){
     
   }
   Logger.log(SS.getUrl());
+     LOGDATA.msg =  'Generated shipping note: '+SS.getUrl();
+     logItem(LOGDATA);
   return 'Shipping Note generated with the url:<br> <a  target="_blank" href="'+SS.getUrl()+'">'+SS.getName()+'</a>';
+  }catch(e){
+    LOGDATA.msg =  'Failed to generate shipping note: '+e.message+ ' <br> ' +e.stack;
+    return 'Failed to generate shipping note: '+e.message+ ' <br> ' +e.stack;
+  }
 }
 
 function printOrdersBatches(SELECTED){
@@ -407,9 +427,18 @@ function printOrdersBatches(SELECTED){
 }
 
 
+function getBatch(data,batch){
+  for(var i = 0; i < data.length ;i++){
+    if(data[i].batch === batch){
+      return {data:data[i],index:i};
+    }
+  }
+  return null;
+}
 
-
-
+function TESTPRINTXERO(){
+printxero(['941864','941864PO']);
+}
 
 function printxero(SELECTED){
   try{
@@ -425,12 +454,27 @@ function printxero(SELECTED){
   var data=JSONtoARR(base.getData('Orders'));
   
   var values=[];
-  
+   for(var i=0;i<data.length;i++){
+    
+    if(!data[i].recipe ){continue;}
+     if(SELECTED.indexOf(data[i].orderID)>=0){
+       if((data[i].batch.toLowerCase().match('po')||data[i].batch.toLowerCase().match('pk'))){
+         var baseBatch = data[i].batch.match(/\d+/)[0];
+         var found =  getBatch(data,baseBatch)
+         if(found){
+           data[found.index].bottles += data[i].bottles;
+         }
+         continue;
+       }
+     }
+   }
   
   for(var i=0;i<data.length;i++){
     
-    if(!data[i].recipe || (data[i].batch.toLowerCase().match('po')||data[i].batch.toLowerCase().match('pk'))){continue;}
-    if(SELECTED.indexOf(data[i].orderID)>=0){
+    if(!data[i].recipe|| (data[i].batch.toLowerCase().match('po')||data[i].batch.toLowerCase().match('pk')) ){continue;}
+       if(SELECTED.indexOf(data[i].orderID)>=0){
+  
+ 
     var shipItem = base.getData("Shipping/"+data[i].batch);
      var PC = base.getData("References/ProductCodes/"+data[i].productcode);
     shipItem = shipItem? shipItem : {}
