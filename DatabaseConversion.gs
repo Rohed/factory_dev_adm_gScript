@@ -1,3 +1,35 @@
+function migrateOrder(){
+  
+      
+    var LOGDATA = {
+      status: true,
+      msg: '',
+      action: 'Import Blank PC/PD',
+      batch: 'Spreadsheet',
+      page: 'PC/PD',
+      user: Session.getActiveUser().getEmail(),
+      data: new Array()
+    };
+  
+  
+  var oldBatch = '942364';
+  var newBatch = '942350';
+  var newOrderId = 'INV-00015264';
+  var orderdate = 1631685342895;
+  var data = base.getData("Orders/"+oldBatch);
+  var oldData = JSON.stringify(data);
+  data.batch = newBatch;
+  data.orderID = newOrderId;
+  data.orderdate = orderdate;
+  base.updateData("Orders/"+newBatch,data)
+  base.removeData("Orders/"+oldBatch)
+  LOGDATA.msg = "Converted :"+oldBatch+" to " +newBatch;
+  LOGDATA.data.push(oldData);
+  LOGDATA.data.push(JSON.stringify(data));
+  logItem(LOGDATA);
+}
+
+
 function changeBusyToInProgress(){
   var sheets=['Orders','FlavourMixOrders','Mixing','MixingTeam','FlavourMixMixingTeam','Production','Printing','Labelling','Packaging','Shipping'];
  
@@ -1588,3 +1620,5 @@ function remoAll(){
 base.removeData('References/AllItems');
 
 }
+
+
