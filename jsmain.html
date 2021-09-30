@@ -3323,10 +3323,16 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
 
    
 
-
+    
     function deleteItem(batch, tab) {
-        google.script.run.withSuccessHandler(lineItemResult).removeItem(batch, tab,'Admin');
+        if(confirm("Are you sure you want to delete " + batch + " from " +tab+"?")){
+          $("#updating").css("display", "block");        
+          google.script.run.withSuccessHandler(lineItemResult).removeItem(batch, tab,'Admin');
+        }
+        
     }
+    
+    
 
     function lineItemMove(batch, tab) {
         google.script.run.withSuccessHandler(lineItemResult).MoveItem(batch, tab,'Admin');
@@ -3339,6 +3345,7 @@ google.script.run.withSuccessHandler(buildQTYFormFromExisting).getSingleQTYData(
         console.log(LASTSEARCH);
         var current = e[1];
         selPage=current;
+        $("#updating").css("display", "none");
          google.script.run.withSuccessHandler(filterResult).searchFor(LASTSEARCH);
 
     }

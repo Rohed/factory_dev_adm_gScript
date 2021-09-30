@@ -4,7 +4,7 @@ function checkStockNew(BATCHES,escapePrint) {
     Logger.log(BATCHES);
 
     var results = [];
-//    BATCHES = ["940008"];
+    BATCHES = ["941989"];
     var requiredFlavour = 0;
     var requiredVG = 0;
     var requiredPG = 0;
@@ -128,9 +128,9 @@ function checkStockNew(BATCHES,escapePrint) {
             var usageItems = usageItemsResp.filtered;
             usageArr = usageItemsResp.newArr;
             row.push(usageItems[0].name);
-            var totalUsageValue = usageItems.reduce(function(total, item) {
+          var totalUsageValue = usageItems.reduce(function(total, item) {
                 return {
-                    value: total.value + item.value
+                    value: (total.value || 0) + (item.value || 0)
                 }
             });
             var running = tabData[usageItems[0].sku] ? tabData[usageItems[0].sku].Running ? tabData[usageItems[0].sku].Running : 0 : 0;
