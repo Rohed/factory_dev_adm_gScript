@@ -1899,7 +1899,7 @@ if(RU){
 return [RU,'Roundups'];
 
 }else{
- return  [{nic:5,cbd:1},'Roundups'];
+ return  [{nic:5,cbd:1,mix:100},'Roundups'];
 }
  
 }
@@ -1910,6 +1910,9 @@ obj.nic = 1;
 }
 if(!obj.cbd){
 obj.cbd = 1;
+}
+if(!obj.mix){
+obj.mix = 100;
 }
 base.updateData('Roundups',obj);
 return 'Saved';

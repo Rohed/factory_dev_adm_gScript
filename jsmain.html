@@ -7358,6 +7358,7 @@ html+='\
 <div style="margin:0 auto; width:500px;"><h2>Round Up Amounts</h2>';
 html+='<div  ><p> Regular: <input  class="form-control" id="roundupnic" value="'+data.nic+'"/>';
 html+='<p> CBD: <input  class="form-control" id="roundupcbd" value="'+data.cbd+'"/><div>';
+html+='<p> Mixing batch maximum: <input  class="form-control" id="roundupmix" value="'+data.mix+'"/><div>';
 html+='<hr></div>\
 <div>\
 <button type="button" class="btn btn-success sarButton" onclick="saveRoundups()">Save Current</button>';
@@ -7368,7 +7369,7 @@ function saveRoundups(){
 var obj ={
 nic:parseInt($("#roundupnic").val(),10),
 cbd:parseInt($("#roundupcbd").val(),10),
-
+mix:parseInt($("#roundupmix").val(),10),
 }
 google.script.run.withSuccessHandler(refreshOrdersMSG).updateRoundups(obj);
 

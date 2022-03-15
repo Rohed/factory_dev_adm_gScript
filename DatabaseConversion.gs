@@ -1,3 +1,27 @@
+function markShipped(){
+  var orders = ['941655'];
+  var code = '33532264';
+  var formattedDate = '10-08-2021';
+ 
+  orders.map(function(order){
+    var ord = base.getData('Orders/'+order);
+    ord.SHIPPINGCODE = code;
+    ord.dateshipped= formattedDate;
+    ord.shipping_status= 'Shipped';
+    ord.final_status= 'Completed';
+    base.updateData('Orders/'+order,ord);
+    
+       var ord = base.getData('Shipping/'+order);
+    ord.SHIPPINGCODE = code;
+    ord.dateshipped= formattedDate;
+    ord.shipping_status= 'Shipped';
+      ord.final_status= 'Completed';
+    base.updateData('Shipping/'+order,ord);
+    
+    
+  })
+}
+
 function migrateOrder(){
   
       

@@ -1,10 +1,10 @@
 function checkStockNew(BATCHES,escapePrint) {
     var failMSG = '';
-
+    
     Logger.log(BATCHES);
 
     var results = [];
-    BATCHES = ["941989"];
+ //    BATCHES = ["944668"];
     var requiredFlavour = 0;
     var requiredVG = 0;
     var requiredPG = 0;

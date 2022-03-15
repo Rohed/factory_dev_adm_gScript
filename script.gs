@@ -397,13 +397,14 @@ function createMixOrder(data) {
                 mixARR.push(result[i][1]);
             }
         }
+        var RU = getRoundups()[0];
         var SPLIT = 0;
         var splitMultiples = [];
-        if (data.QTY > 25) {
-            for (var i = 25; i < data.QTY;) {
-                splitMultiples.push(25);
+        if (data.QTY > RU.mix) {
+            for (var i = RU.mix; i < data.QTY;) {
+                splitMultiples.push(RU.mix);
                 SPLIT++;
-                data.QTY = data.QTY - 25;
+                data.QTY = data.QTY - RU.mix;
             }
             for (var i = 0; i < splitMultiples.length; i++) {
                 var newData = {
@@ -481,15 +482,15 @@ function createMixOrder(data) {
                 if ((mixARR[i].FLAVOUR == data.flavour.name) && (mixARR[i].RECIPE == data.recipe.name) && (mixARR[i].movedtoNext == 0)) {
                     var combined = mixARR[i].QTYTOTAL + data.QTY;
                     var total = mixARR[i].QTYTOTAL;
-                    if (combined <= 25) {
+                    if (combined <= RU.mix) {
                         addToOld.check = true;
                         addToOld.amount = data.QTY;
                         SPLIT++;
-                    } else if (total < 25) {
+                    } else if (total < RU.mix) {
                         addToOld.check = true;
-                        addToOld.amount = 25 - mixARR[i].QTYTOTAL;
+                        addToOld.amount = RU.mix - mixARR[i].QTYTOTAL;
                         createNew.check = true;
-                        createNew.amount = data.QTY - (25 - mixARR[i].QTYTOTAL);
+                        createNew.amount = data.QTY - (RU.mix - mixARR[i].QTYTOTAL);
                         SPLIT += 2;
                     } else {
                         continue;

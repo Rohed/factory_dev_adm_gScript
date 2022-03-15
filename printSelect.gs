@@ -214,7 +214,7 @@ function printShippingNote(data,x){
         batch: JSON.stringify(data),
         page: 'Shipping',
         user: Session.getActiveUser().getEmail(),
-        data: new Array()
+        data: [{items:JSON.stringify(data)}]
     };
 
   try{
@@ -367,6 +367,7 @@ function printShippingNote(data,x){
   return 'Shipping Note generated with the url:<br> <a  target="_blank" href="'+SS.getUrl()+'">'+SS.getName()+'</a>';
   }catch(e){
     LOGDATA.msg =  'Failed to generate shipping note: '+e.message+ ' <br> ' +e.stack;
+      logItem(LOGDATA);
     return 'Failed to generate shipping note: '+e.message+ ' <br> ' +e.stack;
   }
 }
